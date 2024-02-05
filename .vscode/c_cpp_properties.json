@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/build/external/ZeroCore/config",
+                "/home/dmitry/projects/external/SDL3/include",
+                "/home/dmitry/projects/external/glm/include",
+                "${workspaceFolder}/external/ZeroCore/src"
+            ],
+            "defines": [],
+            "cStandard": "c17",
+            "intelliSenseMode": "linux-gcc-x64",
+            "cppStandard": "c++23",
+            "compilerPath": "/usr/bin/g++"
+        }
+    ],
+    "version": 4
+}
