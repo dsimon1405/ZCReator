@@ -1,9 +1,9 @@
 #include <ZC/main/ZC_main.h>
-#include <ZC/Video/ZC_Video.h>
+#include <ZC/Video/ZC_Window.h>
 
 #include <ZC/Video/OpenGL/Shader/ZC_ShProgs.h>
 #include <ZC/Video/OpenGL/VAO/ZC_VAOs.h>
-#include <ZC/Video/OpenGL/VAO/ZC_VAOConfigs.h>
+#include <ZC/Video/OpenGL/VAO/ZC_VAOConfig.h>
 #include <ZC/Video/OpenGL/Buffer/ZC_UBOs.h>
 #include <ZC/Video/OpenGL/Buffer/ZC_Buffers.h>
 #include <ZC/Objects/Camera/ZC_Camera.h>
@@ -13,118 +13,21 @@
 #include <ZC/Tools/Math/ZC_Mat.h>
 #include <ZC/Tools/Console/ZC_cout.h>
 
-#include <ZC/Events/Button/ZC_ButtonOperator.h>
+#include <ZC/Events/ZC_Button.h>
 #include <ZC/Events/ZC_Mouse.h>
-
-#include <imgui.h>
-#include <imgui_impl_opengl3.h>
 
 #include <ZC/Objects/ZC_Object.h>
 
-#include <ZC/Video/OpenGL/Figure/ZC_Quad.h>
+#include <ZC/Tools/Math/ZC_Figures.h>
 
 #include <ZC/Video/OpenGL/Renderer/ZC_Renderer.h>
 
 #include <ZC/Video/OpenGL/Texture/ZC_Textures.h>
 #include <Ogl.h>
-#include <Objects/ZCR_Cube.h>
 
+// #include <Objects/ImGui/ZCR_ImGui.h>
+#include <Objects/Scene/ZCR_Scene.h>
 
-    float width = 800.f;
-    float height = 600.f;
-    ZC_Vec4<float> p1{0.f, -4.8f, 0.f, 1.f},
-        p2(0.f, -4.78f, 0.f, 1.f),
-        p3(1.f,-0.8f,1.f, 1.f);
-
-    ZC_Vec3<float> camPos{0.f, -5.f, 0.f};
-// x = 799.000000 = 0.997500; y = 0.000000 = 1.000000     {1.810660 2.414213 3.807808 4.000000}     {0.452665 0.603553 0.951952}     {0.452654 0.603538 0.951953}
-struct Player
-{
-    ZC_Vec3<float> position;    //  не ведись, это look on
-    float speed;
-    ZC_Camera camera;
-    ZC_Vec3<float> front {0.f, 1.f, 0.f};
-    ZC_Vec3<float> up {0.f, 0.f, 1.f};
-    ZC_Vec3<float> right {1.f, 0.f, 0.f};
-
-    float camDistance = 5.f;
-    float verticalAngle = 0.f;
-    float horizontalAngle = 0.f;
-    float sensitivity = 1.f;
-
-    Player(const ZC_Vec3<float>& _position, float _speed)
-        : position(_position),
-        speed(_speed),
-        camera(ZC_Camera({ZC_Perspective(45.f, 0.1f, 100.f), ZC_View({position[0], position[1] - 5.f, position[2]}, position, {0.f, 0.f, 1.f}, true)}, ZC_Ortho()))
-    {
-       ZC_ButtonOperator::Connect({ZC_ButtonID::K_W, ZC_Button::State::Down}, {&Player::W,this});
-       ZC_ButtonOperator::Connect({ZC_ButtonID::K_S, ZC_Button::State::Down}, {&Player::S,this});
-       ZC_ButtonOperator::Connect({ZC_ButtonID::K_A, ZC_Button::State::Down}, {&Player::A,this});
-       ZC_ButtonOperator::Connect({ZC_ButtonID::K_D, ZC_Button::State::Down}, {&Player::D,this});
-       ZC_ButtonOperator::Connect({ZC_ButtonID::K_Q, ZC_Button::State::Down}, {&Player::Q,this});
-       ZC_ButtonOperator::Connect({ZC_ButtonID::K_E, ZC_Button::State::Down}, {&Player::E,this});
-       ZC_Mouse::ConnectMove({&Player::Mouse, this});
-    }
-
-    void Move(const ZC_Vec3<float>& step) noexcept
-    {
-        position += step;
-        camera.SetLookOn(position)
-              .SetCamPos(camera.GetCamPos() + step);
-    }
-    
-    void W(float time) {Move(front * time * speed);}
-    void S(float time) {Move(front * -1 * time * speed);}
-    void A(float time) {Move(right * -1 * time * speed);}
-    void D(float time) {Move(right * time * speed);}
-    void Q(float time) {Move(up * time * speed);}
-    void E(float time) {Move(up * -1 * time * speed);}
-    void Mouse(float x, float y, float xRel, float yRel, float time)
-    {
-        // ZC_cout("x = " + std::to_string(x) + " = " + std::to_string((x / width) * 2 - 1.f) + "; "
-        //     + "y = " + std::to_string(y) + " = " + std::to_string((1.f - (y / height)) * 2 - 1.f)
-        //     + "     {" + std::to_string(p1[0]) + " " + std::to_string(p1[1]) + " " + std::to_string(p1[2]) + " " + std::to_string(p1[3]) + "}"
-        //     + "     {" + std::to_string(p1[0] / p1[3]) + " " + std::to_string(p1[1] / p1[3]) + " " + std::to_string(p1[2] / p1[3]) + "}"
-        //     // + "     {" + std::to_string(p2[0] / p2[3]) + " " + std::to_string(p2[1] / p2[3]) + " " + std::to_string(p2[2] / p2[3]) + "}"
-        //     + "     {" + std::to_string(p3[0] / p3[3]) + " " + std::to_string(p3[1] / p3[3]) + " " + std::to_string(p3[2] / p3[3]) + "}");
-        if (xRel == 0 && yRel == 0) return;
-
-        verticalAngle += xRel * sensitivity;
-        if (verticalAngle >= 360.f) verticalAngle -= 360.f;
-        if (verticalAngle <= -360.f) verticalAngle += 360.f;
-        
-        horizontalAngle += yRel * sensitivity;
-        if (horizontalAngle >= 90.f) horizontalAngle = 89.f;
-        if (horizontalAngle <= -90.f) horizontalAngle = -89.f;
-
-        float camX = 0.f,
-              camY = 0.f,
-              camZ = 0.f;
-
-        //  horizontal rotaion (rotate around horizont)
-        float horRad = ZC_Vec::Radians(horizontalAngle);
-        camY = camDistance * cos(horRad);
-        camZ = camDistance * sin(horRad);
-
-        //  vertical rotation (rotate around axis arthogonal to horizont)
-        float vertRad = ZC_Vec::Radians(verticalAngle);
-        camX = camY * cos(vertRad);
-        camY = camY * sin(vertRad);
-        
-        camera.SetCamPos({ camX + position[0], camY + position[1], camZ + position[2] });
-
-        // ZC_cout("angX = " + std::to_string(angleX) + "angY = " + std::to_string(angleY) + "x = " + std::to_string(camX) + "y = " + std::to_string(camY) + "z = " + std::to_string(camZ));
-
-        CalculateDirections();
-    }
-
-    void CalculateDirections()
-    {
-        front = ZC_Vec::Normalize(camera.GetLookOn() - camera.GetCamPos());
-        right = ZC_Vec::Cross(front, {0.f,0.f,1.f});    //  world up
-        up = ZC_Vec::Cross(right, front);
-    }
-};
 
 struct NewSquare
 {
@@ -307,10 +210,10 @@ struct CC
         ++rSingleEdges;
     }
 
-    void CommonEdgeCenter(ZC_Vec3<float>& rCECS, ZC_Vec3<float>& rCEC, const ZC_Vec3<float>& point, bool& rIsEP1, bool& rIsEP2, NewSquare& rNS1, NewSquare& rNS2,
+    void CommonEdgeCenter(ZC_Vec3<float>& rCECSum, ZC_Vec3<float>& rCEC, const ZC_Vec3<float>& point, bool& rIsEP1, bool& rIsEP2, NewSquare& rNS1, NewSquare& rNS2,
         void(NewSquare::*pSet1)(const ZC_Vec3<float>&), void(NewSquare::*pSet2)(const ZC_Vec3<float>&), unsigned short& rCommonEdges)
     {
-        rCECS += rCEC;
+        rCECSum += rCEC;
         rIsEP1 = true;
         (rNS1.*pSet1)(point);
         rIsEP1 = true;
@@ -319,81 +222,37 @@ struct CC
     }
 };
 
-
-// struct ZCR_Figures
-// {
-//     static inline std::list<ZCR_Figure> figures;
-// };
-
-
+//  перенос всего цикла в виндоу, рендерер в виндоу
+//  стенсил шедер пусть просит рендерер у шпрогс
 
 int ZC_main()
 {
-
-    ZC_upWindow window = ZC_Video::MakeWindow(true, width, height, "lolka");
+    
+    ZC_upWindow window = ZC_Window::MakeWindow(true, 800.f, 600.f, "lolka");
+    // window->SetFPS(0);
 
     window->SetClearColor(0.4f, 0.4f, 0.4f);
-    window->InitImGui();
 
-    Player player({0.f,0.f,0.f}, 1000);
-    ZC_ShProgs shProgs(false);
+    ZC_ShProgs shProgs;
     typedef typename ZC_ShProgs::Name ShPName; 
-    ShPName shPNames[] { ShPName::Color, ShPName::Point, ShPName::Line, ShPName::Stencil };
+    ShPName shPNames[] { ShPName::ZCR_Color, ShPName::ZCR_Point, ShPName::ZCR_Line, ShPName::ZCR_Stencil, ShPName::ZCR_Texture_Vertex_TexCoord, ShPName::ZCR_Mesh };
     shProgs.Load(shPNames, sizeof(shPNames) / sizeof(ShPName));
 
+    ZCR_Scene scene;
+
     ZC_Renderer::EnablePointSize();
-    ZC_RS::SetStencilShaderProgData(ZC_ShProgs::Get(ZC_ShProgs::Name::Stencil));
-    
-    ZCR_Cube cube;
-
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-
-        bool a = true;
-            bool show_another_window = true;
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	glEnable(GL_DEPTH_TEST);
-
-    auto image = ZC_Textures::LoadTexture2D("/home/dmitry/Загрузки/awesomeface.png");
     
     while (true)
     {
         if (!window->HandleEvents())
         {
            break;
-        }            
-        
-        // ImGui::ShowDemoWindow(&a);
-
-            static float f = 0.0f;
-            static int counter = 0;
-
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-            
-            static const float w = 300.f, h = 500.f;
-            ImGui::SetWindowSize(ImVec2(w, h));
-            ImGui::SetWindowPos({io.DisplaySize.x - w, 0.f});
-
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-            
-            ImGui::Checkbox("Demo Window", &a);      // Edit bools storing our window open/close state
-            ImGui::Checkbox("Another Window", &show_another_window);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-            ImGui::ImageButton("asf", (void*)image.id, ImVec2(50,50));
-            if (ImGui::Button("Button", ImVec2(20,20)))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", io.DisplaySize.x, io.Framerate);
-            ImGui::End();
+        }
             
         window->Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
 
         ZC_Renderer::DrawAll();
 
@@ -503,3 +362,34 @@ int ZC_main()
     // float b = white << 24 >> 24,
     //     g = white << 16 >> 24,
     //     r = white >> 16;
+
+//  упаковка r g b из диапазона (0, 255) в unsigned int
+// #define Func(r, g, b){ ((unsigned int)r << 8 | g) << 8 | b }
+
+
+    // //  texture loading
+    // auto vectorOfTexturesCreator = pShPIS->texSets.GetCreator();
+    // typedef typename ZC_TexSets::TextureName TexName;
+    // for (auto pTextureName = vectorOfTexturesCreator.NextName(); pTextureName != nullptr; pTextureName = vectorOfTexturesCreator.NextName())
+    // {
+    //     switch (*pTextureName)
+    //     {
+    //     case TexName::texColor:
+    //         vectorOfTexturesCreator.Add(ZC_Textures::LoadTexture2D(ZC_FSPath(ZCR_ZCRTexturePath).append("mesh.png").c_str())); break;
+    //     }
+    // }
+    // std::vector<typename ZC_RSTexs::TexSet> texSets;
+    // texSets.emplace_back(texSetName, vectorOfTexturesCreator.GetVector());
+
+    // return { new ZC_RSTexs(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers), std::move(texSets)) };
+
+
+
+
+    // ZC_Sounds::LoadWAV("lp", "/home/dmitry/Загрузки/lp.wav");
+    // ZC_upSound lp = ZC_Sounds::GetSound("lp");
+    // ZC_Sounds::LoadWAV("Airplanes", "/home/dmitry/Загрузки/Airplanes.wav");
+    // ZC_upSound airplanes = ZC_Sounds::GetSound("Airplanes");
+    // ZC_Audio::OpenAudioStream(ZC_AudioSet(ZC_AudioSet::Channels::Stereo, 44100, ZC_AudioSet::BitsPerSample::S16));
+    // lp->Play();
+    // airplanes->Play();
