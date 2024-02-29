@@ -13,14 +13,11 @@
 #include <ZC/Tools/Math/ZC_Mat.h>
 #include <ZC/Tools/Console/ZC_cout.h>
 
-#include <ZC/Events/ZC_Button.h>
-#include <ZC/Events/ZC_Mouse.h>
+#include <ZC/Events/ZC_Events.h>
 
 #include <ZC/Objects/ZC_Object.h>
 
 #include <ZC/Tools/Math/ZC_Figures.h>
-
-#include <ZC/Video/OpenGL/Renderer/ZC_Renderer.h>
 
 #include <ZC/Video/OpenGL/Texture/ZC_Textures.h>
 #include <Ogl.h>
@@ -222,42 +219,18 @@ struct CC
     }
 };
 
-//  перенос всего цикла в виндоу, рендерер в виндоу
-//  стенсил шедер пусть просит рендерер у шпрогс
-
 int ZC_main()
 {
-    
-    ZC_upWindow window = ZC_Window::MakeWindow(true, 800.f, 600.f, "lolka");
+    using namespace ZC_Window;
+    ZC_Window::MakeWindow(ZC_Window_Multisampling_2 | ZC_Window_Border, 800.f, 600.f, "lolka");
     // window->SetFPS(0);
 
-    window->SetClearColor(0.4f, 0.4f, 0.4f);
-
-    ZC_ShProgs shProgs;
-    typedef typename ZC_ShProgs::Name ShPName; 
-    ShPName shPNames[] { ShPName::ZCR_Color, ShPName::ZCR_Point, ShPName::ZCR_Line, ShPName::ZCR_Stencil, ShPName::ZCR_Texture_Vertex_TexCoord, ShPName::ZCR_Mesh };
-    shProgs.Load(shPNames, sizeof(shPNames) / sizeof(ShPName));
-
+    ZC_Window::GlClearColor(0.4f, 0.4f, 0.4f, 1.f);
+    ZC_Window::GlEnablePointSize();
+    
     ZCR_Scene scene;
 
-    ZC_Renderer::EnablePointSize();
-
-	glEnable(GL_DEPTH_TEST);
-    
-    while (true)
-    {
-        if (!window->HandleEvents())
-        {
-           break;
-        }
-            
-        window->Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-
-        ZC_Renderer::DrawAll();
-
-        window->SwapBuffer();
-    }
+    ZC_Window::RuntMainCycle();
     
     return 0;
 }
@@ -271,7 +244,7 @@ int ZC_main()
 //     three   = 1 << 3,
 //     four    = 1 << 4,
 //     five    = 1 << 5,
-//     six     = 1 << 6,
+//     six     = 1 << 6,cd
 //     seven   = 1 << 7,
 //     eight   = two | four,
 // };

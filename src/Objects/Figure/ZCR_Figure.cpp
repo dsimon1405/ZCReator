@@ -21,6 +21,7 @@ void ZCR_Figure::ChangeSceneMode(SceneMode sceneMode)
 
 void ZCR_Figure::ChangeSceneActivity(bool _isActiveOnScene)
 {
+    if (isActiveOnScene == _isActiveOnScene) return;
     isActiveOnScene = _isActiveOnScene;
     figureSet.SwitchToSceneMode(ZCR_Scene::GetActiveSceneMode(), isActiveOnScene);
 }
@@ -28,7 +29,7 @@ void ZCR_Figure::ChangeSceneActivity(bool _isActiveOnScene)
 void ZCR_Figure::ChangeSceneModeAndActivity(SceneMode sceneMode, bool _isActiveOnScene)
 {
     isActiveOnScene = _isActiveOnScene;
-    figureSet.SwitchToSceneMode(ZCR_Scene::GetActiveSceneMode(), isActiveOnScene);
+    figureSet.SwitchToSceneMode(sceneMode, isActiveOnScene);
 }
 
 void ZCR_Figure::Translate(const ZC_Vec3<float>& trans)
@@ -41,7 +42,7 @@ std::string ZCR_Figure::GetName(Name standartFigure)
     switch (standartFigure)
     {
     case Name::Cube: return "Cube";
-    default: return nullptr;
+    default: return "";
     }
 }
 

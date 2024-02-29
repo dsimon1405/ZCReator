@@ -1,6 +1,5 @@
 #include "ZCR_FigureSet.h"
 
-
 ZCR_FigureSet::ZCR_FigureSet(ZC_sptr<ZC_DA<ZC_Quad>>&& _quads, ZC_sptr<ZC_DA<ZC_Triangle>>&& _triangles, ZC_sptr<ZC_DA<int>>&& _normals)
     : ZCR_VBO(std::move(_quads), std::move(_triangles), std::move(_normals))
 {
@@ -16,7 +15,7 @@ ZCR_FigureSet::ZCR_FigureSet(ZC_sptr<ZC_DA<ZC_Quad>>&& _quads, ZC_sptr<ZC_DA<ZC_
     spRSADSLine->SetUniformsData(UName::unModel, spMatModel->Begin());
     spRSADSSurface->SetUniformsData(UName::unModel, spMatModel->Begin());
 
-    SwitchToSceneMode(ZCR_Scene::GetActiveSceneMode(), true);
+    // SwitchToSceneMode(ZCR_Scene::GetActiveSceneMode(), true);
 }
 
 // ZCR_FigureSet::ZCR_FigureSet(ZCR_FigureSet&& tr)

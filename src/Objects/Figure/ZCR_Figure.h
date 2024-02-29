@@ -27,7 +27,7 @@ struct ZCR_Figure
 private:
     std::string name;
     ZCR_FigureSet figureSet;
-    bool isActiveOnScene = true;
+    bool isActiveOnScene = false;
 
     static std::string GetName(Name standartFigure);
     static ZC_sptr<ZC_DA<ZC_Quad>> GetQuads(Name standartFigure);

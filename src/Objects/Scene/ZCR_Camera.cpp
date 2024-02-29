@@ -1,13 +1,12 @@
 #include "ZCR_Camera.h"
 
-#include <ZC/Events/ZC_Button.h>
-#include <ZC/Events/ZC_Mouse.h>
+#include <ZC/Events/ZC_Events.h>
 #include <ZC/Video/ZC_Window.h>
 
 ZCR_Camera::ZCR_Camera()
     : camera(ZC_Camera::CreateCamera({ZC_Perspective(45.f, 0.1f, 100.f),
         ZC_View({0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 1.f}, true)}, ZC_Ortho())),
-    sconButton(ZC_Button::ConnectDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this }))
+    sconButton(ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this }))
 {
     MouseMoveAroundObject(0, 0, -120, 20, 0);
     
@@ -86,15 +85,15 @@ void ZCR_Camera::CalculateDirections()
 void ZCR_Camera::ButtonMouseWheelDown(float time)
 {
     sconButton.Disconnect();
-    sconButton = ZC_Button::ConnectUp(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelUp, this });
-    sconMouseMove = ZC_Mouse::ConnectMove({ &ZCR_Camera::MouseMoveAroundObject, this });
+    sconButton = ZC_Events::ConnectButtonUp(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelUp, this });
+    sconMouseMove = ZC_Events::ConnectMouseMove({ &ZCR_Camera::MouseMoveAroundObject, this });
         // ZC_Window::HideCursor();
 }
 
 void ZCR_Camera::ButtonMouseWheelUp(float time)
 {
     sconButton.Disconnect();
-    sconButton = ZC_Button::ConnectDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this });
+    sconButton = ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this });
     sconMouseMove.Disconnect();
     // ZC_Window::ShowCursor();
 }

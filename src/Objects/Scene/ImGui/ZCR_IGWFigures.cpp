@@ -3,9 +3,10 @@
 #include <imgui.h>
 #include "ZCR_IconTexture.h"
 #include <Objects/Figure/ZCR_Figures.h>
+#include <ZC/Events/ZC_Events.h>
 
 ZCR_IGWFigures::ZCR_IGWFigures()
-    : ZC_IGWindow("Figure", false, 465.f, 160.f, 0.f, 0.f, WindowIndentFlags::Center, true,
+    : ZC_IGWindow("Figures", false, 465.f, 160.f, 0.f, 0.f, WindowIndentFlags::Center, true,
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)
 {}
 
@@ -47,8 +48,15 @@ void ZCR_IGWFigures::DrawWindow()
     }
 }
 
-void ZCR_IGWFigures::CreateFigure(int figureName)
+void ZCR_IGWFigures::CreateFigure(int _creatingFigureName)
 {
     NeedDraw(false);
-    ZCR_Figures::CreateFigure(static_cast<typename ZCR_Figure::Name>(figureName));
+    creatingFigureName = _creatingFigureName;
+    sconHandleEventsEnd = ZC_Events::ConnectHandleEventsEnd({ &ZCR_IGWFigures::Callback, this });
+}
+
+void ZCR_IGWFigures::Callback()
+{
+    ZCR_Figures::CreateFigure(static_cast<typename ZCR_Figure::Name>(creatingFigureName));
+    sconHandleEventsEnd.Disconnect();
 }

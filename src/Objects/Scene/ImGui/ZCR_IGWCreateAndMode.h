@@ -10,7 +10,7 @@ public:
     ZCR_IGWCreateAndMode();
 
 private:
-    ZCR_IGWFigures wFigures;
+    ZCR_IGWFigures winFigures;
 
     void DrawWindow() override;
 };
