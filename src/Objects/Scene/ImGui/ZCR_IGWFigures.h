@@ -13,6 +13,6 @@ private:
     int creatingFigureName;
 
     void DrawWindow() override;
-    void CreateFigure(int _creatingFigureName);
-    void Callback();
+    void FigureCreation(int _creatingFigureName);
+    void CreateFigure(float time);
 };

@@ -64,6 +64,7 @@
         "forward_list": "cpp",
         "cstring": "cpp",
         "cassert": "cpp",
-        "zc_opengl.h": "c"
+        "zc_opengl.h": "c",
+        "format": "cpp"
     }
 }

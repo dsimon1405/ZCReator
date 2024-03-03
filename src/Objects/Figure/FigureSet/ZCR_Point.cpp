@@ -1,5 +1,7 @@
 #include "ZCR_Point.h"
 
+#include <algorithm>
+
 ZCR_Point::ZCR_Point()
     : spRendererSetsPoint(MakePointRendererSet()),
     spRSADSPoint(spRendererSetsPoint->Make_sptrRendererSetDrawingSet(nullptr, 0, 0))

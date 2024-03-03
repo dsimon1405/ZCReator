@@ -1,5 +1,7 @@
 #include "ZCR_Line.h"
 
+#include <algorithm>
+
 ZCR_Line::ZCR_Line()
     : spRendererSetsLine(MakeLineRendererSet()),
     spRSADSLine(spRendererSetsLine->Make_sptrRendererSetDrawingSet(nullptr, 0, 0))

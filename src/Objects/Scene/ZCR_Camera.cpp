@@ -7,7 +7,7 @@ ZCR_Camera::ZCR_Camera()
     : camera(ZC_Camera::CreateCamera({ZC_Perspective(45.f, 0.1f, 100.f),
         ZC_View({0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 1.f}, true)}, ZC_Ortho())),
     sconButton_M_MIDLE(ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this })),
-    sconMouse(ZC_Events::ConnectMouseScroll({ &ZCR_Camera::MouseScroll, this }))
+    sconMouse(ZC_Events::ConnectMouseScrollOnceInFrame({ &ZCR_Camera::MouseScroll, this }))
 {
     MouseMoveAroundObject(0, 0, -120, 20, 0);
 
@@ -27,17 +27,17 @@ void ZCR_Camera::Move(const ZC_Vec3<float>& step) noexcept
           .SetCamPos(camera->GetCamPos() + step);
 }
 
-void ZCR_Camera::W(float time) {Move(front * time * speedMove);}
+void ZCR_Camera::W(float time) {Move(dirFront * time * speedMove);}
 
-void ZCR_Camera::S(float time) {Move(front * -1 * time * speedMove);}
+void ZCR_Camera::S(float time) {Move(dirFront * -1 * time * speedMove);}
 
-void ZCR_Camera::A(float time) {Move(right * -1 * time * speedMove);}
+void ZCR_Camera::A(float time) {Move(dirRight * -1 * time * speedMove);}
 
-void ZCR_Camera::D(float time) {Move(right * time * speedMove);}
+void ZCR_Camera::D(float time) {Move(dirRight * time * speedMove);}
 
-void ZCR_Camera::Q(float time) {Move(up * time * speedMove);}
+void ZCR_Camera::Q(float time) {Move(dirUp * time * speedMove);}
 
-void ZCR_Camera::E(float time) {Move(up * -1 * time * speedMove);}
+void ZCR_Camera::E(float time) {Move(dirUp * -1 * time * speedMove);}
 
 void ZCR_Camera::MouseMoveAroundObject(float x, float y, float xRel, float yRel, float time)
 {
@@ -49,11 +49,11 @@ void ZCR_Camera::MouseMoveAroundObject(float x, float y, float xRel, float yRel,
     //     + "     {" + std::to_string(p3[0] / p3[3]) + " " + std::to_string(p3[1] / p3[3]) + " " + std::to_string(p3[2] / p3[3]) + "}");
     
     if (xRel == 0 && yRel == 0) return;
-    verticalAngle += xRel * sensitivity;
+    verticalAngle += xRel * sensitivityRotation;
     if (verticalAngle >= 360.f) verticalAngle -= 360.f;
     if (verticalAngle <= -360.f) verticalAngle += 360.f;
     
-    horizontalAngle += yRel * sensitivity;
+    horizontalAngle += yRel * sensitivityRotation;
     if (horizontalAngle >= 90.f) horizontalAngle = 89.f;
     if (horizontalAngle <= -90.f) horizontalAngle = -89.f;
     float camX = 0.f,
@@ -73,21 +73,23 @@ void ZCR_Camera::MouseMoveAroundObject(float x, float y, float xRel, float yRel,
 
     // ZC_cout("angX = " + std::to_string(angleX) + "angY = " + std::to_string(angleY) + "x = " + std::to_string(camX) + "y = " + std::to_string(camY) + "z = " + std::to_string(camZ));
     // CalculateDirections();  //  ???
+    isDirsActual = false;
 }
 
 void ZCR_Camera::CalculateDirections()
 {
-    front = ZC_Vec::Normalize(camera->GetLookOn() - camera->GetCamPos());
-    right = ZC_Vec::Cross(front, {0.f,0.f,1.f});    //  world up
-    up = ZC_Vec::Cross(right, front);
+    dirFront = ZC_Vec::Normalize(camera->GetLookOn() - camera->GetCamPos());
+    dirRight = ZC_Vec::Cross(dirFront, {0.f,0.f,1.f});    //  world up
+    dirUp = ZC_Vec::Cross(dirRight, dirFront);
+    isDirsActual = true;
 }
 
 void ZCR_Camera::ButtonMouseWheelDown(float time)
 {
     sconButton_M_MIDLE.Disconnect();
     sconButton_M_MIDLE = ZC_Events::ConnectButtonUp(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelUp, this });
-    sconMouse = ZC_Events::ConnectMouseMove({ &ZCR_Camera::MouseMoveAroundObject, this });
-        // ZC_Window::HideCursor();
+    sconMouse = ZC_Events::ConnectMouseMoveOnceInFrame({ &ZCR_Camera::MouseMoveAroundObject, this });
+    // ZC_Window::HideCursor();
 }
 
 void ZCR_Camera::ButtonMouseWheelUp(float time)
@@ -98,7 +100,25 @@ void ZCR_Camera::ButtonMouseWheelUp(float time)
     // ZC_Window::ShowCursor();
 }
 
-void ZCR_Camera::MouseScroll(float rotationVertical, float rotationHorizontal, float time)
+void ZCR_Camera::MouseScroll(float rotationHorizontal, float rotationVertical, float time)
 {
-    // ZC_cout()
+    if (rotationVertical == 0.f || (distanceToObject == minDistanceToObject && rotationVertical > 0.f) ||
+        (distanceToObject == maxDistanceToObject && rotationVertical < 0.f)) return;
+    if (!isDirsActual) CalculateDirections();
+    float newDistance = distanceToObject - (rotationVertical * sensivityScroll);
+    if (newDistance >= maxDistanceToObject)
+    {
+        distanceToObject = maxDistanceToObject;
+        camera->SetCamPos(camera->GetLookOn() - (dirFront * maxDistanceToObject));
+    }
+    else if (newDistance <= minDistanceToObject)
+    {
+        distanceToObject = minDistanceToObject;
+        camera->SetCamPos(camera->GetLookOn());
+    }
+    else
+    {
+        distanceToObject = newDistance;
+        camera->SetCamPos(camera->GetLookOn() - (dirFront * distanceToObject));
+    }
 }

@@ -219,17 +219,9 @@ struct CC
     }
 };
 //  ZCR_Camera scroll and IGWindow for axis
-#include <iostream>
-template<typename... T>
-void F(T... args)
-{
-    (std::cout<<...<<args)<<"\n";
-    // std::string q(args...);
-    // int a = 3;
-}
+
 int ZC_main()
 {
-    F(1,3,4,"mom", "lol");
     using namespace ZC_Window;
     ZC_Window::MakeWindow(ZC_Window_Multisampling_2 | ZC_Window_Border, 800.f, 600.f, "ZeroCreator");
     // window->SetFPS(0);

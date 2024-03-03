@@ -23,39 +23,39 @@ void ZCR_IGWFigures::DrawWindow()
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("Cube", reinterpret_cast<ImTextureID>(ZCR_IconTexture::iconTexture.GetId()),
                 iconSize, ZCR_IconTexture::tcCreateCube.tl, ZCR_IconTexture::tcCreateCube.br))
-            CreateFigure(ZCR_Figure::Name::Cube);
+            FigureCreation(ZCR_Figure::Name::Cube);
         ImGui::IsItemHovered() ? ImGui::TextColored(colorActive, "      Cube") : ImGui::TextColored(colorPassive, "      Cube");
         
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("Cylinder", reinterpret_cast<ImTextureID>(ZCR_IconTexture::iconTexture.GetId()),
                 iconSize, ZCR_IconTexture::tcCreateCylinder.tl, ZCR_IconTexture::tcCreateCylinder.br))
-            CreateFigure(ZCR_Figure::Name::Cube);
+            FigureCreation(ZCR_Figure::Name::Cube);
         ImGui::IsItemHovered() ? ImGui::TextColored(colorActive, "    Cylinder") : ImGui::TextColored(colorPassive, "    Cylinder");
 
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("Cone", reinterpret_cast<ImTextureID>(ZCR_IconTexture::iconTexture.GetId()),
                 iconSize, ZCR_IconTexture::tcCreateCone.tl, ZCR_IconTexture::tcCreateCone.br))
-            CreateFigure(ZCR_Figure::Name::Cube);
+            FigureCreation(ZCR_Figure::Name::Cube);
         ImGui::IsItemHovered() ? ImGui::TextColored(colorActive, "      Cone") : ImGui::TextColored(colorPassive, "      Cone");
 
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("Sphere", reinterpret_cast<ImTextureID>(ZCR_IconTexture::iconTexture.GetId()),
                 iconSize, ZCR_IconTexture::tcCreateSphere.tl, ZCR_IconTexture::tcCreateSphere.br))
-            CreateFigure(ZCR_Figure::Name::Cube);
+            FigureCreation(ZCR_Figure::Name::Cube);
         ImGui::IsItemHovered() ? ImGui::TextColored(colorActive, "     Sphere") : ImGui::TextColored(colorPassive, "     Sphere");
 
         ImGui::EndTable();
     }
 }
 
-void ZCR_IGWFigures::CreateFigure(int _creatingFigureName)
+void ZCR_IGWFigures::FigureCreation(int _creatingFigureName)
 {
     NeedDraw(false);
     creatingFigureName = _creatingFigureName;
-    sconHandleEventsEnd = ZC_Events::ConnectHandleEventsEnd({ &ZCR_IGWFigures::Callback, this });
+    sconHandleEventsEnd = ZC_Events::ConnectHandleEventsEnd({ &ZCR_IGWFigures::CreateFigure, this });
 }
 
-void ZCR_IGWFigures::Callback()
+void ZCR_IGWFigures::CreateFigure(float time)
 {
     ZCR_Figures::CreateFigure(static_cast<typename ZCR_Figure::Name>(creatingFigureName));
     sconHandleEventsEnd.Disconnect();
