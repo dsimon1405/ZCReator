@@ -6,10 +6,10 @@
 ZCR_Camera::ZCR_Camera()
     : camera(ZC_Camera::CreateCamera({ZC_Perspective(45.f, 0.1f, 100.f),
         ZC_View({0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 1.f}, true)}, ZC_Ortho())),
-    sconButton(ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this }))
+    sconButton_M_MIDLE(ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this })),
+    sconMouse(ZC_Events::ConnectMouseScroll({ &ZCR_Camera::MouseScroll, this }))
 {
     MouseMoveAroundObject(0, 0, -120, 20, 0);
-    
 
     // sConButtonMouseWheel = sConButtonMouseWheel;
     // ZC_ButtonOperator::Connect({ZC_ButtonID::K_W, ZC_Button::State::Down}, {&ZCR_Camera::W,this});
@@ -72,7 +72,7 @@ void ZCR_Camera::MouseMoveAroundObject(float x, float y, float xRel, float yRel,
     camera->SetCamPos({ camX + lookOn[0], camY + lookOn[1], camZ + lookOn[2] });
 
     // ZC_cout("angX = " + std::to_string(angleX) + "angY = " + std::to_string(angleY) + "x = " + std::to_string(camX) + "y = " + std::to_string(camY) + "z = " + std::to_string(camZ));
-    CalculateDirections();  //  ???
+    // CalculateDirections();  //  ???
 }
 
 void ZCR_Camera::CalculateDirections()
@@ -84,16 +84,21 @@ void ZCR_Camera::CalculateDirections()
 
 void ZCR_Camera::ButtonMouseWheelDown(float time)
 {
-    sconButton.Disconnect();
-    sconButton = ZC_Events::ConnectButtonUp(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelUp, this });
-    sconMouseMove = ZC_Events::ConnectMouseMove({ &ZCR_Camera::MouseMoveAroundObject, this });
+    sconButton_M_MIDLE.Disconnect();
+    sconButton_M_MIDLE = ZC_Events::ConnectButtonUp(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelUp, this });
+    sconMouse = ZC_Events::ConnectMouseMove({ &ZCR_Camera::MouseMoveAroundObject, this });
         // ZC_Window::HideCursor();
 }
 
 void ZCR_Camera::ButtonMouseWheelUp(float time)
 {
-    sconButton.Disconnect();
-    sconButton = ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this });
-    sconMouseMove.Disconnect();
+    sconButton_M_MIDLE.Disconnect();
+    sconButton_M_MIDLE = ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this });
+    sconMouse.Disconnect();
     // ZC_Window::ShowCursor();
+}
+
+void ZCR_Camera::MouseScroll(float rotationVertical, float rotationHorizontal, float time)
+{
+    // ZC_cout()
 }

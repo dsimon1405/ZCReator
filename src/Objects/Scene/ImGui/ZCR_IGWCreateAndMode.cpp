@@ -4,7 +4,7 @@
 #include <Objects/Scene/ZCR_Scene.h>
 
 ZCR_IGWCreateAndMode::ZCR_IGWCreateAndMode()
-    : ZC_IGWindow("CreateAndMode", true, 130.f, 100.f, 0.f, 0.f, WindowIndentFlags::XLeft_YTop, false,
+    : ZC_IGWindow("CreateAndMode", true, 130.f, 100.f, 10.f, 30.f, X_Left_Pixel | Y_Top_Pixel, false,
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration)
 {}
 

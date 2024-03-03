@@ -12,9 +12,9 @@ private:
     ZC_upCamera camera;
 
     const float speedMove = 10000.f;
-    ZC_Vec3<float> front {0.f, 1.f, 0.f};
-    ZC_Vec3<float> up {0.f, 0.f, 1.f};
-    ZC_Vec3<float> right {1.f, 0.f, 0.f};
+    ZC_Vec3<float> front;
+    ZC_Vec3<float> up;
+    ZC_Vec3<float> right;
 
     const float maxDistanceToObject = 100.f;
     float distanceToObject = 15.f;
@@ -22,8 +22,8 @@ private:
     float horizontalAngle = 0.f;
     float sensitivity = 1.f;
 
-    ZC_SConnection sconButton;
-    ZC_SConnection sconMouseMove;
+    ZC_SConnection sconButton_M_MIDLE;
+    ZC_SConnection sconMouse;
 
     void Move(const ZC_Vec3<float>& step) noexcept;
     void W(float time);
@@ -36,4 +36,5 @@ private:
     void CalculateDirections();
     void ButtonMouseWheelDown(float time);
     void ButtonMouseWheelUp(float time);
+    void MouseScroll(float rotationVertical, float rotationHorizontal, float time);
 };

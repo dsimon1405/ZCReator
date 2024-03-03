@@ -218,11 +218,20 @@ struct CC
         ++rCommonEdges;
     }
 };
-
+//  ZCR_Camera scroll and IGWindow for axis
+#include <iostream>
+template<typename... T>
+void F(T... args)
+{
+    (std::cout<<...<<args)<<"\n";
+    // std::string q(args...);
+    // int a = 3;
+}
 int ZC_main()
 {
+    F(1,3,4,"mom", "lol");
     using namespace ZC_Window;
-    ZC_Window::MakeWindow(ZC_Window_Multisampling_2 | ZC_Window_Border, 800.f, 600.f, "lolka");
+    ZC_Window::MakeWindow(ZC_Window_Multisampling_2 | ZC_Window_Border, 800.f, 600.f, "ZeroCreator");
     // window->SetFPS(0);
 
     ZC_Window::GlClearColor(0.4f, 0.4f, 0.4f, 1.f);
@@ -244,7 +253,7 @@ int ZC_main()
 //     three   = 1 << 3,
 //     four    = 1 << 4,
 //     five    = 1 << 5,
-//     six     = 1 << 6,cd
+//     six     = 1 << 6,
 //     seven   = 1 << 7,
 //     eight   = two | four,
 // };

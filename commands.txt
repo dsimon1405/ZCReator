@@ -1,0 +1,6 @@
+ZeroCore
+cd /home/dmitry/projects/ZCreator/external/ZeroCore && git add . && git commit -m "" && cd /home/dmitry/projects/ZCreator/build
+cd /home/dmitry/projects/ZCreator/external/ZeroCore && git add . && git commit -m "" && git push origin main && cd /home/dmitry/projects/ZCreator/build
+ZCReator
+cd /home/dmitry/projects/ZCreator && git add . && git commit -m "" && cd /home/dmitry/projects/ZCreator/build
+cd /home/dmitry/projects/ZCreator && git add . && git commit -m "" && git push origin main && cd /home/dmitry/projects/ZCreator/build
