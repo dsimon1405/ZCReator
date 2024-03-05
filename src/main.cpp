@@ -223,10 +223,10 @@ struct CC
 int ZC_main()
 {
     using namespace ZC_Window;
-    ZC_Window::MakeWindow(ZC_Window_Multisampling_2 | ZC_Window_Border, 800.f, 600.f, "ZeroCreator");
+    ZC_Window::MakeWindow(ZC_Window_Multisampling_4 | ZC_Window_Border, 800.f, 600.f, "ZeroCreator");
     // window->SetFPS(0);
 
-    ZC_Window::GlClearColor(0.4f, 0.4f, 0.4f, 1.f);
+    ZC_Window::GlClearColor(0.3f, 0.3f, 0.3f, 1.f);
     ZC_Window::GlEnablePointSize();
     
     ZCR_Scene scene;

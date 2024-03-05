@@ -6,7 +6,7 @@
 #include <Objects/Scene/ImGui/ZCR_IconTexture.h>
 
 ZCR_Scene::ZCR_Scene()
-    : mesh(10.f)
+    : mesh(100.f)
 {
     ZCR_IconTexture::iconTexture = std::move(ZC_Textures::LoadTexture2D(ZC_FSPath(ZCR_ZCRTexturePath).append("sceneIcons.png").c_str()));
     pScene = this;

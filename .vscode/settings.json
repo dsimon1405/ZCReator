@@ -65,6 +65,10 @@
         "cstring": "cpp",
         "cassert": "cpp",
         "zc_opengl.h": "c",
-        "format": "cpp"
+        "format": "cpp",
+        "charconv": "cpp",
+        "optional": "cpp",
+        "span": "cpp",
+        "variant": "cpp"
     }
 }

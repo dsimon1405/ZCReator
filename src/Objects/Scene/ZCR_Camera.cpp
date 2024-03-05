@@ -4,7 +4,7 @@
 #include <ZC/Video/ZC_Window.h>
 
 ZCR_Camera::ZCR_Camera()
-    : camera(ZC_Camera::CreateCamera({ZC_Perspective(45.f, 0.1f, 100.f),
+    : camera(ZC_Camera::CreateCamera({ZC_Perspective(45.f, 0.01f, 100.f),
         ZC_View({0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 1.f}, true)}, ZC_Ortho())),
     sconButton_M_MIDLE(ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this })),
     sconMouse(ZC_Events::ConnectMouseScrollOnceInFrame({ &ZCR_Camera::MouseScroll, this }))
@@ -47,15 +47,57 @@ void ZCR_Camera::MouseMoveAroundObject(float x, float y, float xRel, float yRel,
     //     + "     {" + std::to_string(p1[0] / p1[3]) + " " + std::to_string(p1[1] / p1[3]) + " " + std::to_string(p1[2] / p1[3]) + "}"
     //     // + "     {" + std::to_string(p2[0] / p2[3]) + " " + std::to_string(p2[1] / p2[3]) + " " + std::to_string(p2[2] / p2[3]) + "}"
     //     + "     {" + std::to_string(p3[0] / p3[3]) + " " + std::to_string(p3[1] / p3[3]) + " " + std::to_string(p3[2] / p3[3]) + "}");
-    
+
     if (xRel == 0 && yRel == 0) return;
+    horizontalAngle += yRel * sensitivityRotation;
+    if (horizontalAngle >= 90.f) horizontalAngle = 89.9f;
+    else if (horizontalAngle <= -90.f) horizontalAngle = -89.9f;
     verticalAngle += xRel * sensitivityRotation;
     if (verticalAngle >= 360.f) verticalAngle -= 360.f;
-    if (verticalAngle <= -360.f) verticalAngle += 360.f;
+    else if (verticalAngle <= -360.f) verticalAngle += 360.f;
+
+    // static bool isNormalHorizontalOrientation = true;
+    // horizontalAngle += isNormalHorizontalOrientation ? yRel * sensitivityRotation : - (yRel * sensitivityRotation);
+    // if (horizontalAngle == 90.f) horizontalAngle = 89.9f;
+    // else if (horizontalAngle == -90.f) horizontalAngle = -89.9f;
+    // else if (horizontalAngle > 90.f)
+    // {
+    //     horizontalAngle = 90.f - (horizontalAngle - 90.f);
+
+    //     isNormalHorizontalOrientation = !isNormalHorizontalOrientation;
+    //     isNormalHorizontalOrientation ? camera->SetUp({0.f, 0.f, 1.f}) : camera->SetUp({0.f, 0.f, -1.f});
+    //     if (verticalAngle >= 0.f)
+    //     {
+    //         verticalAngle += 180.f;
+    //         if (verticalAngle >= 360.f) verticalAngle -= 360.f;
+    //     }
+    //     else if (verticalAngle < 0.f)
+    //     {
+    //         verticalAngle -= 180.f;
+    //         if (verticalAngle <= -360.f) verticalAngle += 360.f;
+    //     }
+    // }
+    // else if (horizontalAngle <= -90.f)
+    // {
+    //     horizontalAngle = -90.f - (horizontalAngle + 90.f);
+        
+    //     isNormalHorizontalOrientation = !isNormalHorizontalOrientation;
+    //     isNormalHorizontalOrientation ? camera->SetUp({0.f, 0.f, 1.f}) : camera->SetUp({0.f, 0.f, -1.f});
+    //     if (verticalAngle >= 0.f)
+    //     {
+    //         verticalAngle += 180.f;
+    //         if (verticalAngle >= 360.f) verticalAngle -= 360.f;
+    //     }
+    //     else if (verticalAngle < 0.f)
+    //     {
+    //         verticalAngle -= 180.f;
+    //         if (verticalAngle <= -360.f) verticalAngle += 360.f;
+    //     }
+    // }
+    // verticalAngle += isNormalHorizontalOrientation ? xRel * sensitivityRotation : - (xRel * sensitivityRotation);
+    // if (verticalAngle >= 360.f) verticalAngle -= 360.f;
+    // else if (verticalAngle <= -360.f) verticalAngle += 360.f;
     
-    horizontalAngle += yRel * sensitivityRotation;
-    if (horizontalAngle >= 90.f) horizontalAngle = 89.f;
-    if (horizontalAngle <= -90.f) horizontalAngle = -89.f;
     float camX = 0.f,
           camY = 0.f,
           camZ = 0.f;
@@ -72,7 +114,6 @@ void ZCR_Camera::MouseMoveAroundObject(float x, float y, float xRel, float yRel,
     camera->SetCamPos({ camX + lookOn[0], camY + lookOn[1], camZ + lookOn[2] });
 
     // ZC_cout("angX = " + std::to_string(angleX) + "angY = " + std::to_string(angleY) + "x = " + std::to_string(camX) + "y = " + std::to_string(camY) + "z = " + std::to_string(camZ));
-    // CalculateDirections();  //  ???
     isDirsActual = false;
 }
 
@@ -88,6 +129,7 @@ void ZCR_Camera::ButtonMouseWheelDown(float time)
 {
     sconButton_M_MIDLE.Disconnect();
     sconButton_M_MIDLE = ZC_Events::ConnectButtonUp(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelUp, this });
+    sconMouse.Disconnect(); //  disconnect scroll
     sconMouse = ZC_Events::ConnectMouseMoveOnceInFrame({ &ZCR_Camera::MouseMoveAroundObject, this });
     // ZC_Window::HideCursor();
 }
@@ -96,7 +138,8 @@ void ZCR_Camera::ButtonMouseWheelUp(float time)
 {
     sconButton_M_MIDLE.Disconnect();
     sconButton_M_MIDLE = ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this });
-    sconMouse.Disconnect();
+    sconMouse.Disconnect(); //  disconnect mouse MouseMoveAroundObject
+    sconMouse = ZC_Events::ConnectMouseScrollOnceInFrame({ &ZCR_Camera::MouseScroll, this });   //  return scroll connection
     // ZC_Window::ShowCursor();
 }
 
@@ -114,7 +157,7 @@ void ZCR_Camera::MouseScroll(float rotationHorizontal, float rotationVertical, f
     else if (newDistance <= minDistanceToObject)
     {
         distanceToObject = minDistanceToObject;
-        camera->SetCamPos(camera->GetLookOn());
+        camera->SetCamPos(camera->GetLookOn() - (dirFront * distanceToObject));
     }
     else
     {
