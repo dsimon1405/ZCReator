@@ -9,7 +9,8 @@ ZCR_Camera::ZCR_Camera()
     sconButton_M_MIDLE(ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this })),
     sconMouse(ZC_Events::ConnectMouseScrollOnceInFrame({ &ZCR_Camera::MouseScroll, this }))
 {
-    MouseMoveAroundObject(0, 0, -120, 20, 0);
+    // MouseMoveAroundObject(0, 0, -120, 20, 0);
+    MouseMoveAroundObject(0, 0, 0, 70, 0);
 
     // sConButtonMouseWheel = sConButtonMouseWheel;
     // ZC_ButtonOperator::Connect({ZC_ButtonID::K_W, ZC_Button::State::Down}, {&ZCR_Camera::W,this});
@@ -103,15 +104,15 @@ void ZCR_Camera::MouseMoveAroundObject(float x, float y, float xRel, float yRel,
           camZ = 0.f;
     //  horizontal rotaion (rotate around horizont)
     float horRad = ZC_Vec::Radians(horizontalAngle);
-    camY = distanceToObject * cos(horRad);
+    camX = distanceToObject * cos(horRad);
     camZ = distanceToObject * sin(horRad);
     //  vertical rotation (rotate around axis arthogonal to horizont)
     float vertRad = ZC_Vec::Radians(verticalAngle);
-    camX = camY * cos(vertRad);
-    camY = camY * sin(vertRad);
+    camY = camX * sin(vertRad);
+    camX = camX * cos(vertRad);
     
     auto lookOn = camera->GetLookOn();
-    camera->SetCamPos({ camX + lookOn[0], camY + lookOn[1], camZ + lookOn[2] });
+    camera->SetCamPos({ camX + lookOn[0], camY + lookOn[1], camZ + lookOn[2] });    //  on start positive X, positive Y, positive Z, if positive camX, camY, camZ
 
     // ZC_cout("angX = " + std::to_string(angleX) + "angY = " + std::to_string(angleY) + "x = " + std::to_string(camX) + "y = " + std::to_string(camY) + "z = " + std::to_string(camZ));
     isDirsActual = false;

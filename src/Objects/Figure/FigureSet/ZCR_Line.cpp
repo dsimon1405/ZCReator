@@ -18,7 +18,7 @@ ZC_sptr<ZC_RendererSet> ZCR_Line::MakeLineRendererSet()
 
     auto upDraw = ZC_uptrMakeFromChild<ZC_GLDraw, ZC_DrawElements>(GL_LINES, elementsCount, elementsType, 0);
 
-    typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZCR_Line);
+    typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZCR_LineFigure);
 
     ZC_VAO vao;                                        //  vertices count in vbo (in one quad 4, in one triangle 3)
     vao.Config(pShPIS->vaoConData, *vbo, &ebo, 0, (spQuads ? (spQuads->size * 4) : 0) + (spTriangles ? (spTriangles->size * 3) : 0));

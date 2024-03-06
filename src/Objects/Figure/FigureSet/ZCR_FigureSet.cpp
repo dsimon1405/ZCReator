@@ -14,8 +14,6 @@ ZCR_FigureSet::ZCR_FigureSet(ZC_sptr<ZC_DA<ZC_Quad>>&& _quads, ZC_sptr<ZC_DA<ZC_
     spRSADSPoint->SetUniformsData(UName::unModel, spMatModel->Begin());
     spRSADSLine->SetUniformsData(UName::unModel, spMatModel->Begin());
     spRSADSSurface->SetUniformsData(UName::unModel, spMatModel->Begin());
-
-    // SwitchToSceneMode(ZCR_Scene::GetActiveSceneMode(), true);
 }
 
 // ZCR_FigureSet::ZCR_FigureSet(ZCR_FigureSet&& tr)

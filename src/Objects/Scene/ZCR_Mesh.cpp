@@ -50,8 +50,8 @@ void ZCR_Mesh::SwitchToCoordSystem(CoordSystem _coordSystem)
 
 ZC_uptr<ZC_RendererSet> ZCR_Mesh::MakeRendererSet(float totalLength)
 {
-    //  (* 2 - two vertices on one line) (+ 2 - last line, if totalLength 10 than fifth line(center line) gonna be colored and 5 grey lines from sides
-    ZC_DA<ZC_Vec3<float>> vertices((totalLength * 2 + 2) * 2);  //  last * 2 - pluss same count perpendicular lines 
+    //  (* 2 -> two vertices on one line) (+ 2 -> last line, if totalLength 10 than fifth line(center line) gonna be colored and 5 grey lines from sides
+    ZC_DA<ZC_Vec3<float>> vertices((totalLength * 2 + 2) * 2);  //  last (* 2) -> pluss same count perpendicular lines 
     auto linePosition = -(totalLength / 2.f);
     auto axisLength = totalLength / 2.f;
     size_t i = 0;
@@ -74,7 +74,7 @@ ZC_uptr<ZC_RendererSet> ZCR_Mesh::MakeRendererSet(float totalLength)
 
     auto upDraw = ZC_uptrMakeFromChild<ZC_GLDraw, ZC_DrawArrays>(GL_LINES, 0, vertices.size);
 
-    typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZCR_Mesh);
+    typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZCR_LineMesh);
 
     ZC_VAO vao;
     vao.Config(pShPIS->vaoConData, vbo, nullptr, 0, 0);

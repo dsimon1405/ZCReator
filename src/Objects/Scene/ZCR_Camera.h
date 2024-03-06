@@ -21,7 +21,7 @@ private:
         minDistanceToObject = 0.2f,
         sensivityScroll = 1.f;
     float distanceToObject = 15.f;
-        
+    
     const float sensitivityRotation = 1.f;
     float verticalAngle = 0.f,
         horizontalAngle = 0.f;
