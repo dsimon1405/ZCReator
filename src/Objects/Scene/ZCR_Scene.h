@@ -4,6 +4,7 @@
 #include <Objects/Scene/ImGui/ZCR_IGWCreateAndMode.h>
 #include "ZCR_Mesh.h"
 #include "ZCR_Camera.h"
+#include <Objects/Scene/ZCR_Orientation3D.h>
 
 struct ZCR_Scene
 {

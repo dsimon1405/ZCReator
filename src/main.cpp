@@ -219,7 +219,7 @@ struct CC
     }
 };
 //  ZCR_Camera scroll and IGWindow for axis
-#include <Objects/Scene/ZCR_Orientation3D.h>
+
 int ZC_main()
 {
     using namespace ZC_Window;
@@ -230,7 +230,6 @@ int ZC_main()
     ZC_Window::GlEnablePointSize();
     
     ZCR_Scene scene;
-    ZCR_Orientation3D o3d(0.f, 70.f);
 
     ZC_Window::RuntMainCycle();
     

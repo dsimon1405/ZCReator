@@ -6,11 +6,12 @@
 ZCR_Camera::ZCR_Camera()
     : camera(ZC_Camera::CreateCamera({ZC_Perspective(45.f, 0.01f, 100.f),
         ZC_View({0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 1.f}, true)}, ZC_Ortho())),
+    orientatoin3D(camera->GetWindowAspect()),
     sconButton_M_MIDLE(ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this })),
     sconMouse(ZC_Events::ConnectMouseScrollOnceInFrame({ &ZCR_Camera::MouseScroll, this }))
 {
     // MouseMoveAroundObject(0, 0, -120, 20, 0);
-    MouseMoveAroundObject(0, 0, 0, 70, 0);
+    MouseMoveCallback(0, 0, 45, 45, 0);
 
     // sConButtonMouseWheel = sConButtonMouseWheel;
     // ZC_ButtonOperator::Connect({ZC_ButtonID::K_W, ZC_Button::State::Down}, {&ZCR_Camera::W,this});
@@ -28,19 +29,25 @@ void ZCR_Camera::Move(const ZC_Vec3<float>& step) noexcept
           .SetCamPos(camera->GetCamPos() + step);
 }
 
-void ZCR_Camera::W(float time) {Move(dirFront * time * speedMove);}
+// void ZCR_Camera::W(float time) {Move(dirFront * time * speedMove);}
 
-void ZCR_Camera::S(float time) {Move(dirFront * -1 * time * speedMove);}
+// void ZCR_Camera::S(float time) {Move(dirFront * -1 * time * speedMove);}
 
-void ZCR_Camera::A(float time) {Move(dirRight * -1 * time * speedMove);}
+// void ZCR_Camera::A(float time) {Move(dirRight * -1 * time * speedMove);}
 
-void ZCR_Camera::D(float time) {Move(dirRight * time * speedMove);}
+// void ZCR_Camera::D(float time) {Move(dirRight * time * speedMove);}
 
-void ZCR_Camera::Q(float time) {Move(dirUp * time * speedMove);}
+// void ZCR_Camera::Q(float time) {Move(dirUp * time * speedMove);}
 
-void ZCR_Camera::E(float time) {Move(dirUp * -1 * time * speedMove);}
+// void ZCR_Camera::E(float time) {Move(dirUp * -1 * time * speedMove);}
 
-void ZCR_Camera::MouseMoveAroundObject(float x, float y, float xRel, float yRel, float time)
+void ZCR_Camera::MouseMoveCallback(float x, float y, float xRel, float yRel, float time)
+{
+    MoveAroundObject(xRel, yRel, time);
+    orientatoin3D.MoveAroundObject(horizontalAngle, verticalAngle, isNormalHorizontalOrientation);
+}
+
+void ZCR_Camera::MoveAroundObject(float xRel, float yRel, float time)
 {
     // ZC_cout("x = " + std::to_string(x) + " = " + std::to_string((x / width) * 2 - 1.f) + "; "
     //     + "y = " + std::to_string(y) + " = " + std::to_string((1.f - (y / height)) * 2 - 1.f)
@@ -49,73 +56,55 @@ void ZCR_Camera::MouseMoveAroundObject(float x, float y, float xRel, float yRel,
     //     // + "     {" + std::to_string(p2[0] / p2[3]) + " " + std::to_string(p2[1] / p2[3]) + " " + std::to_string(p2[2] / p2[3]) + "}"
     //     + "     {" + std::to_string(p3[0] / p3[3]) + " " + std::to_string(p3[1] / p3[3]) + " " + std::to_string(p3[2] / p3[3]) + "}");
 
-    if (xRel == 0 && yRel == 0) return;
-    horizontalAngle += yRel * sensitivityRotation;
-    if (horizontalAngle >= 90.f) horizontalAngle = 89.9f;
-    else if (horizontalAngle <= -90.f) horizontalAngle = -89.9f;
-    verticalAngle += xRel * sensitivityRotation;
+    // if (xRel == 0 && yRel == 0) return;
+    // horizontalAngle += yRel * sensitivityRotation;
+    // if (horizontalAngle >= 90.f) horizontalAngle = 89.9f;
+    // else if (horizontalAngle <= -90.f) horizontalAngle = -89.9f;
+    // verticalAngle += xRel * sensitivityRotation;
+    // if (verticalAngle >= 360.f) verticalAngle -= 360.f;
+    // else if (verticalAngle <= -360.f) verticalAngle += 360.f;
+
+    horizontalAngle += sensitivityRotation * (isNormalHorizontalOrientation ? yRel : - yRel);
+    if (horizontalAngle == 90.f) horizontalAngle = 89.9f;
+    else if (horizontalAngle == -90.f) horizontalAngle = -89.9f;
+    else if (horizontalAngle > 90.f) SetHorAngleMoreOrLessThan90(true);
+    else if (horizontalAngle < -90.f) SetHorAngleMoreOrLessThan90(false);
+    verticalAngle += sensitivityRotation * (isNormalHorizontalOrientation ? xRel : - xRel);
     if (verticalAngle >= 360.f) verticalAngle -= 360.f;
     else if (verticalAngle <= -360.f) verticalAngle += 360.f;
 
-    // static bool isNormalHorizontalOrientation = true;
-    // horizontalAngle += isNormalHorizontalOrientation ? yRel * sensitivityRotation : - (yRel * sensitivityRotation);
-    // if (horizontalAngle == 90.f) horizontalAngle = 89.9f;
-    // else if (horizontalAngle == -90.f) horizontalAngle = -89.9f;
-    // else if (horizontalAngle > 90.f)
-    // {
-    //     horizontalAngle = 90.f - (horizontalAngle - 90.f);
+    // float camX = 0.f,
+    //       camY = 0.f,
+    //       camZ = 0.f;
+    // //  horizontal rotaion (rotate around horizont)
+    // float horRad = ZC_Vec::Radians(horizontalAngle);
+    // camX = distanceToObject * cos(horRad);
+    // camZ = distanceToObject * sin(horRad);
+    // //  vertical rotation (rotate around axis arthogonal to horizont)
+    // float vertRad = ZC_Vec::Radians(verticalAngle);
+    // camY = camX * sin(vertRad);
+    // camX = camX * cos(vertRad);
 
-    //     isNormalHorizontalOrientation = !isNormalHorizontalOrientation;
-    //     isNormalHorizontalOrientation ? camera->SetUp({0.f, 0.f, 1.f}) : camera->SetUp({0.f, 0.f, -1.f});
-    //     if (verticalAngle >= 0.f)
-    //     {
-    //         verticalAngle += 180.f;
-    //         if (verticalAngle >= 360.f) verticalAngle -= 360.f;
-    //     }
-    //     else if (verticalAngle < 0.f)
-    //     {
-    //         verticalAngle -= 180.f;
-    //         if (verticalAngle <= -360.f) verticalAngle += 360.f;
-    //     }
-    // }
-    // else if (horizontalAngle <= -90.f)
-    // {
-    //     horizontalAngle = -90.f - (horizontalAngle + 90.f);
-        
-    //     isNormalHorizontalOrientation = !isNormalHorizontalOrientation;
-    //     isNormalHorizontalOrientation ? camera->SetUp({0.f, 0.f, 1.f}) : camera->SetUp({0.f, 0.f, -1.f});
-    //     if (verticalAngle >= 0.f)
-    //     {
-    //         verticalAngle += 180.f;
-    //         if (verticalAngle >= 360.f) verticalAngle -= 360.f;
-    //     }
-    //     else if (verticalAngle < 0.f)
-    //     {
-    //         verticalAngle -= 180.f;
-    //         if (verticalAngle <= -360.f) verticalAngle += 360.f;
-    //     }
-    // }
-    // verticalAngle += isNormalHorizontalOrientation ? xRel * sensitivityRotation : - (xRel * sensitivityRotation);
-    // if (verticalAngle >= 360.f) verticalAngle -= 360.f;
-    // else if (verticalAngle <= -360.f) verticalAngle += 360.f;
+    // auto lookOn = camera->GetLookOn();
+    // camera->SetCamPos({ lookOn[0] + camX, lookOn[1] - camY, lookOn[2] + camZ });    //  on start positive X, positive Y, positive Z, if positive camX, camY, camZ
     
-    float camX = 0.f,
-          camY = 0.f,
-          camZ = 0.f;
-    //  horizontal rotaion (rotate around horizont)
-    float horRad = ZC_Vec::Radians(horizontalAngle);
-    camX = distanceToObject * cos(horRad);
-    camZ = distanceToObject * sin(horRad);
-    //  vertical rotation (rotate around axis arthogonal to horizont)
-    float vertRad = ZC_Vec::Radians(verticalAngle);
-    camY = camX * sin(vertRad);
-    camX = camX * cos(vertRad);
-    
-    auto lookOn = camera->GetLookOn();
-    camera->SetCamPos({ camX + lookOn[0], camY + lookOn[1], camZ + lookOn[2] });    //  on start positive X, positive Y, positive Z, if positive camX, camY, camZ
+    //  analogue with rotation of the model matrix!
+    ZC_Mat4<float> newModel(1.f);
+    newModel.Rotate(verticalAngle, {0.f, 0.f, -1.f}).Rotate(-horizontalAngle, {0.f, 1.f, 0.f});
+    ZC_Vec4<float> camPos = newModel * ZC_Vec4<float>(distanceToObject, 0.f, 0.f, 1.f);
+    camera->SetCamPos({ camPos[0], camPos[1], camPos[2] });
 
     // ZC_cout("angX = " + std::to_string(angleX) + "angY = " + std::to_string(angleY) + "x = " + std::to_string(camX) + "y = " + std::to_string(camY) + "z = " + std::to_string(camZ));
     isDirsActual = false;
+}
+
+void ZCR_Camera::SetHorAngleMoreOrLessThan90(bool isMoreThan90)
+{
+    horizontalAngle = isMoreThan90 ? 90.f - (horizontalAngle - 90.f) : -90.f - (horizontalAngle + 90.f);
+
+    isNormalHorizontalOrientation = !isNormalHorizontalOrientation;
+    isNormalHorizontalOrientation ? camera->SetUp({0.f, 0.f, 1.f}) : camera->SetUp({0.f, 0.f, -1.f});
+    verticalAngle += verticalAngle >= 0.f ? 180.f : -180.f;
 }
 
 void ZCR_Camera::CalculateDirections()
@@ -131,7 +120,7 @@ void ZCR_Camera::ButtonMouseWheelDown(float time)
     sconButton_M_MIDLE.Disconnect();
     sconButton_M_MIDLE = ZC_Events::ConnectButtonUp(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelUp, this });
     sconMouse.Disconnect(); //  disconnect scroll
-    sconMouse = ZC_Events::ConnectMouseMoveOnceInFrame({ &ZCR_Camera::MouseMoveAroundObject, this });
+    sconMouse = ZC_Events::ConnectMouseMoveOnceInFrame({ &ZCR_Camera::MouseMoveCallback, this });
     // ZC_Window::HideCursor();
 }
 
