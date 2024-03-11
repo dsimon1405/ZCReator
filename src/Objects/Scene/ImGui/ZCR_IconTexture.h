@@ -1,7 +1,7 @@
 #pragma once
 
 #include <ZC/Video/OpenGL/Texture/ZC_Texture.h>
-#include <ZC/Tools/Math/ZC_Limits.h>
+#include <ZC/Tools/Math/ZC_Math.h>
 #include <imgui.h>
 
 struct ZCR_IconTexture

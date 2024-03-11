@@ -1,8 +1,10 @@
 #include "ZCR_Surface.h"
 
+#include <ZC/Tools/Math/ZC_Math.h>
+
 ZCR_Surface::ZCR_Surface()
     : spRendererSetsSucafe(MakeTriangleRendererSet()),
-    spRSADSSurface(spRendererSetsSucafe->Make_sptrRendererSetDrawingSet(nullptr, 1.05f, 16734720))    //  stencil border color {r = 255, g = 90, b = 0}
+    spRSADSSurface(spRendererSetsSucafe->Make_sptrRendererSetDrawingSet(nullptr, 1.05f, ZC_PackColorUCharToUInt(255, 90, 0)))    //  stencil border color {r = 255, g = 90, b = 0}
 {}
 
 ZC_sptr<ZC_RendererSet> ZCR_Surface::MakeTriangleRendererSet()

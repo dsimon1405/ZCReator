@@ -220,16 +220,687 @@ struct CC
 };
 //  ZCR_Camera scroll and IGWindow for axis
 
+// class CharAtlas
+// {
+// public:
+//     CharAtlas(const std::string& name, const unsigned& height);
+//     static void LoadContent(const std::string& name, const unsigned& height);
+//     void Update(const std::string& text, const unsigned& startX, const unsigned& startY, const ZC_Vec3<float>& color, const GLfloat& scale = 1.0f);
+//     static void Draw();
+
+// private:
+//     struct Character
+//     {
+//         float advX; 	// advance.x
+//         float advY;	    // advance.y
+
+//         float bitmapW;	    // bitmap.width;
+//         float bitmapH;  	// bitmap.height;
+
+//         float bitmapLeft;	// bitmap_left;
+//         float bitmapTop;	// bitmap_top;
+
+//         float texX;	    // x offset of glyph in texture coordinates
+//         float texY;	    // y offset of glyph in texture coordinates
+//     };
+
+//     struct Point
+//     {
+//         GLfloat x,
+//             y,
+//             s,  // ??? X
+//             t;  // ??? Y
+//     };
+
+//     struct Text
+//     {
+//         ZC_Vec3<float> color;
+//         ZC_Texture* texture;
+//         std::vector<Point> coords;
+//         static inline size_t coordsTotalSize;
+
+//         bool operator<(const Text& text)
+//         {
+//             if (color != text.color)
+//             {
+//                 if (color[0] < text.color[0]) return true;
+//                 if (color[0] > text.color[0]) return false;
+//                 if (color[1] < text.color[1]) return true;
+//                 if (color[1] > text.color[1]) return false;
+//                 if (color[2] < text.color[2]) return true;
+//             }
+//             if (texture < text.texture) return true;
+//             return false;
+//         }
+//     };
+
+//     struct DrawingSet
+//     {
+//         const size_t startIndex;
+//         size_t amount;
+//         ZC_Vec3<float>* color;
+//         ZC_Texture* texture;
+//     };
+
+//     ZC_Texture* texture;
+//     static inline std::map<std::string, const std::shared_ptr<std::map<char, const Character>>> allCharacters;
+//     std::shared_ptr<std::map<char, const Character>> characters;
+//     static inline std::vector<Text> texts;
+    
+//     static void CalculateTextureSize(unsigned& texW, unsigned& texH, const FT_Face& face, const unsigned& firstASCII, const unsigned& lastASCII, const unsigned& borderPixel, const unsigned& texMaxW);
+//     static std::shared_ptr<std::map<char, const Character>> FillTexture(const unsigned& texW, const unsigned& texH, const FT_Face& face, const unsigned& firstASCII, const unsigned& lastASCII, const unsigned& borderPixel, const unsigned& texMaxW);
+//     const std::vector<Point> FillCoords(const std::string& text, GLfloat startX, GLfloat startY, const GLfloat& scale);
+//     static std::vector<Point> PrepareDrawContent(std::list<DrawingSet>& drawingSets);
+//     static bool InitVAO(const ZC_VAO& vao, const ZC_Buffer& vbo);
+// };
+
+struct ZC_ChACharacter
+{
+    float advX; 	// advance.x
+    float advY;	    // advance.y
+
+    float bitmapW;	    // bitmap.width;
+    float bitmapH;  	// bitmap.height;
+
+    float bitmapLeft;	// bitmap_left;
+    float bitmapTop;	// bitmap_top;
+
+    float texX;	    // x offset of glyph in texture coordinates
+    float texY;	    // y offset of glyph in texture coordinates
+};
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include <ZC/ErrorLogger/ZC_ErrorLogger.h>
+
+// CharAtlas::CharAtlas(const std::string& name, const unsigned& height)
+// {
+//     std::string fullName = name + std::to_string(height);
+//     if (allCharacters.find(fullName) == allCharacters.end()) LoadContent(name, height);
+//     texture = Texture2D::GetTexture(fullName);
+//     characters = allCharacters[fullName];
+// }
+
+// void CharAtlas::LoadContent(const std::string& name, const unsigned& height)
+// {
+//     std::string fullName = name + std::to_string(height);
+//     if (allCharacters.find(fullName) != allCharacters.end()) ZC_ErrorLogger::Err("CharAtlas --> " + fullName + " <-- already exist!", __FILE__, __LINE__);
+
+//     FT_Library ft;
+//     if (FT_Init_FreeType(&ft)) ZC_ErrorLogger::Err("ERROR::FREETYPE: Could not init FreeType Library!", __FILE__, __LINE__);
+
+//     std::string fontPath = JSONReader::ReadKeyValues(ResourceManager::pathsToResources, std::vector<std::string>{"fonts", name})[0];
+//     FT_Face face;
+//     if (FT_New_Face(ft, ResourceManager::MakeFullPath(fontPath).c_str(), 0, &face))
+//     {
+//         FT_Done_FreeType(ft);
+//         throw Exception("ERROR::FREETYPE: Failed to load font!", __FILE__, __LINE__);
+//     }
+
+//     FT_Set_Pixel_Sizes(face, 0, height);
+
+//     const unsigned texMaxW = 1024,
+//         borderPixel = 1,
+//         firstASCII = 32,
+//         lastASCII = 127;
+//     unsigned texW = 0,
+//         texH = 0;
+//     FT_GlyphSlot glyph = face->glyph;
+
+//     CalculateTextureSize(texW, texH, face, firstASCII, lastASCII, borderPixel, texMaxW);
+
+//     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+//     Texture2D* texture = Texture2D::Create(fullName, texW, texH, nullptr, GL_RED, true, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+//     texture->Bind();
+//     std::shared_ptr<std::map<char, const Character>> characters = FillTexture(texW, texH, face, firstASCII, lastASCII, borderPixel, texMaxW);
+//     texture->Unbind();
+//     allCharacters.emplace(fullName, characters);
+
+//     FT_Done_Face(face);
+//     FT_Done_FreeType(ft);
+// }
+
+// void CharAtlas::Update(const std::string& text, const unsigned& startX, const unsigned& startY, const glm::vec3& color, const GLfloat& scale)
+// {
+//     if (text == "" || count(text.begin(), text.end(), ' ') == text.size()) return;
+
+//     texts.emplace_back(Text{ color, texture, FillCoords(text, (GLfloat)startX, (GLfloat)startY, scale) });
+// }
+
+// const std::vector<CharAtlas::Point> CharAtlas::FillCoords(const std::string& text, GLfloat startX, GLfloat startY, const GLfloat& scale)
+// {
+//     std::vector<Point> coords;
+//     const unsigned vertices = 6;
+//     coords.reserve((text.length() - count(text.begin(), text.end(), ' ')) * vertices);
+
+//     for (const unsigned char& c : text)
+//     {
+//         const Character& ch = (*characters)[c];
+//         float x = startX + ch.bitmapLeft * scale,
+//             y = startY + (ch.bitmapH - (ch.bitmapH - ch.bitmapTop)) * scale,
+//             w = ch.bitmapW * scale,
+//             h = ch.bitmapH * scale;
+
+//         startX += ch.advX * scale;
+//         //startY += ch.advY * scale;
+
+//         if (!w || !h) continue;   //  ïðîïóñêàåì ïðîáåë
+
+//         const float texWidth = (float)texture->width,
+//             texHeight = (float)texture->height;
+
+//         coords.emplace_back(Point{ x, y, ch.texX, ch.texY });                                                            //  ëåâûé âåðõíèé
+//         coords.emplace_back(Point{ x, y - h, ch.texX, ch.texY + ch.bitmapH / texHeight });                               //  ëåâûé íèæíèé
+//         coords.emplace_back(Point{ x + w, y - h, ch.texX + ch.bitmapW / texWidth, ch.texY + ch.bitmapH / texHeight });   //  ïðàâûé íèæíèé
+//         coords.emplace_back(Point{ x, y, ch.texX, ch.texY });                                                            //  ëåâûé âåðõíèé
+//         coords.emplace_back(Point{ x + w, y - h, ch.texX + ch.bitmapW / texWidth, ch.texY + ch.bitmapH / texHeight });   //  ïðàâûé íèæíèé  
+//         coords.emplace_back(Point{ x + w, y, ch.texX + ch.bitmapW / texWidth, ch.texY });                                //  ïðàâûé âåðõíèé
+//     }
+
+//     Text::coordsTotalSize += coords.size();
+//     return coords;
+// }
+
+// void CharAtlas::Draw()
+// {
+//     if (texts.size() == 0) return;
+
+//     std::list<DrawingSet> drawingSets;
+//     std::vector<Point> allCoords = PrepareDrawContent(drawingSets);
+
+//     glEnable(GL_BLEND);
+//     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+//     static Shader* shader = Shader::GetShader("charAtlas");
+//     static VAO vao;
+//     static VBO vbo;
+//     static bool itin = InitVAO(vao, vbo);
+
+//     shader->Use();
+//     vao.Bind();
+//     vbo.Bind();
+
+//     glBufferData(GL_ARRAY_BUFFER, sizeof(Point) * Text::coordsTotalSize, &allCoords[0], GL_DYNAMIC_DRAW);
+//     for (DrawingSet& drawingSet : drawingSets)
+//     {
+//         if (drawingSet.color) shader->SetVec3("textColor", *drawingSet.color);
+//         if (drawingSet.texture) drawingSet.texture->Bind();
+//         glDrawArrays(GL_TRIANGLES, drawingSet.startIndex, drawingSet.amount);
+//     }
+
+//     vao.Unbind();
+//     vbo.Unbind();
+
+//     glDisable(GL_BLEND);
+
+//     texts.clear();
+//     Text::coordsTotalSize = 0;
+// }
+
+// void CharAtlas::CalculateTextureSize(unsigned& texW, unsigned& texH, const FT_Face& face, const unsigned& firstASCII, const unsigned& lastASCII, const unsigned& borderPixel, const unsigned& texMaxW)
+// {
+//     unsigned rowW = 0,
+//         rowH = 0;
+//     FT_GlyphSlot glyph = face->glyph;
+
+//     for (auto symbol = firstASCII; symbol < lastASCII; symbol++)
+//     {
+//         if (FT_Load_Char(face, symbol, FT_LOAD_RENDER))
+//         {
+//             std::cout << "ERROR::FREETYTPE: Failed to load Glyph\n";
+//             continue;
+//         }
+
+//         //FT_Render_Glyph(glyph, FT_RENDER_MODE_SDF); // <-- And this is new
+
+//         if (rowW + glyph->bitmap.width + borderPixel > texMaxW)
+//         {
+//             texW = std::max(rowW, texW);
+//             texH += rowH + borderPixel;
+//             rowW = 0;
+//             rowH = 0;
+//         }
+
+//         rowW += glyph->bitmap.width + borderPixel;
+//         rowH = std::max(rowH, glyph->bitmap.rows);
+//     }
+
+//     texW = std::max(texW, rowW);
+//     texH += rowH + borderPixel;
+// }
+
+// std::shared_ptr<std::map<char, const CharAtlas::Character>> CharAtlas::FillTexture(const unsigned& texW, const unsigned& texH, const FT_Face& face, const unsigned& firstASCII, const unsigned& lastASCII, const unsigned& borderPixel, const unsigned& texMaxW)
+// {
+//     float texX = 0,
+//         texY = 0;
+//     unsigned rowH = 0;
+//     FT_GlyphSlot glyph = face->glyph;
+
+//     std::shared_ptr<std::map<char, const Character>> characters = std::make_shared<std::map<char, const Character>>();
+
+//     for (auto symbol = firstASCII; symbol < lastASCII; symbol++)
+//     {
+//         if (FT_Load_Char(face, symbol, FT_LOAD_RENDER)) //      ?????????????
+//         {
+//             std::cout << "ERROR::FREETYTPE: Failed to load Glyph\n";
+//             continue;
+//         }
+
+//         //FT_Render_Glyph(glyph, FT_RENDER_MODE_SDF); // <-- And this is new
+
+//         if (texX + glyph->bitmap.width + borderPixel > texMaxW)
+//         {
+//             texY += rowH + borderPixel;
+//             rowH = 0;
+//             texX = 0;
+//         }
+
+//         if (glyph->bitmap.width != 0 && glyph->bitmap.rows != 0)
+//             glTexSubImage2D(GL_TEXTURE_2D, 0, texX, texY, glyph->bitmap.width, glyph->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE, glyph->bitmap.buffer);
+
+//         Character character;
+//         character.advX = glyph->advance.x >> 6;
+//         character.advY = glyph->advance.y >> 6;
+//         character.bitmapW = glyph->bitmap.width;
+//         character.bitmapH = glyph->bitmap.rows;
+//         character.bitmapLeft = glyph->bitmap_left;
+//         character.bitmapTop = glyph->bitmap_top;
+//         character.texX = texX / (float)texW;
+//         character.texY = texY / (float)texH;
+
+//         characters->emplace(symbol, character);
+
+//         texX += glyph->bitmap.width + borderPixel;
+//         rowH = std::max(glyph->bitmap.rows, rowH);
+//     }
+
+//     return characters;
+// }
+
+// std::vector<CharAtlas::Point> CharAtlas::PrepareDrawContent(std::list<DrawingSet>& drawingSets)
+// {
+//     std::sort(texts.begin(), texts.end());
+
+//     std::vector<Point> allCoords;
+//     allCoords.reserve(Text::coordsTotalSize);
+//     for (auto text = texts.begin(); text != texts.end(); text++)
+//     {
+//         allCoords.insert(allCoords.begin() + allCoords.size(), text->coords.begin(), text->coords.end());
+//         if (drawingSets.size() == 0)
+//         {
+//             drawingSets.emplace_back(DrawingSet{ 0, text->coords.size(), &text->color, text->texture });
+//             continue;
+//         }
+//         auto previousText = text - 1;
+//         DrawingSet& previousSet = drawingSets.back();
+//         if (previousText->color == text->color && previousText->texture == text->texture)
+//         {
+//             previousSet.amount += text->coords.size();
+//         }
+//         else
+//         {
+//             drawingSets.emplace_back(DrawingSet
+//                 {
+//                     previousSet.startIndex + previousSet.amount,
+//                     text->coords.size(),
+//                     previousText->color == text->color ? nullptr : &text->color,
+//                     previousText->texture == text->texture ? nullptr : text->texture
+//                 });
+//         }
+//     }
+
+//     return allCoords;
+// }
+
+// bool CharAtlas::InitVAO(const VAO& vao, const VBO& vbo)
+// {
+//     vao.Bind();
+//     vbo.Bind();
+//     glEnableVertexAttribArray(0);
+//     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+//     vao.Unbind();
+//     vbo.Unbind();
+//     return true;
+// }
+
+
+#include <ZC/File/ZC_File.h>
+struct ZC_Fonts
+{
+    enum Name
+    {
+        Arial,
+    };
+
+    struct NameHeight
+    {
+        Name name;
+        size_t height;
+
+        bool operator < (const NameHeight& fs) const noexcept
+        {
+            return name < fs.name || height < fs.height;    //  && || ???
+        }
+    };
+
+    struct Font
+    {
+        struct Point
+        {
+            float x,
+                y,
+                s,  // texCoords X
+                t;  // texCoords Y
+        };
+
+        ZC_Texture texture;
+        std::map<char, ZC_ChACharacter> characters;
+        float width,
+            height;
+
+        const std::vector<Point> FillCoords(const std::string& text, GLfloat startX, GLfloat startY, const GLfloat& scale)
+        {
+            std::vector<Point> coords;
+            const unsigned vertices = 6;
+            coords.reserve((text.length() - count(text.begin(), text.end(), ' ')) * vertices);
+
+            for (const char& c : text)
+            {
+                const ZC_ChACharacter& ch = characters[c];
+                float x = startX + ch.bitmapLeft * scale,
+                    y = startY + (ch.bitmapH - (ch.bitmapH - ch.bitmapTop)) * scale,
+                    w = ch.bitmapW * scale,
+                    h = ch.bitmapH * scale;
+
+                startX += ch.advX * scale;
+                //startY += ch.advY * scale;
+
+                if (!w || !h) continue;   //  ïðîïóñêàåì ïðîáåë
+
+                const float texWidth = width,
+                    texHeight = height;
+
+                coords.emplace_back(Point{ x, y, ch.texX, ch.texY });                                                            //  ëåâûé âåðõíèé
+                coords.emplace_back(Point{ x, y - h, ch.texX, ch.texY + ch.bitmapH / texHeight });                               //  ëåâûé íèæíèé
+                coords.emplace_back(Point{ x + w, y - h, ch.texX + ch.bitmapW / texWidth, ch.texY + ch.bitmapH / texHeight });   //  ïðàâûé íèæíèé
+                coords.emplace_back(Point{ x, y, ch.texX, ch.texY });                                                            //  ëåâûé âåðõíèé
+                coords.emplace_back(Point{ x + w, y - h, ch.texX + ch.bitmapW / texWidth, ch.texY + ch.bitmapH / texHeight });   //  ïðàâûé íèæíèé  
+                coords.emplace_back(Point{ x + w, y, ch.texX + ch.bitmapW / texWidth, ch.texY });                                //  ïðàâûé âåðõíèé
+            }
+
+            return coords;
+        }
+    };
+
+    static inline std::map<NameHeight, Font> fonts;
+    static const uint texMaxW = 1024,
+        borderPixel = 1;
+    static const ulong firstASCII = 32,
+        lastASCII = 127;
+
+    static void Load(NameHeight* names, size_t namesCount)
+    {
+        FT_Library ft;
+        if (FT_Init_FreeType(&ft)) ZC_ErrorLogger::Err("Fail FT_Init_FreeType()!", __FILE__, __LINE__);
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+        for (size_t namesIndex = 0; namesIndex < namesCount; ++namesIndex)
+        {
+            auto fontsIter = fonts.find(names[namesIndex]);
+            if (fontsIter != fonts.end()) continue;
+
+            FT_Face face;
+            if (FT_New_Face(ft, GetPath(names[namesIndex].name).c_str(), 0, &face))
+            {
+                ZC_ErrorLogger::Err("Fail FT_New_Face()!", __FILE__, __LINE__);
+                continue;
+            }
+
+            if (FT_Set_Pixel_Sizes(face, 0, names[namesIndex].height))
+            {
+                ZC_ErrorLogger::Err("Fail FT_Set_Pixel_Sizes()!", __FILE__, __LINE__);
+                continue;
+            }
+
+            fonts.emplace(names[namesIndex], MakeFont(face));
+        }
+
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    }
+
+    static Font* GetFont(NameHeight name)
+    {
+        auto fontsIter = fonts.find(name);
+        if (fontsIter == fonts.end()) ZC_ErrorLogger::Err("Error in GetFont() Font wasn't loaded!", __FILE__,__LINE__);
+        return &(fontsIter->second);
+    }
+
+    static std::string GetPath(Name name)
+    {
+        static const ZC_FSPath ZC_fontsPath = ZC_FSPath(ZC_ZCDirPath).append("fonts");
+        switch (name)
+        {
+        case Arial: return ZC_FSPath(ZC_fontsPath).append("arial.ttf").string();
+        default: return "";
+        }
+    }
+
+    static void CalculateTextureSize(uint& texW, uint& texH, const FT_Face& face)
+    {
+        unsigned rowW = 0,
+            rowH = 0;
+        FT_GlyphSlot glyph = face->glyph;
+
+        for (auto symbol = firstASCII; symbol < lastASCII; ++symbol)
+        {
+            if (FT_Load_Char(face, symbol, FT_LOAD_RENDER))
+            {
+                ZC_ErrorLogger::Err("Fail FT_Load_Char()!", __FILE__, __LINE__);
+                continue;
+            }
+
+            //FT_Render_Glyph(glyph, FT_RENDER_MODE_SDF); // <-- And this is new
+
+            if (rowW + glyph->bitmap.width + borderPixel > texMaxW)
+            {
+                texW = std::max(rowW, texW);
+                texH += rowH + borderPixel;
+                rowW = 0;
+                rowH = 0;
+            }
+
+            rowW += glyph->bitmap.width + borderPixel;
+            rowH = std::max(rowH, glyph->bitmap.rows);
+        }
+
+        texW = std::max(texW, rowW);
+        texH += rowH + borderPixel;
+    }
+
+    static Font MakeFont(const FT_Face& face)
+    {
+        uint texW = 0,
+            texH = 0;
+        CalculateTextureSize(texW, texH, face);
+
+        ZC_Texture texture(GL_TEXTURE_2D, GL_RED, texW, texH, nullptr, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR, GL_LINEAR);
+        texture.Bind();
+
+        float texX = 0,
+            texY = 0;
+        unsigned rowH = 0;
+        FT_GlyphSlot glyph = face->glyph;
+
+        std::map<char, ZC_ChACharacter> characters;
+
+        for (auto symbol = firstASCII; symbol < lastASCII; ++symbol)
+        {
+            if (FT_Load_Char(face, symbol, FT_LOAD_RENDER)) continue;
+
+            //FT_Render_Glyph(glyph, FT_RENDER_MODE_SDF); // <-- And this is new
+
+            if (texX + glyph->bitmap.width + borderPixel > texMaxW)
+            {
+                texY += rowH + borderPixel;
+                rowH = 0;
+                texX = 0;
+            }
+
+            if (glyph->bitmap.width != 0 && glyph->bitmap.rows != 0)
+                glTexSubImage2D(GL_TEXTURE_2D, 0, texX, texY, glyph->bitmap.width, glyph->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE, glyph->bitmap.buffer);
+
+            ZC_ChACharacter character;
+            character.advX = glyph->advance.x >> 6;
+            character.advY = glyph->advance.y >> 6;
+            character.bitmapW = glyph->bitmap.width;
+            character.bitmapH = glyph->bitmap.rows;
+            character.bitmapLeft = glyph->bitmap_left;
+            character.bitmapTop = glyph->bitmap_top;
+            character.texX = texX / (float)texW;
+            character.texY = texY / (float)texH;
+
+            characters.emplace(symbol, character);
+
+            texX += glyph->bitmap.width + borderPixel;
+            rowH = std::max(glyph->bitmap.rows, rowH);
+        }
+        texture.Unbind();
+
+        return { std::move(texture), std::move(characters), static_cast<float>(texW), static_cast<float>(texH) };
+    }
+};
+
+struct ZC_RSText : public ZC_RS
+{
+    ZC_Texture* pTexture;
+
+    ZC_RSText(typename ZC_ShProgs::ShPInitSet* pShPInitSet, ZC_VAO&& _vao, ZC_uptr<ZC_GLDraw>&& _upDraw,
+            std::forward_list<ZC_Buffer>&& _buffers, ZC_Texture* _pTexture);
+    ZC_RSText(ZC_RSText&& rs);
+
+    void Draw(Level lvl) override;
+
+    /*
+    Return unique pointer to ZC_RendererSetAndDrawingSet.
+
+    texSetName - name of the texture set (ZC_RSTexs::TexSet), can be nullptr if used for heir ZC_RSNonTex.
+    stencilScale - scale for drawing the stencil border of the object. Should be greater than 1.0f. Can be anything if ZC_RendererSet::Level::Stencil will not be used.
+    stencilColor - color of stencil border packed in unsigned int. Packing -> unsigned char[32] -> [0 - 7]{no metter}, [7 - 15]{red}, [15 - 23]{green}, [23 - 31]{blue}
+    */
+    ZC_uptr<ZC_RendererSetAndDrawingSet> Make_uptrRendererSetDrawingSet(const char* texSetName, float stencilScale, unsigned int stencilColor) override;
+
+    /*
+    Return shared pointer to ZC_RendererSetAndDrawingSet.
+
+    texSetName - name of the texture set (ZC_RSTexs::TexSet), can be nullptr if used for heir ZC_RSNonTex.
+    stencilScale - scale for drawing the stencil border of the object. Should be greater than 1.0f. Can be anything if ZC_RendererSet::Level::Stencil will not be used.
+    stencilColor - color of stencil border packed in unsigned int. Packing -> unsigned char[32] -> [0 - 7]{no metter}, [7 - 15]{red}, [15 - 23]{green}, [23 - 31]{blue}
+    */
+    ZC_sptr<ZC_RendererSetAndDrawingSet> Make_sptrRendererSetDrawingSet(const char* texSetName, float stencilScale, unsigned int stencilColor) override;
+    void Add(DrawingSet* pDS) override;
+    void Erase(DrawingSet* pDS) override;
+    
+private:
+    LevelController levelController;
+};
+
+ZC_RSText::ZC_RSText(typename ZC_ShProgs::ShPInitSet* pShPInitSet, ZC_VAO&& _vao, ZC_uptr<ZC_GLDraw>&& _upDraw,
+        std::forward_list<ZC_Buffer>&& _buffers, ZC_Texture* _pTexture)
+    : ZC_RS(pShPInitSet, std::move(_vao), std::move(_upDraw), std::move(_buffers)),
+    pTexture(_pTexture)
+{}
+
+ZC_RSText::ZC_RSText(ZC_RSText&& rs)
+    : ZC_RS(dynamic_cast<ZC_RS&&>(rs))
+{}
+
+void ZC_RSText::Draw(Level lvl)
+{
+    vao.BindVertexArray();
+    levelController.Draw(lvl, upGLDraw, pTexture, 1);
+}
+
+ZC_uptr<ZC_RendererSetAndDrawingSet> ZC_RSText::Make_uptrRendererSetDrawingSet(const char* texSetName, float stencilScale, unsigned int stencilColor)
+{
+    return { new ZC_RendererSetAndDrawingSet(this, { pBaseUniforms->GetCopy(), Level::None, nullptr, stencilScale, stencilColor }) };
+}
+
+ZC_sptr<ZC_RendererSetAndDrawingSet> ZC_RSText::Make_sptrRendererSetDrawingSet(const char* texSetName, float stencilScale, unsigned int stencilColor)
+{
+    return { new ZC_RendererSetAndDrawingSet(this, { pBaseUniforms->GetCopy(), Level::None, nullptr, stencilScale, stencilColor }) };
+}
+
+void ZC_RSText::Add(DrawingSet* pDS)
+{
+    if (levelController.Add(pDS)) AddToRenderer(pDS->lvl);
+}
+
+void ZC_RSText::Erase(DrawingSet* pDS)
+{
+    if (levelController.Erase(pDS)) EraseFromRenderer(pDS->lvl);
+}
+
+struct ZC_TextWindow
+{
+    typedef typename ZC_Fonts::Font Font;
+    Font* pFont;
+    ZC_uptr<ZC_RS> upRS;
+    ZC_uptr<ZC_RendererSetAndDrawingSet> upRSADS;
+
+    ZC_TextWindow(typename ZC_Fonts::NameHeight nameHeight, const std::string& text, const ZC_Vec3<float>& color)
+        : pFont(ZC_Fonts::GetFont(nameHeight)),
+        upRS(MakeRS(text)),
+        upRSADS(upRS->Make_uptrRendererSetDrawingSet("", 0, 0))
+    {
+        uint colorUint = ZC_PackColorFloatToUInt(color[0], color[1], color[2]);
+        upRSADS->SetUniformsData(ZC_Uniform::Name::unColor, &colorUint);
+
+        upRSADS->SwitchToLvl(ZC_RendererSet::Level::Drawing);
+    }
+
+    ZC_uptr<ZC_RS> MakeRS(const std::string& text)   //  symbolsInString exclude whitespaces
+    {
+        ZC_Buffer vbo(GL_ARRAY_BUFFER);
+        auto pointsCoords = pFont->FillCoords(text, 300, 300, 1.f);
+        vbo.BufferData(pointsCoords.size() * sizeof(ZC_Fonts::Font::Point), &(pointsCoords[0]), GL_DYNAMIC_DRAW);   //  add check on dynamic or static draw
+
+        auto upDraw = ZC_uptrMakeFromChild<ZC_GLDraw, ZC_DrawArrays>(GL_TRIANGLES, 0, pointsCoords.size() * 6);   //  change on FAN or STRIP
+
+        typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZC_TextWindow);
+
+        ZC_VAO vao;
+        vao.Config(pShPIS->vaoConData, vbo, nullptr, 0, 0);
+
+        std::forward_list<ZC_Buffer> buffers;
+        buffers.emplace_front(std::move(vbo));
+
+        return { new ZC_RSText(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers), &(pFont->texture)) };
+    }
+};
+
+struct ZC_TextScene
+{
+
+};
+#include <ZC/Video/OpenGL/Renderer/ZC_RSTexs.h>
 int ZC_main()
 {
     using namespace ZC_Window;
     ZC_Window::MakeWindow(ZC_Window_Multisampling_4 | ZC_Window_Border, 800.f, 600.f, "ZeroCreator");
     // window->SetFPS(0);
+    ZC_Fonts::NameHeight fonts[]{ZC_Fonts::Name::Arial, 200};
+    ZC_Fonts::Load(fonts, 1);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
 
     ZC_Window::GlClearColor(0.3f, 0.3f, 0.3f, 1.f);
     ZC_Window::GlEnablePointSize();
     
     ZCR_Scene scene;
+    ZC_TextWindow text({ZC_Fonts::Name::Arial, 200}, "lolka", {1.f, 0.f, 0.f});
 
     ZC_Window::RuntMainCycle();
     
