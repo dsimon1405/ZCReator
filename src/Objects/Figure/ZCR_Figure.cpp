@@ -55,10 +55,10 @@ ZC_sptr<ZC_DA<ZC_Quad>> ZCR_Figure::GetQuads(Name standartFigure)
             new ZC_Quad[]
             {
                 {
-                    {-1.f, -1.f, -1.f },
-                    { 1.f, -1.f,  1.f },
-                    {-1.f, -1.f,  1.f },
-                    { 1.f, -1.f, -1.f }
+                    {-1.f, -1.f, -1.f },    //  bl
+                    { 1.f, -1.f,  1.f },    //  tr
+                    {-1.f, -1.f,  1.f },    //  tl
+                    { 1.f, -1.f, -1.f }     //  br
                 },
                 {
                     {-1.f,  1.f, -1.f },
