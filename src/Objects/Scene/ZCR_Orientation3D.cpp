@@ -1,7 +1,7 @@
 #include "ZCR_Orientation3D.h"
 
-#include <ZC/Video/OpenGL/Renderer/ZC_RSNonTex.h>
-#include <ZC/Video/OpenGL/Renderer/ZC_RSTexs.h>
+#include <ZC/Video/OpenGL/Renderer/ZC_RSNotTextured.h>
+#include <ZC/Video/OpenGL/Renderer/ZC_RSTextured.h>
 #include <ZC/Tools/Math/ZC_Math.h>
 #include <ZC/Events/ZC_Events.h>
 #include <ZC/Tools/Math/ZC_Mat.h>
@@ -65,7 +65,7 @@ ZC_uptr<ZC_RS> ZCR_Orientation3D::MakeRSLine()
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(vbo));
 
-    return { new ZC_RSNonTex(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
+    return { new ZC_RSNotTextured(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
 }
 #include <Objects/Scene/ImGui/ZCR_IconTexture.h>
 #include "ZC/Video/OpenGL/Texture/ZC_Textures.h"
@@ -151,10 +151,10 @@ ZC_uptr<ZC_RendererSet> ZCR_Orientation3D::MakeRendererSetAxice()
 
     auto votc = pShPIS->texSets.GetCreator();
     votc.Add(ZC_Textures::LoadTexture2D(ZC_FSPath(ZCR_ZCRTexturePath).append("sceneIcons.png").c_str()));
-    std::vector<ZC_RSTexs::TexSet> texSets;
+    std::vector<ZC_RSTextured::TexSet> texSets;
     texSets.emplace_back("", votc.GetVector());
     
-    return { new ZC_RSTexs(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers), std::move(texSets)) };
+    return { new ZC_RSTextured(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers), std::move(texSets)) };
 }
 
 void ZCR_Orientation3D::WindowResizeCallback(float width, float height)

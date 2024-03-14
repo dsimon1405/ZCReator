@@ -4,7 +4,7 @@
 #include <ZC/Video/OpenGL/Renderer/ZC_Draw.h>
 #include <ZC/Video/OpenGL/Shader/ZC_ShProgs.h>
 #include <ZC/Video/OpenGL/VAO/ZC_VAOs.h>
-#include <ZC/Video/OpenGL/Renderer/ZC_RSNonTex.h>
+#include <ZC/Video/OpenGL/Renderer/ZC_RSNotTextured.h>
 #include <ZC/ErrorLogger/ZC_ErrorLogger.h>
 
 ZCR_Mesh::ZCR_Mesh(float totalLength)
@@ -81,5 +81,5 @@ ZC_uptr<ZC_RendererSet> ZCR_Mesh::MakeRendererSet(float totalLength)
 
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(vbo));
-    return { new ZC_RSNonTex(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
+    return { new ZC_RSNotTextured(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
 }

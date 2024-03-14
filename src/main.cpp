@@ -220,13 +220,13 @@ struct CC
 };
 //  ZCR_Camera scroll and IGWindow for axis
 
-struct ZC_RSText : public ZC_RS
+struct ZC_RSTexturePointer : public ZC_RS
 {
     ZC_Texture* pTexture;
 
-    ZC_RSText(typename ZC_ShProgs::ShPInitSet* pShPInitSet, ZC_VAO&& _vao, ZC_uptr<ZC_GLDraw>&& _upDraw,
+    ZC_RSTexturePointer(typename ZC_ShProgs::ShPInitSet* pShPInitSet, ZC_VAO&& _vao, ZC_uptr<ZC_GLDraw>&& _upDraw,
             std::forward_list<ZC_Buffer>&& _buffers, ZC_Texture* _pTexture);
-    ZC_RSText(ZC_RSText&& rs);
+    ZC_RSTexturePointer(ZC_RSTexturePointer&& rs);
 
     void Draw(Level lvl) override;
 
@@ -254,58 +254,42 @@ private:
     LevelController levelController;
 };
 
-ZC_RSText::ZC_RSText(typename ZC_ShProgs::ShPInitSet* pShPInitSet, ZC_VAO&& _vao, ZC_uptr<ZC_GLDraw>&& _upDraw,
+ZC_RSTexturePointer::ZC_RSTexturePointer(typename ZC_ShProgs::ShPInitSet* pShPInitSet, ZC_VAO&& _vao, ZC_uptr<ZC_GLDraw>&& _upDraw,
         std::forward_list<ZC_Buffer>&& _buffers, ZC_Texture* _pTexture)
     : ZC_RS(pShPInitSet, std::move(_vao), std::move(_upDraw), std::move(_buffers)),
     pTexture(_pTexture)
 {}
 
-ZC_RSText::ZC_RSText(ZC_RSText&& rs)
+ZC_RSTexturePointer::ZC_RSTexturePointer(ZC_RSTexturePointer&& rs)
     : ZC_RS(dynamic_cast<ZC_RS&&>(rs))
 {}
 
-void ZC_RSText::Draw(Level lvl)
+void ZC_RSTexturePointer::Draw(Level lvl)
 {
     vao.BindVertexArray();
     levelController.Draw(lvl, upGLDraw, pTexture, 1);
 }
 
-ZC_uptr<ZC_RendererSetAndDrawingSet> ZC_RSText::Make_uptrRendererSetDrawingSet(const char* texSetName, float stencilScale, unsigned int stencilColor)
+ZC_uptr<ZC_RendererSetAndDrawingSet> ZC_RSTexturePointer::Make_uptrRendererSetDrawingSet(const char* texSetName, float stencilScale, unsigned int stencilColor)
 {
     return { new ZC_RendererSetAndDrawingSet(this, { pBaseUniforms->GetCopy(), Level::None, nullptr, stencilScale, stencilColor }) };
 }
 
-ZC_sptr<ZC_RendererSetAndDrawingSet> ZC_RSText::Make_sptrRendererSetDrawingSet(const char* texSetName, float stencilScale, unsigned int stencilColor)
+ZC_sptr<ZC_RendererSetAndDrawingSet> ZC_RSTexturePointer::Make_sptrRendererSetDrawingSet(const char* texSetName, float stencilScale, unsigned int stencilColor)
 {
     return { new ZC_RendererSetAndDrawingSet(this, { pBaseUniforms->GetCopy(), Level::None, nullptr, stencilScale, stencilColor }) };
 }
 
-void ZC_RSText::Add(DrawingSet* pDS)
+void ZC_RSTexturePointer::Add(DrawingSet* pDS)
 {
     if (levelController.Add(pDS)) AddToRenderer(pDS->lvl);
 }
 
-void ZC_RSText::Erase(DrawingSet* pDS)
+void ZC_RSTexturePointer::Erase(DrawingSet* pDS)
 {
     if (levelController.Erase(pDS)) EraseFromRenderer(pDS->lvl);
 }
 #include <ZC/Tools/Math/ZC_Vec2.h>
-struct ZC_ChACharacter
-{
-    float advX; 	// advance.x
-    float advY;	    // advance.y
-
-    float bitmapW;	    // bitmap.width;
-    float bitmapH;  	// bitmap.height;
-
-    float bitmapLeft;	// bitmap_left;
-    float bitmapTop;	// bitmap_top;
-
-    float texX_left;	    // x offset of glyph in texture coordinates
-    float texY_bottom;	    // y offset of glyph in texture coordinates
-    float texX_right;	    // x offset of glyph in texture coordinates
-    float texY_top;	        // y offset of glyph in texture coordinates
-};
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -313,16 +297,25 @@ struct ZC_ChACharacter
 
 
 #include <ZC/File/ZC_File.h>
+#include <ZC/Tools/Math/ZC_Math.h>
+
+enum ZC_TextAlignment
+{
+    Left,
+    Right,
+    Center,
+};
+
+enum ZC_FontName
+{
+    Arial,
+};
+
 struct ZC_Fonts
 {
-    enum Name
-    {
-        Arial,
-    };
-
     struct NameHeight
     {
-        Name name;
+        ZC_FontName name;
         size_t height;
 
         bool operator < (const NameHeight& fs) const noexcept
@@ -331,25 +324,35 @@ struct ZC_Fonts
         }
     };
 
+    struct Character
+    {
+        float advX; 	// advance.x
+        float advY;	    // advance.y
+
+        float bitmapW;	    // bitmap.width;
+        float bitmapH;  	// bitmap.height;
+
+        float bitmapLeft;	// bitmap_left;
+        float bitmapTop;	// bitmap_top;
+
+        float texX_left;	    // x offset of glyph in texture coordinates
+        float texY_bottom;	    // y offset of glyph in texture coordinates
+        float texX_right;	    // x offset of glyph in texture coordinates
+        float texY_top;	        // y offset of glyph in texture coordinates
+    };
+
     struct Font
     {
         struct Point
         {
             float x,
-                y,
-                s,  // texCoords X
+                y;
+            ushort s,  // texCoords X
                 t;  // texCoords Y
         };
 
         ZC_Texture texture;
-        std::map<char, ZC_ChACharacter> characters;
-
-        enum Alignment
-        {
-            Left,
-            Right,
-            Center,
-        };
+        std::map<char, Character> characters;
 
         struct LineData
         {
@@ -359,18 +362,16 @@ struct ZC_Fonts
                 width;
         };
 
-        std::vector<Point> FillCoords(const std::string& text, float scale, Alignment alignment)
+        std::vector<Point> FillCoords(const std::string& text, float scale, ZC_TextAlignment alignment, float& rTextWidth, float& rTextHeight)
         {
             auto newLineCount = std::count(text.begin(), text.end(), '\n');
             std::vector<LineData> linesData;
             linesData.reserve(newLineCount + 1);   //  + 1 -> minimum 1 line
 
             std::vector<Point> coords;
-            coords.reserve((text.length() - std::count(text.begin(), text.end(), ' ') - newLineCount) * 4); //  4 -> vertices count
+            coords.reserve((text.length() - std::count(text.begin(), text.end(), ' ') - newLineCount) * 4); //  4 -> vertices count, except ' ' and '\n'
 
-            float totalWidth = 0,
-                totalHeight = 0;
-            FillCoordsAndLines(text, coords, linesData, scale, totalWidth, totalHeight);
+            FillCoordsAndLines(text, coords, linesData, scale, rTextWidth, rTextHeight);
 
             for (auto& lineData : linesData)
             {
@@ -383,8 +384,8 @@ struct ZC_Fonts
 
             for (auto& lineData : linesData)
             {
-                if (lineData.width == totalWidth) continue;
-                float offsetX = alignment == Right ? totalWidth - lineData.width : (totalWidth - lineData.width) / 2.f;  //  otherwise Alignment_Center, Alignment_Left is default
+                if (lineData.width == rTextWidth) continue;
+                float offsetX = alignment == Right ? rTextWidth - lineData.width : (rTextWidth - lineData.width) / 2.f;  //  otherwise Alignment_Center, Alignment_Left is default
                 for (size_t i = lineData.coordsStartIndex; i < lineData.coordsStartIndex + lineData.coordsCount; ++i)
                     coords[i].x += offsetX;                
             }
@@ -414,7 +415,7 @@ struct ZC_Fonts
                     continue;
                 }
 
-                const ZC_ChACharacter& ch = characters[c];
+                const Character& ch = characters[c];
                 float x = startX + ch.bitmapLeft * scale,
                     y = startY + (ch.bitmapH - (ch.bitmapH - ch.bitmapTop)) * scale,
                     w = ch.bitmapW * scale,
@@ -426,15 +427,20 @@ struct ZC_Fonts
                 float mustBeUp = h - y;
                 if (mustBeUp > lineHeightDownTail) lineHeightDownTail = mustBeUp;
 
-                float symbolsHeightWithoughtDownTail = y - mustBeUp;
+                float symbolsHeightWithoughtDownTail = h - mustBeUp;
                 if (lineHeightWithoughtButtomTail < symbolsHeightWithoughtDownTail) lineHeightWithoughtButtomTail = symbolsHeightWithoughtDownTail;
 
                 if (!w || !h) continue;   //  whitespace
 
-                rCoords.emplace_back(Point{ x, y, ch.texX_left, ch.texY_bottom });           //  bl  full texture of symbols is Y inversed!
-                rCoords.emplace_back(Point{ x + w, y - h, ch.texX_right, ch.texY_top });     //  tr  full texture of symbols is Y inversed!
-                rCoords.emplace_back(Point{ x, y - h, ch.texX_left, ch.texY_top });          //  tl  full texture of symbols is Y inversed!
-                rCoords.emplace_back(Point{ x + w, y, ch.texX_right, ch.texY_bottom });      //  br  full texture of symbols is Y inversed!
+                ushort texCoord_l = ZC_PackTexCoordFloatToUShort(ch.texX_left);
+                ushort texCoord_r = ZC_PackTexCoordFloatToUShort(ch.texX_right);
+                ushort texCoord_t = ZC_PackTexCoordFloatToUShort(ch.texY_top);
+                ushort texCoord_b = ZC_PackTexCoordFloatToUShort(ch.texY_bottom);
+
+                rCoords.emplace_back(Point{ x, y, texCoord_l, texCoord_b });            //  bl  full texture of symbols is Y inversed!
+                rCoords.emplace_back(Point{ x + w, y - h, texCoord_r, texCoord_t });    //  tr  full texture of symbols is Y inversed!
+                rCoords.emplace_back(Point{ x, y - h, texCoord_l, texCoord_t });        //  tl  full texture of symbols is Y inversed!
+                rCoords.emplace_back(Point{ x + w, y, texCoord_r, texCoord_b });        //  br  full texture of symbols is Y inversed!
 
                 coordsCount += 4;
             }
@@ -500,7 +506,7 @@ struct ZC_Fonts
         return &(fontsIter->second);
     }
 
-    static std::string GetPath(Name name)
+    static std::string GetPath(ZC_FontName name)
     {
         static const ZC_FSPath ZC_fontsPath = ZC_FSPath(ZC_ZCDirPath).append("fonts");
         switch (name)
@@ -554,7 +560,7 @@ struct ZC_Fonts
         unsigned rowH = 0;
         FT_GlyphSlot glyph = face->glyph;
 
-        std::map<char, ZC_ChACharacter> characters;
+        std::map<char, Character> characters;
     
         for (auto symbol = firstASCII; symbol < lastASCII; ++symbol)
         {
@@ -572,7 +578,7 @@ struct ZC_Fonts
                 
             float texX_left = texX / static_cast<float>(texW),
                 texY_bottom = texY / static_cast<float>(texH);
-            characters.emplace(symbol, ZC_ChACharacter
+            characters.emplace(symbol, Character
                 {
                     static_cast<float>(glyph->advance.x >> 6),
                     static_cast<float>(glyph->advance.y >> 6),
@@ -648,63 +654,221 @@ ZC_DA<uchar> GetTriangleElements(size_t& rElementsCount, GLenum& rElementsType, 
     }
     return elements;
 }
-struct ZC_TextWindow
-{
-    typedef typename ZC_Fonts::Font Font;
-    Font* pFont;
-    ZC_uptr<ZC_RS> upRS;
-    ZC_uptr<ZC_RendererSetAndDrawingSet> upRSADS;
 
-    ZC_TextWindow(typename ZC_Fonts::NameHeight nameHeight, const std::string& text, const ZC_Vec3<float>& color)
-        : pFont(ZC_Fonts::GetFont(nameHeight)),
-        upRS(MakeRS(text)),
-        upRSADS(upRS->Make_uptrRendererSetDrawingSet("", 0, 0))
+struct ZC_TextSharedData
+{
+    std::string text;
+    ZC_TextAlignment alignment;
+    ZC_uptr<ZC_RS> upRS;
+};
+
+struct ZC_TextData
+{
+public:
+    virtual ~ZC_TextData() = default;
+
+    void NeedDraw(bool needDraw)
+    {
+        typedef typename ZC_RendererSet::Level RSLevel;
+        needDraw ? upRSADS->SwitchToLvl(isParantOf_ZCTextWindow ? RSLevel::TextWindow : RSLevel::TextWindow)    //  change TextScene !!!!!!!
+            : upRSADS->SwitchToLvl(RSLevel::None);
+    }
+
+    void SetColor(const ZC_Vec3<float>& color)
     {
         uint colorUint = ZC_PackColorFloatToUInt(color[0], color[1], color[2]);
         upRSADS->SetUniformsData(ZC_Uniform::Name::unColor, &colorUint);
-
-        upRSADS->SwitchToLvl(ZC_RendererSet::Level::TextWindow);
     }
 
-    ZC_uptr<ZC_RS> MakeRS(const std::string& text)
+    void SetText(const std::string& _text)
     {
+        if (spTextSharedData->text == _text) return;
+        spTextSharedData->text = _text;
+                                                       //  vbo - second in buffers (firsts added); ebo - first in buffers (seconds added)
+        spTextSharedData->upRS->upGLDraw = std::move(CalculateAndSetTextData(*(++(spTextSharedData->upRS->buffers.begin())), *(spTextSharedData->upRS->buffers.begin())));
+        SetNewTextSize();
+    }
+
+    void SetAlignment(ZC_TextAlignment _alignment)
+    {
+        if (spTextSharedData->alignment == _alignment) return;
+        spTextSharedData->alignment = _alignment;
+                                                       //  vbo - second in buffers (firsts added); ebo - first in buffers (seconds added)
+        spTextSharedData->upRS->upGLDraw = std::move(CalculateAndSetTextData(*(++(spTextSharedData->upRS->buffers.begin())), *(spTextSharedData->upRS->buffers.begin())));
+    }
+
+    //  If need to change text and alignment at the same time, use this function. Calling SetText() and SetAlignment() separately is less effective.
+    void SetTextAndAlignment(const std::string& _text, ZC_TextAlignment _alignment)
+    {
+        bool recalculateText = false;
+        if (spTextSharedData->text != _text)
+        {
+            spTextSharedData->text = _text;
+            recalculateText = true;
+        }
+        bool recalculateAlignment = false;
+        if (spTextSharedData->alignment != _alignment)
+        {
+            spTextSharedData->alignment = _alignment;
+            recalculateAlignment = true;
+        }
+        if (recalculateText || recalculateAlignment) spTextSharedData->upRS->upGLDraw =
+                std::move(CalculateAndSetTextData(*(++(spTextSharedData->upRS->buffers.begin())), *(spTextSharedData->upRS->buffers.begin())));
+        if (recalculateText) SetNewTextSize();
+    }
+
+protected:
+    typedef typename ZC_Fonts::Font Font;
+    Font* pFont;
+    ZC_sptr<ZC_TextSharedData> spTextSharedData;
+    ZC_uptr<ZC_RendererSetAndDrawingSet> upRSADS;
+    float textWidth,
+        textHeight;
+
+    ZC_TextData(bool _isParantOf_ZCTextWindow, typename ZC_Fonts::NameHeight fontData,const std::string& _text,
+            ZC_TextAlignment _alignment, const ZC_Vec3<float>& color)
+        : pFont(ZC_Fonts::GetFont(fontData)),
+        spTextSharedData(ZC_sptrMake<ZC_TextSharedData>(_text, _alignment)),
+        isParantOf_ZCTextWindow(_isParantOf_ZCTextWindow)
+    {
+        spTextSharedData->upRS = MakeRS();
+        upRSADS = spTextSharedData->upRS->Make_uptrRendererSetDrawingSet("", 0, 0);
+        SetColor(color);
+        NeedDraw(true);
+    }
+
+    ZC_TextData(const ZC_TextData& td)
+        : pFont(td.pFont),
+        spTextSharedData(td.spTextSharedData),
+        upRSADS(td.upRSADS->Make_uptrCopy()),
+        textWidth(td.textWidth),
+        textHeight(td.textHeight),
+        isParantOf_ZCTextWindow(td.isParantOf_ZCTextWindow)
+    {}
+
+private:
+    bool isParantOf_ZCTextWindow;
+
+    virtual void SetNewTextSize() = 0;
+    
+    ZC_uptr<ZC_RS> MakeRS()
+    {
+        auto pShPIS = isParantOf_ZCTextWindow ? ZC_ShProgs::Get(ZC_ShProgs::Name::ZC_TextWindow) : nullptr; //  ZC_TextScene   !!!!!!!!!!!!
         ZC_Buffer vbo(GL_ARRAY_BUFFER);
-        auto pointsCoords = pFont->FillCoords(text, 1.f, ZC_Fonts::Font::Alignment::Center);
-        vbo.BufferData(pointsCoords.size() * sizeof(ZC_Fonts::Font::Point), &(pointsCoords[0]), GL_DYNAMIC_DRAW);   //  add check on dynamic or static draw
-  
-        size_t elementsCount = 0;
-        GLenum elementsType = 0;
-        ZC_DA<uchar> elements = GetTriangleElements(elementsCount, elementsType, pointsCoords.size() / 4, 0);
-
         ZC_Buffer ebo(GL_ELEMENT_ARRAY_BUFFER);
-        ebo.BufferData(elements.size, elements.Begin(), GL_STATIC_DRAW);
-
-        auto upDraw = ZC_uptrMakeFromChild<ZC_GLDraw, ZC_DrawElements>(GL_TRIANGLES, elementsCount, elementsType, 0);
-
-        typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZC_TextWindow);
-
         ZC_VAO vao;
-        vao.Config(pShPIS->vaoConData, vbo, &ebo, 0, 0);
+        vao.Config(pShPIS->vaoConData, vbo, &ebo, 0, 0);    //  set vertices count if VVNNCC -> CalculateAndSetTextData()
+
+        auto upGLDraw = CalculateAndSetTextData(vbo, ebo);
 
         std::forward_list<ZC_Buffer> buffers;
         buffers.emplace_front(std::move(vbo));
         buffers.emplace_front(std::move(ebo));
 
-        return { new ZC_RSText(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers), &(pFont->texture)) };
+        return { new ZC_RSTexturePointer(pShPIS, std::move(vao), std::move(upGLDraw), std::move(buffers), &(pFont->texture)) };
+    }
+
+    ZC_uptr<ZC_GLDraw> CalculateAndSetTextData(ZC_Buffer& rVBO, ZC_Buffer& rEBO)
+    {
+        textWidth = 0;
+        textHeight = 0;
+        auto pointsCoords = pFont->FillCoords(spTextSharedData->text, 1.f, spTextSharedData->alignment, textWidth, textHeight);
+
+        rVBO.BufferData(pointsCoords.size() * sizeof(typename Font::Point), &(pointsCoords[0]), GL_STATIC_DRAW);
+  
+        size_t elementsCount = 0;
+        GLenum elementsType = 0;
+        ZC_DA<uchar> elements = GetTriangleElements(elementsCount, elementsType, pointsCoords.size() / 4, 0);
+
+        rEBO.BufferData(elements.size, elements.Begin(), GL_STATIC_DRAW);
+
+        return ZC_uptrMakeFromChild<ZC_GLDraw, ZC_DrawElements>(GL_TRIANGLES, elementsCount, elementsType, 0);
     }
 };
 
-struct ZC_TextScene
+//  Class for rendering text into the window.
+class ZC_TextWindow : public ZC_WindowOrthoIndent, public ZC_TextData
 {
+public:
+    /*
+    Params:
+    fontData - fonts name and size.
+    _text - text for rendering (supports'\n' new line symbol).
+    _alignment - alignment across text consisting of several lines of different lengths.
+    color - texts color.
+    windowIndentX - value of horizontal indent from border of global window. If used IndentFlag:
+        ZC_WOIF__X_Left_Pixel, ZC_WOIF__X_Right_Pixel -> value must be not negative, otherwise sets 0.f;
+        ZC_WOIF__X_Left_Percent, ZC_WOIF__X_Right_Percent -> value must be 0.0f - 1.f (where 1.f is 100%);
+        ZC_WOIF__X_Center -> value no metter.
+    windowIndentY - value of vertival indent from border of global window. If used IndentFlag: 
+        ZC_WOIF__Y_Top_Pixel, ZC_WOIF__Y_Bottom_Pixel -> value must be not negative, otherwise sets 0.f
+        ZC_WOIF__Y_Top_Percent, ZC_WOIF__Y_Bottom_Percent -> value must be 0.0f - 1.f (where 1.f is 100%);
+        ZC_WOIF__Y_Center -> value no metter.
+    indentFlags - flags of indent horizontal(X) and vertical(Y) from border of global window to IGWindow. Must be set one flag for X and one flag for Y. Example: X_Left_Pixel | Y_Top_Pixel.
+    */
+    ZC_TextWindow(typename ZC_Fonts::NameHeight fontData, const std::string& _text, ZC_TextAlignment _alignment, const ZC_Vec3<float>& color,
+            float windowIndentX, float windowIndentY, ZC_WindowOrthoIndentFlags indentFlags)
+        : ZC_WindowOrthoIndent(false, 0, 0, windowIndentX, windowIndentY, indentFlags),
+        ZC_TextData(true, fontData, _text, _alignment, color)
+    {
+        SetNewTextSize();
+        upRSADS->SetUniformsData(ZC_Uniform::Name::unPosition, this->currentIndents);
+    }
 
+    /*
+    Params:
+    windowIndentX - value of horizontal indent from border of global window. If used IndentFlag:
+        ZC_WOIF__X_Left_Pixel, ZC_WOIF__X_Right_Pixel -> value must be not negative, otherwise sets 0.f;
+        ZC_WOIF__X_Left_Percent, ZC_WOIF__X_Right_Percent -> value must be 0.0f - 1.f (where 1.f is 100%);
+        ZC_WOIF__X_Center -> value no metter.
+    windowIndentY - value of vertival indent from border of global window. If used IndentFlag: 
+        ZC_WOIF__Y_Top_Pixel, ZC_WOIF__Y_Bottom_Pixel -> value must be not negative, otherwise sets 0.f
+        ZC_WOIF__Y_Top_Percent, ZC_WOIF__Y_Bottom_Percent -> value must be 0.0f - 1.f (where 1.f is 100%);
+        ZC_WOIF__Y_Center -> value no metter.
+    indentFlags - flags of indent horizontal(X) and vertical(Y) from border of global window to IGWindow. Must be set one flag for X and one flag for Y. Example: X_Left_Pixel | Y_Top_Pixel.
+    */
+    void SetIndentData(float windowIndentX, float windowIndentY, ZC_WindowOrthoIndentFlags indentFlags)
+    {
+        this->SetNewIndentParams(windowIndentX, windowIndentY, indentFlags);
+    }
+
+    /*
+    Makes a copy of the text.
+    The methods affect only the current copy: NeedDraw(), SetColor(), SetIndentData().
+    Methods that include effects on all copies: SetText() SetAlignment() SetTextAndAlignment().
+    */
+    ZC_TextWindow MakeCopy()
+    {
+        return { *this };
+    } 
+
+private:
+    ZC_TextWindow(const ZC_TextWindow& tw)
+        : ZC_WindowOrthoIndent(dynamic_cast<const ZC_WindowOrthoIndent&>(tw)),
+        ZC_TextData(dynamic_cast<const ZC_TextData&>(tw))
+    {
+        upRSADS->SetUniformsData(ZC_Uniform::Name::unPosition, currentIndents);
+    }
+
+    void SetNewTextSize() override
+    {
+        this->SetNewSize(textWidth, textHeight);    //  calculates text indents into the window and store text size in ZC_WindowOrthoIndent
+    }
 };
-#include <ZC/Video/OpenGL/Renderer/ZC_RSTexs.h>
+
+struct ZC_TextScene : public ZC_TextData
+{
+    // ZC_TextScene(typename ZC_Fonts::NameHeight fontData, const std::string& _text, ZC_TextAlignment _alignment, const ZC_Vec3<float>& color)
+};
+
+ZC_TextWindow* pText;
+void SetColor(float);
 int ZC_main()
 {
     using namespace ZC_Window;
     ZC_Window::MakeWindow(ZC_Window_Multisampling_4 | ZC_Window_Border, 800.f, 600.f, "ZeroCreator");
     // window->SetFPS(0);
-    ZC_Fonts::NameHeight fonts[]{ZC_Fonts::Name::Arial, 20};
+    ZC_Fonts::NameHeight fonts[]{ZC_FontName::Arial, 20};
     ZC_Fonts::Load(fonts, 1);
 
     ZC_Window::GlClearColor(0.3f, 0.3f, 0.3f, 1.f);
@@ -712,11 +876,57 @@ int ZC_main()
     
     ZCR_Scene scene;
     
-    ZC_TextWindow text({ZC_Fonts::Name::Arial, 20}, "l\n d!magadgadgfdgpona\nRaur!!!", {1.f, 0.f, 0.f});
+    static const ulong firstASCII = 32,
+        lastASCII = 127;
+    char str[(lastASCII - firstASCII) * 2];
+    for (size_t i = 0, strIndex = 0; i < (lastASCII - firstASCII) * 2; i++, strIndex++)
+    {
+        str[i] = firstASCII + strIndex;
+        ++i;
+        if (lastASCII - firstASCII == i)
+            str[i] = '\n';
+        else
+            str[i] = ' ';
+    }
+    
+
+    ZC_TextWindow text({ZC_FontName::Arial, 20}, str, ZC_TextAlignment::Left,
+        {1.f, 0.f, 0.f}, 0.f, 0.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel);
+    pText = &text;
+    auto text1 = text.MakeCopy();
+    // text1.SetColor({0, 1.f, 0});
+    // text1.SetIndentData(20.f, 40.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel);
+
+    ZC_Events::ConnectButtonDown(ZC_ButtonID::K_Q, {&SetColor});
 
     ZC_Window::RuntMainCycle();
     
     return 0;
+}
+
+std::string first = "first\nLol\nsdaasdffffffafsdf\nsdaf",
+    second = "{seconD}}\nasdf'_",
+    current = first;
+
+
+void SetColor(float)
+{
+    if (current == first)
+    {
+        // pText->NeedDraw(false);
+        // pText->SetTextAndAlignment(second, ZC_TextAlignment::Left);
+        // pText->SetColor({1.f, 1.f, 0.f});
+        pText->SetIndentData(0.2f, 90.f, ZC_WOIF__X_Left_Percent | ZC_WOIF__Y_Center);
+        current = second;
+    }
+    else
+    {
+        // pText->NeedDraw(true);
+        // pText->SetTextAndAlignment(first, ZC_TextAlignment::Right);
+        // pText->SetColor({0.f, 1.f, 1.f});
+        pText->SetIndentData(20.f, 40.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel);
+        current = first;
+    }
 }
         
 

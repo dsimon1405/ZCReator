@@ -26,7 +26,7 @@ ZC_sptr<ZC_RendererSet> ZCR_Surface::MakeTriangleRendererSet()
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(ebo));
 
-    return { new ZC_RSNonTex(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
+    return { new ZC_RSNotTextured(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
     // switch (element)
     // {
     // case GLElement::Triangle: return { new ZC_RSNonTex(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };

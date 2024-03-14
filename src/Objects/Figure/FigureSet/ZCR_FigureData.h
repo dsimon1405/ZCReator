@@ -3,7 +3,7 @@
 #include <ZC/Tools/ZC_sptr.h>
 #include <ZC/Tools/Container/ZC_DA.h>
 #include <ZC/Tools/Math/ZC_Figures.h>
-#include <ZC/Video/OpenGL/Renderer/ZC_RSNonTex.h>
+#include <ZC/Video/OpenGL/Renderer/ZC_RSNotTextured.h>
 #include <ZC/Tools/Math/ZC_Vec2.h>
 
 struct ZCR_FigureData

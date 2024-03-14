@@ -6,7 +6,7 @@
 #include <ZC/Events/ZC_Events.h>
 
 ZCR_IGWFigures::ZCR_IGWFigures()
-    : ZC_IGWindow("Figures", false, 465.f, 160.f, 0.f, 0.f, X_Center | Y_Center, true,
+    : ZC_IGWindow("Figures", false, 465.f, 160.f, 0.f, 0.f, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, true,
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)
 {}
 
