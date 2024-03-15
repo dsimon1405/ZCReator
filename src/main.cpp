@@ -753,11 +753,11 @@ private:
     
     ZC_uptr<ZC_RS> MakeRS()
     {
-        auto pShPIS = isParantOf_ZCTextWindow ? ZC_ShProgs::Get(ZC_ShProgs::Name::ZC_TextWindow) : nullptr; //  ZC_TextScene   !!!!!!!!!!!!
+        auto pShPIS = ZC_ShProgs::Get(isParantOf_ZCTextWindow ? ZC_ShProgs::Name::ZC_TextWindow : ZC_ShProgs::Name::ZC_TextScene);
         ZC_Buffer vbo(GL_ARRAY_BUFFER);
         ZC_Buffer ebo(GL_ELEMENT_ARRAY_BUFFER);
         ZC_VAO vao;
-        vao.Config(pShPIS->vaoConData, vbo, &ebo, 0, 0);    //  set vertices count if VVNNCC -> CalculateAndSetTextData()
+        vao.Config(pShPIS->vaoConData, vbo, &ebo, 0, 0);
 
         auto upGLDraw = CalculateAndSetTextData(vbo, ebo);
 
@@ -856,11 +856,61 @@ private:
     }
 };
 
-struct ZC_TextScene : public ZC_TextData
+//  Class for rendering text into the window.
+class ZC_TextScene : public ZC_TextData
 {
-    // ZC_TextScene(typename ZC_Fonts::NameHeight fontData, const std::string& _text, ZC_TextAlignment _alignment, const ZC_Vec3<float>& color)
-};
+public:
+    /*
+    Params:
+    fontData - fonts name and size.
+    _text - text for rendering (supports'\n' new line symbol).
+    _alignment - alignment across text consisting of several lines of different lengths.
+    color - texts color.
+    */
+    ZC_TextScene(typename ZC_Fonts::NameHeight fontData, const std::string& _text, ZC_TextAlignment _alignment, const ZC_Vec3<float>& color)
+        : ZC_TextData(false, fontData, _text, _alignment, color)
+    {
+        SetNewTextSize();
+        upRSADS->SetUniformsData(ZC_Uniform::Name::unModel, &matModel);
+    }
 
+    void SetPosition(float x, float y, float z)
+    {
+
+    }
+
+    // /*
+    // Makes a copy of the text.
+    // The methods affect only the current copy: NeedDraw(), SetColor(), SetIndentData().
+    // Methods that include effects on all copies: SetText() SetAlignment() SetTextAndAlignment().
+    // */
+    // ZC_TextWindow MakeCopy()
+    // {
+    //     return { *this };
+    // } 
+
+private:
+    ZC_Mat4<float> matModel{ 1.f };
+
+    // ZC_TextWindow(const ZC_TextWindow& tw)
+    //     : ZC_WindowOrthoIndent(dynamic_cast<const ZC_WindowOrthoIndent&>(tw)),
+    //     ZC_TextData(dynamic_cast<const ZC_TextData&>(tw))
+    // {
+    //     upRSADS->SetUniformsData(ZC_Uniform::Name::unPosition, currentIndents);
+    // }
+
+    void SetNewTextSize() override
+    {
+        static bool isFirst = true;
+        if (isFirst)
+        {
+            matModel.Scale(0.01f, 0.01f, 0.01f).Translate(-(this->textWidth / 2.f), 0, -(this->textHeight / 2.f));
+            isFirst = false;
+        }
+        else matModel.Translate(0, 5, 0).Scale(0.01f, 0.01f, 0.01f).Translate(-(this->textWidth / 2.f), 0, -(this->textHeight / 2.f));
+    }
+};
+//  add in ZC_Renderer TextScene and in RS
 ZC_TextWindow* pText;
 void SetColor(float);
 int ZC_main()
@@ -868,7 +918,8 @@ int ZC_main()
     using namespace ZC_Window;
     ZC_Window::MakeWindow(ZC_Window_Multisampling_4 | ZC_Window_Border, 800.f, 600.f, "ZeroCreator");
     // window->SetFPS(0);
-    ZC_Fonts::NameHeight fonts[]{ZC_FontName::Arial, 20};
+    size_t textHeight = 100;
+    ZC_Fonts::NameHeight fonts[]{ZC_FontName::Arial, textHeight};
     ZC_Fonts::Load(fonts, 1);
 
     ZC_Window::GlClearColor(0.3f, 0.3f, 0.3f, 1.f);
@@ -876,7 +927,7 @@ int ZC_main()
     
     ZCR_Scene scene;
     
-    static const ulong firstASCII = 32,
+    static const ulong firstASCII = 20,
         lastASCII = 127;
     char str[(lastASCII - firstASCII) * 2];
     for (size_t i = 0, strIndex = 0; i < (lastASCII - firstASCII) * 2; i++, strIndex++)
@@ -890,10 +941,13 @@ int ZC_main()
     }
     
 
-    ZC_TextWindow text({ZC_FontName::Arial, 20}, str, ZC_TextAlignment::Left,
-        {1.f, 0.f, 0.f}, 0.f, 0.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel);
-    pText = &text;
-    auto text1 = text.MakeCopy();
+    ZC_TextScene text1({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, {1.f, 0.f, 0.f});
+    ZC_TextScene text2({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, {1.f, 0.f, 0.f});
+
+    ZC_TextWindow text({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left,
+        {0.f, 1.f, 0.f}, 0.f, 0.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel);
+    // pText = &text;
+    // auto text1 = text.MakeCopy();
     // text1.SetColor({0, 1.f, 0});
     // text1.SetIndentData(20.f, 40.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel);
 

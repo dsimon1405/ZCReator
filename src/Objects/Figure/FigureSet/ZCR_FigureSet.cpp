@@ -15,7 +15,7 @@ ZCR_FigureSet::ZCR_FigureSet(ZC_sptr<ZC_DA<ZC_Quad>>&& _quads, ZC_sptr<ZC_DA<ZC_
     spRSADSLine->SetUniformsData(UName::unModel, spMatModel->Begin());
     spRSADSSurface->SetUniformsData(UName::unModel, spMatModel->Begin());
 
-    spMatModel->Translate({4.f, 2.f, 1.f});
+    spMatModel->Translate(4.f, 2.f, 1.f);
 }
 
 // ZCR_FigureSet::ZCR_FigureSet(ZCR_FigureSet&& tr)
@@ -38,7 +38,7 @@ void ZCR_FigureSet::SwitchToSceneMode(SceneMode sceneMode, bool isActiveOnScene)
     {
     case SceneMode::Model:
     {
-        if (isActiveOnScene) SwitchGLElementOnRSLevel(RSLvl::Stencil, RSLvl::None, RSLvl::None);
+        if (isActiveOnScene) SwitchGLElementOnRSLevel(RSLvl::StencilBorder, RSLvl::None, RSLvl::None);
         else SwitchGLElementOnRSLevel(RSLvl::Drawing, RSLvl::None, RSLvl::None);
         break;
     }

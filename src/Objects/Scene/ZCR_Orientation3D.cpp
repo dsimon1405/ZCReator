@@ -195,21 +195,21 @@ void ZCR_Orientation3D::RotateLinesAndTranslateQuads()
     if (!isNormalHorizontalOrientation) mod.Rotate(180.f, {1.f,0.f,0.f});   //  turn around texture
     
     ZC_Mat4<float> posX(1.f);
-    posX = perspView * posX.Translate({ positiveX[0], positiveX[1], positiveX[2]}) * mod;
+    posX = perspView * posX.Translate(positiveX[0], positiveX[1], positiveX[2]) * mod;
     RSASDAxices[Axice_posX]->SetUniformsData(ZC_Uniform::Name::unModel, &posX);
     ZC_Mat4<float> negX(1.f);
-    negX = perspView * negX.Translate({ -positiveX[0], -positiveX[1], -positiveX[2]}) * mod;
+    negX = perspView * negX.Translate(-positiveX[0], -positiveX[1], -positiveX[2]) * mod;
     RSASDAxices[Axice_negX]->SetUniformsData(ZC_Uniform::Name::unModel, &negX);
     ZC_Mat4<float> posY(1.f);
-    posY = perspView * posY.Translate({ positiveY[0], positiveY[1], positiveY[2]}) * mod;
+    posY = perspView * posY.Translate(positiveY[0], positiveY[1], positiveY[2]) * mod;
     RSASDAxices[Axice_posY]->SetUniformsData(ZC_Uniform::Name::unModel, &posY);
     ZC_Mat4<float> negY(1.f);
-    negY = perspView * negY.Translate({ -positiveY[0], -positiveY[1], -positiveY[2]}) * mod;
+    negY = perspView * negY.Translate(-positiveY[0], -positiveY[1], -positiveY[2]) * mod;
     RSASDAxices[Axice_negY]->SetUniformsData(ZC_Uniform::Name::unModel, &negY);
     ZC_Mat4<float> posZ(1.f);
-    posZ = perspView * posZ.Translate({ positiveZ[0], positiveZ[1], positiveZ[2]}) * mod;
+    posZ = perspView * posZ.Translate(positiveZ[0], positiveZ[1], positiveZ[2]) * mod;
     RSASDAxices[Axice_posZ]->SetUniformsData(ZC_Uniform::Name::unModel, &posZ);
     ZC_Mat4<float> negZ(1.f);
-    negZ = perspView * negZ.Translate({ -positiveZ[0], -positiveZ[1], -positiveZ[2]}) * mod;
+    negZ = perspView * negZ.Translate(-positiveZ[0], -positiveZ[1], -positiveZ[2]) * mod;
     RSASDAxices[Axice_negZ]->SetUniformsData(ZC_Uniform::Name::unModel, &negZ);
 }
