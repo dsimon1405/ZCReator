@@ -3,7 +3,7 @@
 #include <ZC/Tools/ZC_sptr.h>
 #include <ZC/Tools/Container/ZC_DA.h>
 #include <ZC/Tools/Math/ZC_Figures.h>
-#include <ZC/Video/OpenGL/Renderer/ZC_RSNotTextured.h>
+#include <ZC/Video/OpenGL/Renderer/ZC_RendererSet.h>
 #include <ZC/Tools/Math/ZC_Vec2.h>
 
 struct ZCR_FigureData
@@ -27,5 +27,5 @@ protected:
     ZC_sptr<ZC_DA<int>> spNormals;
     ZC_sptr<ZC_DA<ZC_Vec2<float>>> spTexCoords = nullptr;
 
-    ZC_sptr<ZC_RendererSet> MakeRendererSet(GLElement elementsType);
+    // ZC_sptr<ZC_RendererSet> MakeRendererSet(GLElement elementsType);
 };

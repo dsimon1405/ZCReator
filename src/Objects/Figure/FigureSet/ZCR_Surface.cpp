@@ -3,11 +3,11 @@
 #include <ZC/Tools/Math/ZC_Math.h>
 
 ZCR_Surface::ZCR_Surface()
-    : spRendererSetsSucafe(MakeTriangleRendererSet()),
-    spRSADSSurface(spRendererSetsSucafe->Make_sptrRendererSetDrawingSet(nullptr, 1.05f, ZC_PackColorUCharToUInt(255, 90, 0)))    //  stencil border color {r = 255, g = 90, b = 0}
+    : spRendererSetsSucafe(MakeSurfaceRendererSet()),
+    rsControllerSurface(MakeSurfaceRSController())
 {}
 
-ZC_sptr<ZC_RendererSet> ZCR_Surface::MakeTriangleRendererSet()
+ZC_sptr<ZC_RendererSet> ZCR_Surface::MakeSurfaceRendererSet()
 {
     size_t elementsCount = 0;
     GLenum elementsType = 0;
@@ -26,13 +26,23 @@ ZC_sptr<ZC_RendererSet> ZCR_Surface::MakeTriangleRendererSet()
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(ebo));
 
-    return { new ZC_RSNotTextured(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
+    return ZC_RendererSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
     // switch (element)
     // {
     // case GLElement::Triangle: return { new ZC_RSNonTex(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
     // case GLElement::Point: return { new ZC_RSNonTex(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
     // case GLElement::Line: return { new ZC_RSNonTex(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
     // }
+}
+
+ZC_RSController ZCR_Surface::MakeSurfaceRSController()
+{
+    // std::forward_list<ZC_uptr<ZC_RSPersonalData>>{ZC_RSPDStencilBorder::Make({ 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) })};
+    // ZC_RSPDStencilBorder::Make({ 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) });
+
+    std::forward_list<ZC_uptr<ZC_RSPersonalData>> persDatas;
+    persDatas.emplace_front(ZC_RSPDStencilBorder::Make({ 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) }));    //  stencil border color {r = 255, g = 90, b = 0}
+    return spRendererSetsSucafe->MakeZC_RSController(-1, std::move(persDatas));
 }
 
 ZC_DA<uchar> ZCR_Surface::GetTriangleElements(size_t& rElementsCount, GLenum& rElementsType)
@@ -53,7 +63,7 @@ ZC_DA<uchar> ZCR_Surface::GetTriangleElements(size_t& rElementsCount, GLenum& rE
     return elements;
 }
 
-void ZCR_Surface::SwitchRSandDSTriangle(RSLvl lvl)
+void ZCR_Surface::SwitchRSandDSTriangle(ZC_RendererLevel lvl)
 {
-    spRSADSSurface->SwitchToLvl(lvl);
+    rsControllerSurface.SwitchToLvl(lvl);
 }

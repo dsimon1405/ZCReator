@@ -18,6 +18,5 @@ public:
 private:
     ZC_sptr<ZC_Mat4<float>> spMatModel = ZC_sptrMake<ZC_Mat4<float>>(1.f);
 
-    typedef typename ZC_RendererSet::Level RSLvl;
-    void SwitchGLElementOnRSLevel(RSLvl triangle, RSLvl line, RSLvl point);
+    void SwitchGLElementOnRSLevel(ZC_RendererLevel triangle, ZC_RendererLevel line, ZC_RendererLevel point);
 };

@@ -1,10 +1,11 @@
 #include "ZCR_Line.h"
 
+#include <ZC/Tools/Container/ZC_ContFunc.h>
 #include <algorithm>
 
 ZCR_Line::ZCR_Line()
     : spRendererSetsLine(MakeLineRendererSet()),
-    spRSADSLine(spRendererSetsLine->Make_sptrRendererSetDrawingSet(nullptr, 0, 0))
+    rsControllerLine(spRendererSetsLine->MakeZC_RSController())
 {}
 
 ZC_sptr<ZC_RendererSet> ZCR_Line::MakeLineRendererSet()
@@ -26,7 +27,7 @@ ZC_sptr<ZC_RendererSet> ZCR_Line::MakeLineRendererSet()
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(ebo));
 
-    return { new ZC_RSNotTextured(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
+    return ZC_RendererSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
 }
 
 ZC_DA<uchar> ZCR_Line::GetLineElements(size_t& rElementsCount, GLenum& rElementsType)
@@ -51,18 +52,18 @@ std::forward_list<typename ZCR_Line::Lines> ZCR_Line::GetLines(size_t& rElements
     auto linesAdd = [&lines](ZC_Vec3<float>& corner1, ZC_Vec3<float>& corner2, bool isQuad)
     {
         auto edgeCenter = (corner1 + corner2) / 2.f;
-        auto pLines = std::find(lines.begin(), lines.end(), edgeCenter);
-        if (pLines == lines.end())
+        auto pLines = ZC_Find(lines, edgeCenter);
+        if (pLines)
+        {
+            pLines->corners.emplace_front(&corner1, &corner2, isQuad);
+            return 0;   //  in ebo line is two values, if found same return 0
+        }
+        else
         {
             std::forward_list<typename Lines::Corners> corners;
             corners.emplace_front(&corner1, &corner2, isQuad);
             lines.emplace_front(Lines{ edgeCenter, std::move(corners) });
             return 2;   //  in ebo line is two values, if not found same return 2 (new line)
-        }
-        else
-        {
-            pLines->corners.emplace_front(&corner1, &corner2, isQuad);
-            return 0;   //  in ebo line is two values, if found same return 0
         }
     };
     for (size_t i = 0; i < (spTriangles ? spTriangles->size : 0); ++i)
@@ -81,9 +82,9 @@ std::forward_list<typename ZCR_Line::Lines> ZCR_Line::GetLines(size_t& rElements
     return lines;
 }
 
-void ZCR_Line::SwitchRSandDSLine(RSLvl lvl)
+void ZCR_Line::SwitchRSandDSLine(ZC_RendererLevel lvl)
 {
-    spRSADSLine->SwitchToLvl(lvl);
+    rsControllerLine.SwitchToLvl(lvl);
 }
 
 

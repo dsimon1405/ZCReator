@@ -10,10 +10,13 @@ ZCR_FigureSet::ZCR_FigureSet(ZC_sptr<ZC_DA<ZC_Quad>>&& _quads, ZC_sptr<ZC_DA<ZC_
     for (auto& point : *spPoints) allActivePoints.emplace_back(&point);
     MakePointsActive(std::move(allActivePoints));
 
-    typedef typename ZC_Uniform::Name UName;
-    spRSADSPoint->SetUniformsData(UName::unModel, spMatModel->Begin());
-    spRSADSLine->SetUniformsData(UName::unModel, spMatModel->Begin());
-    spRSADSSurface->SetUniformsData(UName::unModel, spMatModel->Begin());
+    ZC_RSPDUniformData unModel(ZC_UN_unModel, spMatModel->Begin());
+    rsControllerPoint.SetData(ZC_RSPDC_uniforms, &unModel);
+    rsControllerLine.SetData(ZC_RSPDC_uniforms, &unModel);
+    rsControllerSurface.SetData(ZC_RSPDC_uniforms, &unModel);
+    // rsControllerPoint->SetUniformsData(UName::unModel, spMatModel->Begin());
+    // rsControllerLine->SetUniformsData(UName::unModel, spMatModel->Begin());
+    // rsControllerSurface->SetUniformsData(UName::unModel, spMatModel->Begin());
 
     spMatModel->Translate(4.f, 2.f, 1.f);
 }
@@ -38,20 +41,20 @@ void ZCR_FigureSet::SwitchToSceneMode(SceneMode sceneMode, bool isActiveOnScene)
     {
     case SceneMode::Model:
     {
-        if (isActiveOnScene) SwitchGLElementOnRSLevel(RSLvl::StencilBorder, RSLvl::None, RSLvl::None);
-        else SwitchGLElementOnRSLevel(RSLvl::Drawing, RSLvl::None, RSLvl::None);
+        if (isActiveOnScene) SwitchGLElementOnRSLevel(ZC_RL_StencilBorder, ZC_RL_None, ZC_RL_None);
+        else SwitchGLElementOnRSLevel(Drawing, ZC_RL_None, ZC_RL_None);
         break;
     }
     case SceneMode::Edit:
     {
-        if (isActiveOnScene) SwitchGLElementOnRSLevel(RSLvl::Drawing, RSLvl::Drawing, RSLvl::Drawing);
-        else SwitchGLElementOnRSLevel(RSLvl::Drawing, RSLvl::None, RSLvl::None);
+        if (isActiveOnScene) SwitchGLElementOnRSLevel(Drawing, Drawing, Drawing);
+        else SwitchGLElementOnRSLevel(Drawing, ZC_RL_None, ZC_RL_None);
         break;
     }
     case SceneMode::Sculpting:
     {
-        if (isActiveOnScene) SwitchGLElementOnRSLevel(RSLvl::Drawing, RSLvl::None, RSLvl::None);
-        else SwitchGLElementOnRSLevel(RSLvl::None, RSLvl::None, RSLvl::None);
+        if (isActiveOnScene) SwitchGLElementOnRSLevel(Drawing, ZC_RL_None, ZC_RL_None);
+        else SwitchGLElementOnRSLevel(ZC_RL_None, ZC_RL_None, ZC_RL_None);
         break;
     }
     }
@@ -62,7 +65,7 @@ void ZCR_FigureSet::TranslateModelMatrix(const ZC_Vec3<float>& trans)
     spMatModel->Translate(trans);
 }
 
-void ZCR_FigureSet::SwitchGLElementOnRSLevel(RSLvl triangle, RSLvl point, RSLvl line)
+void ZCR_FigureSet::SwitchGLElementOnRSLevel(ZC_RendererLevel triangle, ZC_RendererLevel point, ZC_RendererLevel line)
 {
     SwitchRSandDSTriangle(triangle);
     SwitchRSandDSPoint(point);

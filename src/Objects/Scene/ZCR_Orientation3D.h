@@ -1,8 +1,7 @@
 #pragma once
 
-#include <ZC/Video/OpenGL/Renderer/ZC_RendererSetAndDrawingSet.h>
 #include <ZC/Tools/Signal/ZC_SConnection.h>
-#include <ZC/Video/OpenGL/Renderer/ZC_RS.h>
+#include <ZC/Video/OpenGL/Renderer/ZC_RendererSet.h>
 #include <ZC/Tools/Container/ZC_DA.h>
 
 struct ZCR_Orientation3D
@@ -21,11 +20,11 @@ struct ZCR_Orientation3D
     void MoveAroundObject(float _horizontalAngle, float _verticalAngle, bool _isNormalHorizontalOrientation);
 
 private:
-    ZC_uptr<ZC_RS> upRSLine;
-    ZC_uptr<ZC_RendererSetAndDrawingSet> upRSASDLine;
+    ZC_uptr<ZC_RendererSet> upRendSetLine;
+    ZC_RSController rsControllerLine;
 
-    ZC_uptr<ZC_RendererSet> rendSetAxices;
-    ZC_uptr<ZC_RendererSetAndDrawingSet> RSASDAxices[6];
+    ZC_uptr<ZC_RendererSet> rendSetAxise;
+    ZC_RSController rsControllerAxises[6];
     
     bool isNormalHorizontalOrientation = true;
     ZC_Mat4<float> perspective,
@@ -34,7 +33,7 @@ private:
         modelLine,
         modelRotateQuads;
 
-    ZC_uptr<ZC_RS> MakeRSLine();
+    ZC_uptr<ZC_RendererSet> MakeRSLine();
     ZC_uptr<ZC_RendererSet> MakeRendererSetAxice();
     void WindowResizeCallback(float width, float height);
     void UpdateViewMatrix(bool _isNormalHorizontalOrientation);

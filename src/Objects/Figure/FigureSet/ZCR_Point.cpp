@@ -1,10 +1,11 @@
 #include "ZCR_Point.h"
 
 #include <algorithm>
+#include <ZC/Tools/Container/ZC_ContFunc.h>
 
 ZCR_Point::ZCR_Point()
     : spRendererSetsPoint(MakePointRendererSet()),
-    spRSADSPoint(spRendererSetsPoint->Make_sptrRendererSetDrawingSet(nullptr, 0, 0))
+    rsControllerPoint(spRendererSetsPoint->MakeZC_RSController())
 {}
 
 ZC_sptr<ZC_RendererSet> ZCR_Point::MakePointRendererSet()
@@ -26,7 +27,7 @@ ZC_sptr<ZC_RendererSet> ZCR_Point::MakePointRendererSet()
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(ebo));
 
-    return { new ZC_RSNotTextured(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
+    return ZC_RendererSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
 }
 
 ZC_DA<uchar> ZCR_Point::GetPointElements(size_t& rElementsCount, GLenum& rElementsType)
@@ -67,10 +68,10 @@ void ZCR_Point::GetPoints(size_t& rElementsCount)
 
 size_t ZCR_Point::FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>* pVertexContainerHead)
 {
-    auto spPointsIter = std::find(spPoints->begin(), spPoints->end(), pVertex);
-    if(spPointsIter != spPoints->end())
+    auto pPoints = ZC_Find(*spPoints, pVertex);
+    if(pPoints)
     {
-        spPointsIter->samePoints.emplace_front(Points::SamePoint{ pVertex, isQuad, static_cast<size_t>(pVertex - pVertexContainerHead) });
+        pPoints->samePoints.emplace_front(Points::SamePoint{ pVertex, isQuad, static_cast<size_t>(pVertex - pVertexContainerHead) });
         return 0;   //  in ebo point is one value, if found same return 0
     }
     else
@@ -80,9 +81,9 @@ size_t ZCR_Point::FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float
     }
 }
 
-void ZCR_Point::SwitchRSandDSPoint(RSLvl lvl)
+void ZCR_Point::SwitchRSandDSPoint(ZC_RendererLevel lvl)
 {
-    spRSADSPoint->SwitchToLvl(lvl);
+    rsControllerPoint.SwitchToLvl(lvl);
 }
 
 void ZCR_Point::MakePointsActive(std::list<Points*>&& points)

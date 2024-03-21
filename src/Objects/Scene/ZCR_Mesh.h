@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ZC/Video/OpenGL/Renderer/ZC_RendererSetAndDrawingSet.h>
+#include <ZC/Video/OpenGL/Renderer/ZC_RendererSet.h>
 
 struct ZCR_Mesh
 {
@@ -19,11 +19,9 @@ struct ZCR_Mesh
 private:
     CoordSystem coordSystem { CoordSystem::none };
     ZC_uptr<ZC_RendererSet> upRendererSet;
-    ZC_uptr<ZC_RendererSetAndDrawingSet> upRSADSaxisXY;
-    ZC_uptr<ZC_RendererSetAndDrawingSet> upRSADSaxisXZ;
-    ZC_uptr<ZC_RendererSetAndDrawingSet> upRSADSaxisYZ;
+    ZC_RSController rsController_axisXY;
+    ZC_RSController rsController_axisXZ;
+    ZC_RSController rsController_axisYZ;
     
-    typedef typename ZC_RendererSet::Level RSLvl;
-
     ZC_uptr<ZC_RendererSet> MakeRendererSet(float totalLength);
 };
