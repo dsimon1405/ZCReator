@@ -220,76 +220,6 @@ struct CC
     }
 };
 //  ZCR_Camera scroll and IGWindow for axis
-
-// struct ZC_RSTexturePointer : public ZC_RS
-// {
-//     ZC_Texture* pTexture;
-
-//     ZC_RSTexturePointer(typename ZC_ShProgs::ShPInitSet* pShPInitSet, ZC_VAO&& _vao, ZC_uptr<ZC_GLDraw>&& _upDraw,
-//             std::forward_list<ZC_Buffer>&& _buffers, ZC_Texture* _pTexture);
-//     ZC_RSTexturePointer(ZC_RSTexturePointer&& rs);
-
-//     void Draw(ZC_RendererLevel lvl) override;
-
-//     /*
-//     Return unique pointer to ZC_RendererSetAndDrawingSet.
-
-//     texSetName - name of the texture set (ZC_RSTexs::TexSet), can be nullptr if used for heir ZC_RSNonTex.
-//     stencilScale - scale for drawing the stencil border of the object. Should be greater than 1.0f. Can be anything if ZC_RendererSet::Level::Stencil will not be used.
-//     stencilColor - color of stencil border packed in unsigned int. Packing -> unsigned char[32] -> [0 - 7]{no metter}, [7 - 15]{red}, [15 - 23]{green}, [23 - 31]{blue}
-//     */
-//     ZC_uptr<ZC_RendererSetAndDrawingSet> Make_uptrRendererSetDrawingSet(const char* texSetName, float stencilScale, unsigned int stencilColor) override;
-
-//     /*
-//     Return shared pointer to ZC_RendererSetAndDrawingSet.
-
-//     texSetName - name of the texture set (ZC_RSTexs::TexSet), can be nullptr if used for heir ZC_RSNonTex.
-//     stencilScale - scale for drawing the stencil border of the object. Should be greater than 1.0f. Can be anything if ZC_RendererSet::Level::Stencil will not be used.
-//     stencilColor - color of stencil border packed in unsigned int. Packing -> unsigned char[32] -> [0 - 7]{no metter}, [7 - 15]{red}, [15 - 23]{green}, [23 - 31]{blue}
-//     */
-//     ZC_sptr<ZC_RendererSetAndDrawingSet> Make_sptrRendererSetDrawingSet(const char* texSetName, float stencilScale, unsigned int stencilColor) override;
-//     void Add(ZC_DrawingSet* pDS) override;
-//     void Erase(ZC_DrawingSet* pDS) override;
-    
-// private:
-//     LevelController levelController;
-// };
-
-// ZC_RSTexturePointer::ZC_RSTexturePointer(typename ZC_ShProgs::ShPInitSet* pShPInitSet, ZC_VAO&& _vao, ZC_uptr<ZC_GLDraw>&& _upDraw,
-//         std::forward_list<ZC_Buffer>&& _buffers, ZC_Texture* _pTexture)
-//     : ZC_RS(pShPInitSet, std::move(_vao), std::move(_upDraw), std::move(_buffers)),
-//     pTexture(_pTexture)
-// {}
-
-// ZC_RSTexturePointer::ZC_RSTexturePointer(ZC_RSTexturePointer&& rs)
-//     : ZC_RS(dynamic_cast<ZC_RS&&>(rs))
-// {}
-
-// void ZC_RSTexturePointer::Draw(ZC_RendererLevel lvl)
-// {
-//     vao.BindVertexArray();
-//     levelController.Draw(lvl, upGLDraw, pTexture, 1);
-// }
-
-// ZC_uptr<ZC_RendererSetAndDrawingSet> ZC_RSTexturePointer::Make_uptrRendererSetDrawingSet(const char* texSetName, float stencilScale, unsigned int stencilColor)
-// {
-//     return { new ZC_RendererSetAndDrawingSet(this, { pBaseUniforms->GetCopy(), ZC_RendererLevel::ZC_RL_None, nullptr, stencilScale, stencilColor }) };
-// }
-
-// ZC_sptr<ZC_RendererSetAndDrawingSet> ZC_RSTexturePointer::Make_sptrRendererSetDrawingSet(const char* texSetName, float stencilScale, unsigned int stencilColor)
-// {
-//     return { new ZC_RendererSetAndDrawingSet(this, { pBaseUniforms->GetCopy(), ZC_RendererLevel::ZC_RL_None, nullptr, stencilScale, stencilColor }) };
-// }
-
-// void ZC_RSTexturePointer::Add(ZC_DrawingSet* pDS)
-// {
-//     if (levelController.Add(pDS)) AddToRenderer(pDS->lvl);
-// }
-
-// void ZC_RSTexturePointer::Erase(ZC_DrawingSet* pDS)
-// {
-//     if (levelController.Erase(pDS)) EraseFromRenderer(pDS->lvl);
-// }
 #include <ZC/Tools/Math/ZC_Vec2.h>
 
 #include <ft2build.h>
@@ -697,7 +627,7 @@ public:
 
     void NeedDraw(bool needDraw)
     {
-        needDraw ? rsController.SwitchToLvl(isParantOf_ZCTextWindow ? ZC_RendererLevels::TextScene : ZC_RendererLevels::TextWindow)
+        needDraw ? rsController.SwitchToLvl(isParantOf_ZCTextWindow ? ZC_RendererLevels::TextWindow : ZC_RendererLevels::TextScene)
             : rsController.SwitchToLvl(ZC_RL_None);
     }
 
@@ -913,7 +843,7 @@ public:
     ZC_TextScene(typename ZC_Fonts::NameHeight fontData, const std::string& _text, ZC_TextAlignment _alignment)
         : ZC_TextData(false, fontData, _text, _alignment)
     {
-        rsController.SetUniformsData(ZC_UN_unModel, &(ZC_Mat4<float>(1.f).Scale(scale, scale, scale)));
+        rsController.SetUniformsData(ZC_UN_unModel, &(model.Scale(scale, scale, scale)));
     }
 
     void SetPosition(const ZC_Vec3<float>& pos) noexcept
@@ -961,6 +891,7 @@ public:
     } 
 
 private:
+    ZC_Mat4<float> model { 1.f };
     float scale = 0.01f;
     ZC_Vec3<float> position{ 0.f, 0.f, 0.f };
     float rotationAngle = 0.f;
@@ -968,21 +899,128 @@ private:
 
     ZC_TextScene(const ZC_TextScene& tw)
         : ZC_TextData(dynamic_cast<const ZC_TextData&>(tw)),
+        model(tw.model),
         scale(tw.scale),
         position(tw.position),
         rotationAngle(tw.rotationAngle),
         rotationAxises(tw.rotationAxises)
     {
-        rsController.SetUniformsData(ZC_UN_unModel, &(ZC_Mat4<float>(1.f).Scale(scale, scale, scale)));
+        rsController.SetUniformsData(ZC_UN_unModel, &model);
     }
 
     void RecalculateModelMatrix()
     {
-        ZC_Mat4<float> model(1.f);
+        model = ZC_Mat4<float>(1.f);
         model.Translate(position);
         if (rotationAngle != 0.f) model.Rotate(rotationAngle, rotationAxises);
         model.Scale(scale, scale, scale);
-        rsController.SetUniformsData(ZC_UN_unModel, &model);
+    }
+};
+#include <cassert>
+struct ZC_TurnToCamera
+{
+    virtual ~ZC_TurnToCamera()
+    {
+        bool isErased = ZC_ForwardListErase(allHeirs, this);
+        assert(isErased);
+        if (isNeedUpdate) ZC_ForwardListErase(needUpdate, this);  
+        if (allHeirs.empty()) sconEventsEnd.Disconnect();
+    }
+
+    static inline ZC_SConnection sconEventsEnd; //  must be connected to event, which calls after all camera manipulations  !!!!!!!!!!!!
+    static inline std::forward_list<ZC_TurnToCamera*> allHeirs;
+    static inline std::forward_list<ZC_TurnToCamera*> needUpdate;
+
+    ZC_Mat4<float> model;
+    ZC_Vec3<float> position;
+    bool isNeedUpdate = true;
+    float scale = 0.f;
+
+    static void Update(float time)
+    {
+        auto camPos = ZC_Camera::GetCamPos();
+        bool isNormalVerticalOrientation = ZC_Camera::GetUp()[2] == 1.f;
+        for (auto pHeir : allHeirs)
+        {
+            pHeir->CalculateModel(camPos, isNormalVerticalOrientation);
+        }
+    }
+
+    void CalculateModel(const ZC_Vec3<float>& camPos, bool isNormalVerticalOrientation)
+    {
+        auto posToCam = position - camPos;
+        ZC_Vec3<float> zeroZ(posToCam[0], posToCam[1], 0);
+
+        auto normPosToCam = ZC_Vec::Normalize(posToCam);
+        ZC_Vec3<float> vertivalStartPoint = ZC_Vec::Normalize(ZC_Vec3<float>(posToCam[0], posToCam[1], 0.f));    //  also end point for horizontal rotation
+        auto cosVertical = ZC_Vec::Dot(normPosToCam, vertivalStartPoint);
+        auto sinVertical = sqrt(1.f - (cosVertical * cosVertical));
+        if (posToCam[2] > 0) sinVertical *= -1.f;
+        if (!isNormalVerticalOrientation) cosVertical *= -1.f;
+
+        ZC_Vec3<float> horizontalStartPoint(0.f, 1.f, 0.f);
+        auto cosHorizontal = ZC_Vec::Dot(horizontalStartPoint, vertivalStartPoint);   //  vertivalStartPoint is normalized end point for horizontal angle
+        auto sinHorizontal = sqrt(1.f - (cosHorizontal * cosHorizontal));
+        if (posToCam[0] < 0) sinHorizontal *= -1.f;
+        if (!isNormalVerticalOrientation)
+        {
+            cosHorizontal *= -1.f;
+            sinHorizontal *= -1.f;
+        }
+
+        model = ZC_Mat4<float>(1.f);
+        model.Translate(position);
+        Rotate(model, cosHorizontal, sinHorizontal, { 0, 0, -1.f });
+        Rotate(model, cosVertical, sinVertical, { -1.f, 0, 0 });
+        if (scale != 0.f) model.Scale(scale, scale, scale);
+    }
+
+    static void Rotate(ZC_Mat4<float>& model, float cos, float sin, const ZC_Vec3<float>& axise)
+    {
+        ZC_Vec3<float> temp(axise * (static_cast<float>(1) - cos));
+
+        ZC_Vec3<float> rotateX;
+        rotateX[0] = cos + temp[0] * axise[0];
+        rotateX[1] = temp[0] * axise[1] + sin * axise[2];
+        rotateX[2] = temp[0] * axise[2] - sin * axise[1];
+        ZC_Vec4<float> columnX = model[0] * rotateX[0] + model[1] * rotateX[1] + model[2] * rotateX[2];
+
+        ZC_Vec3<float> rotateY;
+        rotateY[0] = temp[1] * axise[0] - sin * axise[2];
+        rotateY[1] = cos + temp[1] * axise[1];
+        rotateY[2] = temp[1] * axise[2] + sin * axise[0];
+        ZC_Vec4<float> columnY = model[0] * rotateY[0] + model[1] * rotateY[1] + model[2] * rotateY[2];
+
+        ZC_Vec3<float> rotateZ;
+        rotateZ[0] = temp[2] * axise[0] + sin * axise[1];
+        rotateZ[1] = temp[2] * axise[1] - sin * axise[0];
+        rotateZ[2] = cos + temp[2] * axise[2];
+        ZC_Vec4<float> columnZ = model[0] * rotateZ[0] + model[1] * rotateZ[1] + model[2] * rotateZ[2];
+
+        model[0] = columnX;
+        model[1] = columnY;
+        model[2] = columnZ;
+    }
+
+protected:
+    ZC_TurnToCamera(const ZC_Vec3<float>& _position, float _scale)
+        : position(_position),
+        scale(_scale)
+    {
+        if (allHeirs.empty()) sconEventsEnd = ZC_Events::ConnectHandleEventsEnd({ &ZC_TurnToCamera::Update });
+        allHeirs.emplace_front(this);
+        this->CalculateModel(ZC_Camera::GetCamPos(), ZC_Camera::GetUp()[2] == 1.f);
+    }
+};
+
+struct ZC_TextSceneTurnedToCamera : public ZC_TextData, public ZC_TurnToCamera
+{
+    ZC_TextSceneTurnedToCamera(typename ZC_Fonts::NameHeight fontData, const std::string& _text, ZC_TextAlignment _alignment,
+            const ZC_Vec3<float>& _position, float _scale = 0.f)
+        : ZC_TextData(false, fontData, _text, _alignment),
+        ZC_TurnToCamera(_position, _scale == 0.f ? 0.01f : _scale)
+    {
+        this->rsController.SetUniformsData(ZC_UN_unModel, &(this->model));
     }
 };
 
@@ -991,6 +1029,19 @@ private:
 // void SetColor(float);
 int ZC_main()
 {
+    // ZC_Vec3<float> zy0(2.f, 0, 0);
+    // auto lengthZY0 = ZC_Vec::Length(zy0);
+    // auto leg1 = ZC_Vec::MoveByLength({0,0,0}, {1.f, -1.f, 0}, 2.f);
+    // auto lengthLeg1 = ZC_Vec::Length(leg1);
+    // auto leg2 = ZC_Vec::MoveByLength({0,0,0}, {1.f, -1.f, 1.f}, 2.f);
+    // auto lengthLeg2 = ZC_Vec::Length(leg2);
+
+    // auto dot1 = zy0[0] * leg1[0] + zy0[1] * leg1[1] + zy0[2] * leg1[2];
+    // auto dot2 = zy0[0] * leg2[0] + zy0[1] * leg2[1] + zy0[2] * leg2[2];
+
+    // auto cos1 = dot1 / (lengthLeg1 * lengthZY0);
+    // auto cos2 = dot2 / (lengthLeg2 * lengthZY0);
+
     using namespace ZC_Window;
     ZC_Window::MakeWindow(ZC_Window_Multisampling_4 | ZC_Window_Border, 800.f, 600.f, "ZeroCreator");
     // window->SetFPS(0);
@@ -1004,30 +1055,34 @@ int ZC_main()
     
     ZCR_Scene scene;
     
-    static const ulong firstASCII = 32,
-        lastASCII = 127;
-    char str[(lastASCII - firstASCII) * 2];
-    for (size_t i = 0, strIndex = 0; i < (lastASCII - firstASCII) * 2; i++, strIndex++)
-    {
-        str[i] = firstASCII + strIndex;
-        ++i;
-        if (lastASCII - firstASCII == i)
-            str[i] = '\n';
-        else
-            str[i] = ' ';
-    }
-    
+    // static const ulong firstASCII = 32,
+    //     lastASCII = 127;
+    // char str[(lastASCII - firstASCII) * 2];
+    // for (size_t i = 0, strIndex = 0; i < (lastASCII - firstASCII) * 2; i++, strIndex++)
+    // {
+    //     str[i] = firstASCII + strIndex;
+    //     ++i;
+    //     if (lastASCII - firstASCII == i)
+    //         str[i] = '\n';
+    //     else
+    //         str[i] = ' ';
+    // }
+    std::string str = "D I M A";
 
-    ZC_TextScene text1({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left);
-    text1.SetColor({1.f, 0.f, 0.f});
-    ZC_Vec3<float> text2Pos(0.f, 5.f, 0.f);
-    float text2RotAngle = 30.f;
-    ZC_Vec3<float> text2Rotaxises(0.f, 0.f, 1.f);
+    // ZC_TextScene text1({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left);
+    // text1.SetColor({1.f, 0.f, 0.f});
+    // ZC_Vec3<float> text2Pos(0.f, 5.f, 0.f);
+    // float text2RotAngle = 30.f;
+    // ZC_Vec3<float> text2Rotaxises(0.f, 0.f, 1.f);
     
-    auto text2 = text1.MakeCopy(&text2Pos, &text2RotAngle, &text2Rotaxises, nullptr);
-    text2.SetColor({0.f, 0.f, 1.f});
+    // auto text2 = text1.MakeCopy(&text2Pos, &text2RotAngle, &text2Rotaxises, nullptr);
+    // text2.SetColor({0.f, 0.f, 1.f});
 
-    ZC_TextWindow text({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, 0.f, 0.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel);
+    // ZC_TextWindow text({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, 0.f, 0.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel);
+
+
+    ZC_TextSceneTurnedToCamera textSceneTurn({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, {20,20,10});
+    // ZC_TextSceneTurnedToCamera textSceneTurn({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, {0,0,0});
 
 
     // pText = &text;

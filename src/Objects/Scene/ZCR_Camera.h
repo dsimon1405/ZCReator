@@ -26,8 +26,8 @@ private:
     float distanceToObject = 15.f;
     
     const float sensitivityRotation = 1.f;
-    float verticalAngle = 0.f,
-        horizontalAngle = 0.f;
+    float horizontalAngle = 0.f,
+        verticalAngle = 0.f;
 
     ZC_SConnection sconButton_M_MIDLE;
     ZC_SConnection sconMouse;
@@ -41,7 +41,7 @@ private:
     void E(float time);
     void MouseMoveCallback(float x, float y, float xRel, float yRel, float time);
     void MoveAroundObject(float xRel, float yRel, float time);
-    void SetHorAngleMoreOrLessThan90(bool isMoreThan90);
+    void SetVerticalAngleMoreOrLessThan90(bool isMoreThan90);
     void CalculateDirections();
     void ButtonMouseWheelDown(float time);
     void ButtonMouseWheelUp(float time);

@@ -29,11 +29,11 @@ ZCR_Orientation3D::ZCR_Orientation3D(float windowAspect)
 
     for (size_t i = 0; i < 6; i++) rsControllerAxises[i].SwitchToLvl(ZC_RL_Drawing);
 }
-float horizontalAngle = 0, verticalAngle = 0;
-void ZCR_Orientation3D::MoveAroundObject(float _horizontalAngle, float _verticalAngle, bool _isNormalHorizontalOrientation)
+float verticalAngle = 0, horizontalAngle = 0;
+void ZCR_Orientation3D::MoveAroundObject(float _verticalAngle, float _horizontalAngle, bool _isNormalHorizontalOrientation)
 {
-    horizontalAngle = _horizontalAngle;
     verticalAngle = _verticalAngle;
+    horizontalAngle = _horizontalAngle;
     UpdateViewMatrix(_isNormalHorizontalOrientation);
 
 
@@ -166,7 +166,7 @@ void ZCR_Orientation3D::WindowResizeCallback(float width, float height)
 void ZCR_Orientation3D::UpdateViewMatrix(bool _isNormalHorizontalOrientation)
 {
     ZC_Mat4<float> newModel(1.f);
-    newModel.Rotate(verticalAngle, {0.f, 0.f, -1.f}).Rotate(-horizontalAngle, {0.f, 1.f, 0.f});
+    newModel.Rotate(horizontalAngle, {0.f, 0.f, -1.f}).Rotate(verticalAngle, {0.f, -1.f, 0.f});
     ZC_Vec4<float> camPos = newModel * ZC_Vec4<float>(5.f, 0.f, 0.f, 1.f);  //  5 distance to center
     isNormalHorizontalOrientation = _isNormalHorizontalOrientation;
     view = isNormalHorizontalOrientation ? ZC_Mat::LookAt(ZC_Vec3<float>{camPos[0], camPos[1], camPos[2]}, {0.f, 0.f, 0.f}, {0.f, 0.f, 1.f})
@@ -190,7 +190,7 @@ void ZCR_Orientation3D::RotateLinesAndTranslateQuads()
     upRendSetLine->buffers.begin()->BufferSubData(0, threeVerticesByteSize, positivePointsOfLines);
 
     ZC_Mat4<float> mod(1.f);
-    mod.Rotate(verticalAngle, {0.f, 0.f, -1.f}).Rotate(horizontalAngle, {0.f, -1.f, 0.f});
+    mod.Rotate(horizontalAngle, {0.f, 0.f, -1.f}).Rotate(verticalAngle, {0.f, -1.f, 0.f});
     if (!isNormalHorizontalOrientation) mod.Rotate(180.f, {1.f,0.f,0.f});   //  turn around texture
     
     ZC_Mat4<float> posX(1.f);

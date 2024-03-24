@@ -44,7 +44,7 @@ void ZCR_Camera::Move(const ZC_Vec3<float>& step) noexcept
 void ZCR_Camera::MouseMoveCallback(float x, float y, float xRel, float yRel, float time)
 {
     MoveAroundObject(xRel, yRel, time);
-    orientatoin3D.MoveAroundObject(horizontalAngle, verticalAngle, isNormalHorizontalOrientation);
+    orientatoin3D.MoveAroundObject(verticalAngle, horizontalAngle, isNormalHorizontalOrientation);
 }
 
 void ZCR_Camera::MoveAroundObject(float xRel, float yRel, float time)
@@ -64,14 +64,14 @@ void ZCR_Camera::MoveAroundObject(float xRel, float yRel, float time)
     // if (verticalAngle >= 360.f) verticalAngle -= 360.f;
     // else if (verticalAngle <= -360.f) verticalAngle += 360.f;
 
-    horizontalAngle += sensitivityRotation * (isNormalHorizontalOrientation ? yRel : - yRel);
-    if (horizontalAngle == 90.f) horizontalAngle = 89.9f;
-    else if (horizontalAngle == -90.f) horizontalAngle = -89.9f;
-    else if (horizontalAngle > 90.f) SetHorAngleMoreOrLessThan90(true);
-    else if (horizontalAngle < -90.f) SetHorAngleMoreOrLessThan90(false);
-    verticalAngle += sensitivityRotation * (isNormalHorizontalOrientation ? xRel : - xRel);
-    if (verticalAngle >= 360.f) verticalAngle -= 360.f;
-    else if (verticalAngle <= -360.f) verticalAngle += 360.f;
+    verticalAngle += sensitivityRotation * (isNormalHorizontalOrientation ? yRel : - yRel);
+    if (verticalAngle == 90.f) verticalAngle = 89.9f;
+    else if (verticalAngle == -90.f) verticalAngle = -89.9f;
+    else if (verticalAngle > 90.f) SetVerticalAngleMoreOrLessThan90(true);
+    else if (verticalAngle < -90.f) SetVerticalAngleMoreOrLessThan90(false);
+    horizontalAngle += sensitivityRotation * (isNormalHorizontalOrientation ? xRel : - xRel);
+    if (horizontalAngle >= 360.f) horizontalAngle -= 360.f;
+    else if (horizontalAngle <= -360.f) horizontalAngle += 360.f;
 
     // float camX = 0.f,
     //       camY = 0.f,
@@ -90,7 +90,7 @@ void ZCR_Camera::MoveAroundObject(float xRel, float yRel, float time)
     
     //  analogue with rotation of the model matrix!
     ZC_Mat4<float> newModel(1.f);
-    newModel.Rotate(verticalAngle, {0.f, 0.f, -1.f}).Rotate(-horizontalAngle, {0.f, 1.f, 0.f});
+    newModel.Rotate(horizontalAngle, {0.f, 0.f, -1.f}).Rotate(verticalAngle, {0.f, -1.f, 0.f});
     ZC_Vec4<float> camPos = newModel * ZC_Vec4<float>(distanceToObject, 0.f, 0.f, 1.f);
     camera->SetCamPos({ camPos[0], camPos[1], camPos[2] });
 
@@ -98,13 +98,13 @@ void ZCR_Camera::MoveAroundObject(float xRel, float yRel, float time)
     isDirsActual = false;
 }
 
-void ZCR_Camera::SetHorAngleMoreOrLessThan90(bool isMoreThan90)
+void ZCR_Camera::SetVerticalAngleMoreOrLessThan90(bool isMoreThan90)
 {
-    horizontalAngle = isMoreThan90 ? 90.f - (horizontalAngle - 90.f) : -90.f - (horizontalAngle + 90.f);
+    verticalAngle = isMoreThan90 ? 90.f - (verticalAngle - 90.f) : -90.f - (verticalAngle + 90.f);
 
     isNormalHorizontalOrientation = !isNormalHorizontalOrientation;
     isNormalHorizontalOrientation ? camera->SetUp({0.f, 0.f, 1.f}) : camera->SetUp({0.f, 0.f, -1.f});
-    verticalAngle += verticalAngle >= 0.f ? 180.f : -180.f;
+    horizontalAngle += horizontalAngle >= 0.f ? 180.f : -180.f;
 }
 
 void ZCR_Camera::CalculateDirections()
