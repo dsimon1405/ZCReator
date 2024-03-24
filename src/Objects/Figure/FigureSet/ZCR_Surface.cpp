@@ -21,7 +21,7 @@ ZC_sptr<ZC_RendererSet> ZCR_Surface::MakeSurfaceRendererSet()
     typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZCR_ColorFigure);
 
     ZC_VAO vao;
-    vao.Config(pShPIS->vaoConData, *vbo, &ebo, 0, (spQuads ? (spQuads->size * 4) : 0) + (spTriangles ? (spTriangles->size * 3) : 0));   //  vertices count in vbo (in one quad 4, in one triangle 3)
+    vao.Config(pShPIS->vaoConfigData, *vbo, &ebo, 0, (spQuads ? (spQuads->size * 4) : 0) + (spTriangles ? (spTriangles->size * 3) : 0));   //  vertices count in vbo (in one quad 4, in one triangle 3)
 
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(ebo));

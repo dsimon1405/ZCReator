@@ -20,7 +20,6 @@
 #include <ZC/Tools/Math/ZC_Figures.h>
 
 #include <ZC/Video/OpenGL/Texture/ZC_Textures.h>
-#include <Ogl.h>
 
 // #include <Objects/ImGui/ZCR_ImGui.h>
 #include <Objects/Scene/ZCR_Scene.h>
@@ -296,7 +295,7 @@ struct CC
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <ZC/ErrorLogger/ZC_ErrorLogger.h>
-
+#include <ZC/Video/OpenGL/ZC_OpenGL.h>
 
 #include <ZC/File/ZC_File.h>
 #include <ZC/Tools/Math/ZC_Math.h>
@@ -765,7 +764,7 @@ protected:
         textHeight;
 
     ZC_TextData(bool _isParantOf_ZCTextWindow, typename ZC_Fonts::NameHeight fontData, const std::string& _text,
-            ZC_TextAlignment _alignment, const ZC_Vec3<float>& color)
+            ZC_TextAlignment _alignment)
         : pFont(ZC_Fonts::GetFont(fontData)),
         isParantOf_ZCTextWindow(_isParantOf_ZCTextWindow),
         spTextSharedData(ZC_sptrMake<ZC_TextSharedData>(_text, _alignment, MakeRendererSet(_text, _alignment))),
@@ -774,7 +773,6 @@ protected:
         rsController.pTexture = &(pFont->texture);  //  the texture pointer is manually set because in the case of Text one texture can be used in multiple objects and is stored in Font::Font and not in ZC_RendererSet::texSets
         rsController.texturesCount = 1;
 
-        SetColor(color);
         NeedDraw(true);
     }
 
@@ -785,10 +783,12 @@ protected:
         rsController(td.rsController.MakeCopy()),
         textWidth(td.textWidth),
         textHeight(td.textHeight)
-    {}
+    {
+        NeedDraw(true);
+    }
 
 private:
-    virtual void SetNewTextSize() = 0;
+    virtual void SetNewTextSize() {};
     
     ZC_RendererSet MakeRendererSet(const std::string& _text, ZC_TextAlignment _alignment)
     {
@@ -796,7 +796,7 @@ private:
         ZC_Buffer vbo(GL_ARRAY_BUFFER);
         ZC_Buffer ebo(GL_ELEMENT_ARRAY_BUFFER);
         ZC_VAO vao;
-        vao.Config(pShPIS->vaoConData, vbo, &ebo, 0, 0);
+        vao.Config(pShPIS->vaoConfigData, vbo, &ebo, 0, 0);
 
         auto upGLDraw = ZC_uptrMakeFromChild<ZC_GLDraw, ZC_DrawElements>(CalculateAndSetTextData(vbo, ebo, _text, _alignment));
 
@@ -845,10 +845,10 @@ public:
         ZC_WOIF__Y_Center -> value no metter.
     indentFlags - flags of indent horizontal(X) and vertical(Y) from border of global window to IGWindow. Must be set one flag for X and one flag for Y. Example: X_Left_Pixel | Y_Top_Pixel.
     */
-    ZC_TextWindow(typename ZC_Fonts::NameHeight fontData, const std::string& _text, ZC_TextAlignment _alignment, const ZC_Vec3<float>& color,
+    ZC_TextWindow(typename ZC_Fonts::NameHeight fontData, const std::string& _text, ZC_TextAlignment _alignment,
             float windowIndentX, float windowIndentY, ZC_WindowOrthoIndentFlags indentFlags)
         : ZC_WindowOrthoIndent(false, 0, 0, windowIndentX, windowIndentY, indentFlags),
-        ZC_TextData(true, fontData, _text, _alignment, color)
+        ZC_TextData(true, fontData, _text, _alignment)
     {
         SetNewTextSize();
 
@@ -878,9 +878,11 @@ public:
     The methods affect only the current copy: NeedDraw(), SetColor(), SetIndentData().
     Methods that include effects on all copies: SetText() SetAlignment() SetTextAndAlignment().
     */
-    ZC_TextWindow MakeCopy()
+    ZC_TextWindow MakeCopy(float windowIndentX, float windowIndentY, ZC_WindowOrthoIndentFlags indentFlags)
     {
-        return { *this };
+        ZC_TextWindow copy = { *this };
+        copy.SetIndentData(windowIndentX, windowIndentY, indentFlags);
+        return copy;
     } 
 
 private:
@@ -888,8 +890,7 @@ private:
         : ZC_WindowOrthoIndent(dynamic_cast<const ZC_WindowOrthoIndent&>(tw)),
         ZC_TextData(dynamic_cast<const ZC_TextData&>(tw))
     {
-        ZC_RSPDUniformData unPosition(ZC_UN_unPosition, this->currentIndents);
-        rsController.SetData(ZC_RSPDC_uniforms, &unPosition);
+        rsController.SetUniformsData(ZC_UN_unPosition, this->currentIndents);
     }
 
     void SetNewTextSize() override
@@ -898,7 +899,7 @@ private:
     }
 };
 
-//  Class for rendering text into the window.
+//  Class for rendering text into the scene.
 class ZC_TextScene : public ZC_TextData
 {
 public:
@@ -909,51 +910,79 @@ public:
     _alignment - alignment across text consisting of several lines of different lengths.
     color - texts color.
     */
-    ZC_TextScene(typename ZC_Fonts::NameHeight fontData, const std::string& _text, ZC_TextAlignment _alignment, const ZC_Vec3<float>& color)
-        : ZC_TextData(false, fontData, _text, _alignment, color)
+    ZC_TextScene(typename ZC_Fonts::NameHeight fontData, const std::string& _text, ZC_TextAlignment _alignment)
+        : ZC_TextData(false, fontData, _text, _alignment)
     {
-        SetNewTextSize();
-
-        ZC_RSPDUniformData unModel(ZC_UN_unModel, matModel.Begin());
-        rsController.SetData(ZC_RSPDC_uniforms, &unModel);
+        rsController.SetUniformsData(ZC_UN_unModel, &(ZC_Mat4<float>(1.f).Scale(scale, scale, scale)));
     }
 
-    void SetPosition(float x, float y, float z)
+    void SetPosition(const ZC_Vec3<float>& pos) noexcept
     {
-
+        position = pos;
+        RecalculateModelMatrix();
     }
 
-    // /*
-    // Makes a copy of the text.
-    // The methods affect only the current copy: NeedDraw(), SetColor(), SetIndentData().
-    // Methods that include effects on all copies: SetText() SetAlignment() SetTextAndAlignment().
-    // */
-    // ZC_TextWindow MakeCopy()
-    // {
-    //     return { *this };
-    // } 
+    void SetRotation(float angle, const ZC_Vec3<float>& axises) noexcept
+    {
+        rotationAngle = angle;
+        rotationAxises = axises;
+        RecalculateModelMatrix();
+    }
+
+    void SetScale(float _scale)
+    {
+        scale = _scale;
+        RecalculateModelMatrix();
+    }
+
+    //  This function must be used if more than one parameter of the model matrix(position, rotaion, scale) needs to be changed. 
+    void SetModelMatrixData(ZC_Vec3<float>* pPosition, float* pRotationAngle, const ZC_Vec3<float>* pRotationAxises, float* pScale)
+    {
+        if (pPosition) position = * pPosition;
+        if (pRotationAngle && pRotationAxises)
+        {
+            rotationAngle = *pRotationAngle;
+            rotationAxises = *pRotationAxises;
+        }
+        if (pScale) scale = *pScale;
+        RecalculateModelMatrix();
+    }
+
+    /*
+    Makes a copy of the text.
+    The methods affect only the current copy: NeedDraw(), SetColor(), SetPosition(), SetRotation(), SetScale(), SetModelMatrixData().
+    Methods that include effects on all copies: SetText() SetAlignment() SetTextAndAlignment().
+    */
+    ZC_TextScene MakeCopy(ZC_Vec3<float>* pPosition, float* pRotationAngle, const ZC_Vec3<float>* pRotationAxises, float* pScale)
+    {
+        ZC_TextScene copy = { *this };
+        copy.SetModelMatrixData(pPosition, pRotationAngle, pRotationAxises, pScale);
+        return copy;
+    } 
 
 private:
-    ZC_Mat4<float> matModel{ 1.f };
+    float scale = 0.01f;
+    ZC_Vec3<float> position{ 0.f, 0.f, 0.f };
+    float rotationAngle = 0.f;
+    ZC_Vec3<float> rotationAxises{ 0.f, 0.f, 0.f };
 
-    // ZC_TextWindow(const ZC_TextWindow& tw)
-    //     : ZC_WindowOrthoIndent(dynamic_cast<const ZC_WindowOrthoIndent&>(tw)),
-    //     ZC_TextData(dynamic_cast<const ZC_TextData&>(tw))
-    // {
-    //     upRSADS->SetUniformsData(ZC_Uniform::Name::unPosition, currentIndents);
-    // }
-
-    void SetNewTextSize() override
+    ZC_TextScene(const ZC_TextScene& tw)
+        : ZC_TextData(dynamic_cast<const ZC_TextData&>(tw)),
+        scale(tw.scale),
+        position(tw.position),
+        rotationAngle(tw.rotationAngle),
+        rotationAxises(tw.rotationAxises)
     {
-        static bool isFirst = true;
-        if (isFirst)
-        {
-            matModel.Scale(0.01f, 0.01f, 0.01f);
-            // .Translate(-(this->textWidth / 2.f), 0, -(this->textHeight / 2.f));
-            isFirst = false;
-        }
-        else matModel.Translate(0, 5, 0).Scale(0.01f, 0.01f, 0.01f);
-        // .Translate(-(this->textWidth / 2.f), 0, -(this->textHeight / 2.f));
+        rsController.SetUniformsData(ZC_UN_unModel, &(ZC_Mat4<float>(1.f).Scale(scale, scale, scale)));
+    }
+
+    void RecalculateModelMatrix()
+    {
+        ZC_Mat4<float> model(1.f);
+        model.Translate(position);
+        if (rotationAngle != 0.f) model.Rotate(rotationAngle, rotationAxises);
+        model.Scale(scale, scale, scale);
+        rsController.SetUniformsData(ZC_UN_unModel, &model);
     }
 };
 
@@ -967,8 +996,8 @@ int ZC_main()
     // window->SetFPS(0);
 
     size_t textHeight = 200;
-    ZC_Fonts::NameHeight fonts[]{ZC_FontName::Arial, textHeight};
-    ZC_Fonts::Load(fonts, 1);
+    ZC_Fonts::NameHeight fonts{ZC_FontName::Arial, textHeight};
+    ZC_Fonts::Load(&fonts, 1);
 
     ZC_Window::GlClearColor(0.3f, 0.3f, 0.3f, 1.f);
     ZC_Window::GlEnablePointSize();
@@ -989,11 +1018,16 @@ int ZC_main()
     }
     
 
-    ZC_TextScene text1({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, {1.f, 0.f, 0.f});
-    ZC_TextScene text2({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, {1.f, 0.f, 0.f});
+    ZC_TextScene text1({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left);
+    text1.SetColor({1.f, 0.f, 0.f});
+    ZC_Vec3<float> text2Pos(0.f, 5.f, 0.f);
+    float text2RotAngle = 30.f;
+    ZC_Vec3<float> text2Rotaxises(0.f, 0.f, 1.f);
+    
+    auto text2 = text1.MakeCopy(&text2Pos, &text2RotAngle, &text2Rotaxises, nullptr);
+    text2.SetColor({0.f, 0.f, 1.f});
 
-    ZC_TextWindow text({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left,
-        {0.f, 1.f, 0.f}, 0.f, 0.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel);
+    ZC_TextWindow text({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, 0.f, 0.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel);
 
 
     // pText = &text;

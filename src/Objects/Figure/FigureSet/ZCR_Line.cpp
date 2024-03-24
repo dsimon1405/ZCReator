@@ -1,7 +1,6 @@
 #include "ZCR_Line.h"
 
 #include <ZC/Tools/Container/ZC_ContFunc.h>
-#include <algorithm>
 
 ZCR_Line::ZCR_Line()
     : spRendererSetsLine(MakeLineRendererSet()),
@@ -22,7 +21,7 @@ ZC_sptr<ZC_RendererSet> ZCR_Line::MakeLineRendererSet()
     typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZCR_LineFigure);
 
     ZC_VAO vao;                                        //  vertices count in vbo (in one quad 4, in one triangle 3)
-    vao.Config(pShPIS->vaoConData, *vbo, &ebo, 0, (spQuads ? (spQuads->size * 4) : 0) + (spTriangles ? (spTriangles->size * 3) : 0));
+    vao.Config(pShPIS->vaoConfigData, *vbo, &ebo, 0, (spQuads ? (spQuads->size * 4) : 0) + (spTriangles ? (spTriangles->size * 3) : 0));
 
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(ebo));

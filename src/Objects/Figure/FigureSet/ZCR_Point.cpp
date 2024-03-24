@@ -1,6 +1,5 @@
 #include "ZCR_Point.h"
 
-#include <algorithm>
 #include <ZC/Tools/Container/ZC_ContFunc.h>
 
 ZCR_Point::ZCR_Point()
@@ -22,7 +21,7 @@ ZC_sptr<ZC_RendererSet> ZCR_Point::MakePointRendererSet()
     typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZCR_Point);
 
     ZC_VAO vao;
-    vao.Config(pShPIS->vaoConData, *vbo, &ebo, 0, (spQuads ? (spQuads->size * 4) : 0) + (spTriangles ? (spTriangles->size * 3) : 0));   //  vertices count in vbo (in one quad 4, in one triangle 3)
+    vao.Config(pShPIS->vaoConfigData, *vbo, &ebo, 0, (spQuads ? (spQuads->size * 4) : 0) + (spTriangles ? (spTriangles->size * 3) : 0));   //  vertices count in vbo (in one quad 4, in one triangle 3)
 
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(ebo));

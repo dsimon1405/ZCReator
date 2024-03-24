@@ -3,6 +3,7 @@
 #include <ZC/Tools/Signal/ZC_SConnection.h>
 #include <ZC/Video/OpenGL/Renderer/ZC_RendererSet.h>
 #include <ZC/Tools/Container/ZC_DA.h>
+#include <ZC/Tools/Math/ZC_Mat4.h>
 
 struct ZCR_Orientation3D
 {

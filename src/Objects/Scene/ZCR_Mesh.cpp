@@ -5,6 +5,7 @@
 #include <ZC/Video/OpenGL/Shader/ZC_ShProgs.h>
 #include <ZC/Video/OpenGL/VAO/ZC_VAOs.h>
 #include <ZC/ErrorLogger/ZC_ErrorLogger.h>
+#include <ZC/Tools/Math/ZC_Mat4.h>
 
 ZCR_Mesh::ZCR_Mesh(float totalLength)
     : upRendererSet(MakeRendererSet(totalLength)),
@@ -78,7 +79,7 @@ ZC_uptr<ZC_RendererSet> ZCR_Mesh::MakeRendererSet(float totalLength)
     typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZCR_LineMesh);
 
     ZC_VAO vao;
-    vao.Config(pShPIS->vaoConData, vbo, nullptr, 0, 0);
+    vao.Config(pShPIS->vaoConfigData, vbo, nullptr, 0, 0);
 
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(vbo));

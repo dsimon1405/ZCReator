@@ -4,6 +4,7 @@
 #include <ZC/Events/ZC_Events.h>
 #include <ZC/Tools/Math/ZC_Mat.h>
 #include "ZCR_Camera.h"
+#include <ZC/Tools/Math/ZC_Mat.h>
 
 ZCR_Orientation3D::ZCR_Orientation3D(float windowAspect)
     : upRendSetLine(MakeRSLine()),
@@ -58,7 +59,7 @@ ZC_uptr<ZC_RendererSet> ZCR_Orientation3D::MakeRSLine()
     typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZCR_LineOrientation3D);
 
     ZC_VAO vao;
-    vao.Config(pShPIS->vaoConData, vbo, nullptr, 0, 3);   //  last param = 3, vertices amount
+    vao.Config(pShPIS->vaoConfigData, vbo, nullptr, 0, 3);   //  last param = 3, vertices amount
 
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(vbo));
@@ -142,7 +143,7 @@ ZC_uptr<ZC_RendererSet> ZCR_Orientation3D::MakeRendererSetAxice()
     typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZCR_QuadOrientation3D);
 
     ZC_VAO vao;
-    vao.Config(pShPIS->vaoConData, vbo, nullptr, 0, 24);   //  24 vertices amount
+    vao.Config(pShPIS->vaoConfigData, vbo, nullptr, 0, 24);   //  24 vertices amount
 
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(vbo));
