@@ -25,8 +25,8 @@ ZCR_Camera::ZCR_Camera()
 
 void ZCR_Camera::Move(const ZC_Vec3<float>& step) noexcept
 {
-    camera->SetLookOn(camera->GetLookOn() + step)
-          .SetCamPos(camera->GetCamPos() + step);
+    camera->SetLookOn(*camera->GetLookOn() + step)
+          .SetCamPos(*camera->GetCamPos() + step);
 }
 
 // void ZCR_Camera::W(float time) {Move(dirFront * time * speedMove);}
@@ -109,7 +109,7 @@ void ZCR_Camera::SetVerticalAngleMoreOrLessThan90(bool isMoreThan90)
 
 void ZCR_Camera::CalculateDirections()
 {
-    dirFront = ZC_Vec::Normalize(camera->GetLookOn() - camera->GetCamPos());
+    dirFront = ZC_Vec::Normalize(*(camera->GetLookOn()) - *(camera->GetCamPos()));
     dirRight = ZC_Vec::Cross(dirFront, {0.f,0.f,1.f});    //  world up
     dirUp = ZC_Vec::Cross(dirRight, dirFront);
     isDirsActual = true;
@@ -142,16 +142,16 @@ void ZCR_Camera::MouseScroll(float rotationHorizontal, float rotationVertical, f
     if (newDistance >= maxDistanceToObject)
     {
         distanceToObject = maxDistanceToObject;
-        camera->SetCamPos(camera->GetLookOn() - (dirFront * maxDistanceToObject));
+        camera->SetCamPos(*(camera->GetLookOn()) - (dirFront * maxDistanceToObject));
     }
     else if (newDistance <= minDistanceToObject)
     {
         distanceToObject = minDistanceToObject;
-        camera->SetCamPos(camera->GetLookOn() - (dirFront * distanceToObject));
+        camera->SetCamPos(*(camera->GetLookOn()) - (dirFront * distanceToObject));
     }
     else
     {
         distanceToObject = newDistance;
-        camera->SetCamPos(camera->GetLookOn() - (dirFront * distanceToObject));
+        camera->SetCamPos(*(camera->GetLookOn()) - (dirFront * distanceToObject));
     }
 }

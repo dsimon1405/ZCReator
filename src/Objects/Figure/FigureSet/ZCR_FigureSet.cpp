@@ -18,7 +18,7 @@ ZCR_FigureSet::ZCR_FigureSet(ZC_sptr<ZC_DA<ZC_Quad>>&& _quads, ZC_sptr<ZC_DA<ZC_
     // rsControllerLine->SetUniformsData(UName::unModel, spMatModel->Begin());
     // rsControllerSurface->SetUniformsData(UName::unModel, spMatModel->Begin());
 
-    spMatModel->Translate(4.f, 2.f, 1.f);
+    spMatModel->Translate(3.f, 1.f, 2.f);
 }
 
 // ZCR_FigureSet::ZCR_FigureSet(ZCR_FigureSet&& tr)

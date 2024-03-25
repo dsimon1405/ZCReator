@@ -232,9 +232,9 @@ struct CC
 
 enum ZC_TextAlignment
 {
-    Left,
-    Right,
-    Center,
+    ZC_TA_Left,
+    ZC_TA_Right,
+    ZC_TA_Center,
 };
 
 enum ZC_FontName
@@ -374,12 +374,12 @@ struct ZC_Fonts
                     rCoords[i].y += lineData.mustBeUp_Y;
             }
 
-            if (alignment == Left) return;
+            if (alignment == ZC_TA_Left) return;
 
             for (auto& lineData : rLinesData)    //  X alignment
             {
                 if (lineData.width == textWidth) continue;
-                float offsetX = alignment == Right ? textWidth - lineData.width : (textWidth - lineData.width) / 2.f;  //  otherwise Alignment_Center, Alignment_Left is default
+                float offsetX = alignment == ZC_TA_Right ? textWidth - lineData.width : (textWidth - lineData.width) / 2.f;  //  otherwise Alignment_Center, Alignment_Left is default
                 for (size_t i = lineData.coordsStartIndex; i < lineData.coordsStartIndex + lineData.coordsCount; ++i)
                     rCoords[i].x += offsetX;                
             }
@@ -399,8 +399,8 @@ struct ZC_Fonts
             for (auto& lineData : rLinesData)    //  X alignment
             {
                 float offsetX = -halfTextWidth;     //  make texts X origin center
-                if (lineData.width != rTextWidth)
-                    offsetX += alignment == Right ? rTextWidth - lineData.width : (rTextWidth - lineData.width) / 2.f;  //  otherwise Alignment_Center, Alignment_Left is default
+                if (alignment != ZC_TA_Left && lineData.width != rTextWidth)
+                    offsetX += alignment == ZC_TA_Right ? rTextWidth - lineData.width : (rTextWidth - lineData.width) / 2.f;  //  otherwise Alignment_Center
                 for (size_t i = lineData.coordsStartIndex; i < lineData.coordsStartIndex + lineData.coordsCount; ++i)
                     rCoords[i].x += offsetX;                
             }
@@ -848,12 +848,14 @@ public:
 
     void SetPosition(const ZC_Vec3<float>& pos) noexcept
     {
+        if (position == pos) return;
         position = pos;
         RecalculateModelMatrix();
     }
 
     void SetRotation(float angle, const ZC_Vec3<float>& axises) noexcept
     {
+        if (rotationAngle == angle && rotationAxises == axises) return;
         rotationAngle = angle;
         rotationAxises = axises;
         RecalculateModelMatrix();
@@ -861,6 +863,7 @@ public:
 
     void SetScale(float _scale)
     {
+        if (scale == _scale) return;
         scale = _scale;
         RecalculateModelMatrix();
     }
@@ -868,7 +871,7 @@ public:
     //  This function must be used if more than one parameter of the model matrix(position, rotaion, scale) needs to be changed. 
     void SetModelMatrixData(ZC_Vec3<float>* pPosition, float* pRotationAngle, const ZC_Vec3<float>* pRotationAxises, float* pScale)
     {
-        if (pPosition) position = * pPosition;
+        if (pPosition) position = *pPosition;
         if (pRotationAngle && pRotationAxises)
         {
             rotationAngle = *pRotationAngle;
@@ -897,13 +900,13 @@ private:
     float rotationAngle = 0.f;
     ZC_Vec3<float> rotationAxises{ 0.f, 0.f, 0.f };
 
-    ZC_TextScene(const ZC_TextScene& tw)
-        : ZC_TextData(dynamic_cast<const ZC_TextData&>(tw)),
-        model(tw.model),
-        scale(tw.scale),
-        position(tw.position),
-        rotationAngle(tw.rotationAngle),
-        rotationAxises(tw.rotationAxises)
+    ZC_TextScene(const ZC_TextScene& ts)
+        : ZC_TextData(dynamic_cast<const ZC_TextData&>(ts)),
+        model(ts.model),
+        scale(ts.scale),
+        position(ts.position),
+        rotationAngle(ts.rotationAngle),
+        rotationAxises(ts.rotationAxises)
     {
         rsController.SetUniformsData(ZC_UN_unModel, &model);
     }
@@ -927,23 +930,84 @@ struct ZC_TurnToCamera
         if (allHeirs.empty()) sconEventsEnd.Disconnect();
     }
 
-    static inline ZC_SConnection sconEventsEnd; //  must be connected to event, which calls after all camera manipulations  !!!!!!!!!!!!
-    static inline std::forward_list<ZC_TurnToCamera*> allHeirs;
-    static inline std::forward_list<ZC_TurnToCamera*> needUpdate;
+    void SetPosition(const ZC_Vec3<float>& pos)
+    {
+        if (position == pos) return;
+        position = pos;
+        if (!isNeedUpdate)
+        {
+            isNeedUpdate = true;
+            needUpdate.emplace_front(this);
+        }
+    }
 
+    void SetScale(float _scale)
+    {
+        if (scale == _scale) return;
+        if (scale != 0.f)   //  need return to 1.0 -> 100%
+        {   //  (model[0] / scale) -> return 100% scale, if new scale not null make scale -> (* _scale)
+            auto column0 = _scale == 0.f ? model[0] / scale : model[0] / scale * _scale,
+                column1 = _scale == 0.f ? model[1] / scale : model[1] / scale * _scale,
+                column2 = _scale == 0.f ? model[2] / scale : model[2] / scale * _scale;
+            model[0] = column0;
+            model[1] = column1;
+            model[2] = column2;
+        }
+        scale = _scale;
+    }
+
+protected:
     ZC_Mat4<float> model;
     ZC_Vec3<float> position;
     bool isNeedUpdate = true;
     float scale = 0.f;
 
+    ZC_TurnToCamera(const ZC_Vec3<float>& _position, float _scale)
+        : position(_position),
+        scale(_scale)
+    {
+        if (allHeirs.empty()) sconEventsEnd = ZC_Events::ConnectHandleEventsEnd({ &ZC_TurnToCamera::Update });
+        allHeirs.emplace_front(this);
+        this->CalculateModel(*ZC_Camera::GetCamPos(), (*ZC_Camera::GetUp())[2] == 1.f);
+    }
+
+    ZC_TurnToCamera(const ZC_TurnToCamera& ttc)
+        : model(ttc.model),
+        position(ttc.position),
+        isNeedUpdate(ttc.isNeedUpdate),
+        scale(ttc.scale)
+    {
+        allHeirs.emplace_front(this);
+        if (isNeedUpdate) needUpdate.emplace_front(this);
+    }
+
+private:
+    static inline ZC_SConnection sconEventsEnd; //  must be connected to event, which calls after all camera manipulations  !!!!!!!!!!!!
+    static inline std::forward_list<ZC_TurnToCamera*> allHeirs;
+    static inline std::forward_list<ZC_TurnToCamera*> needUpdate;
+
     static void Update(float time)
     {
-        auto camPos = ZC_Camera::GetCamPos();
-        bool isNormalVerticalOrientation = ZC_Camera::GetUp()[2] == 1.f;
-        for (auto pHeir : allHeirs)
+        static ZC_Vec3<float> previousCameraPosition;
+
+        auto currentCamPos = ZC_Camera::GetCamPos();
+        bool isNormalVerticalOrientation = (*ZC_Camera::GetUp())[2] == 1.f;
+        if (previousCameraPosition == *currentCamPos)
         {
-            pHeir->CalculateModel(camPos, isNormalVerticalOrientation);
+            for (auto pHeir : needUpdate)
+            {
+                pHeir->CalculateModel(previousCameraPosition, isNormalVerticalOrientation);
+            }
         }
+        else
+        {
+            previousCameraPosition = *currentCamPos;
+            for (auto pHeir : allHeirs)
+            {
+                pHeir->CalculateModel(previousCameraPosition, isNormalVerticalOrientation);
+            }
+        }
+        needUpdate.clear();
     }
 
     void CalculateModel(const ZC_Vec3<float>& camPos, bool isNormalVerticalOrientation)
@@ -973,6 +1037,8 @@ struct ZC_TurnToCamera
         Rotate(model, cosHorizontal, sinHorizontal, { 0, 0, -1.f });
         Rotate(model, cosVertical, sinVertical, { -1.f, 0, 0 });
         if (scale != 0.f) model.Scale(scale, scale, scale);
+
+        isNeedUpdate = false;
     }
 
     static void Rotate(ZC_Mat4<float>& model, float cos, float sin, const ZC_Vec3<float>& axise)
@@ -1001,16 +1067,6 @@ struct ZC_TurnToCamera
         model[1] = columnY;
         model[2] = columnZ;
     }
-
-protected:
-    ZC_TurnToCamera(const ZC_Vec3<float>& _position, float _scale)
-        : position(_position),
-        scale(_scale)
-    {
-        if (allHeirs.empty()) sconEventsEnd = ZC_Events::ConnectHandleEventsEnd({ &ZC_TurnToCamera::Update });
-        allHeirs.emplace_front(this);
-        this->CalculateModel(ZC_Camera::GetCamPos(), ZC_Camera::GetUp()[2] == 1.f);
-    }
 };
 
 struct ZC_TextSceneTurnedToCamera : public ZC_TextData, public ZC_TurnToCamera
@@ -1022,25 +1078,49 @@ struct ZC_TextSceneTurnedToCamera : public ZC_TextData, public ZC_TurnToCamera
     {
         this->rsController.SetUniformsData(ZC_UN_unModel, &(this->model));
     }
+
+    ZC_TextSceneTurnedToCamera MakeCopy()
+    {
+        return { *this };
+    }
+
+private:
+    ZC_TextSceneTurnedToCamera(const ZC_TextSceneTurnedToCamera& tsttc)
+        : ZC_TextData(dynamic_cast<const ZC_TextData&>(tsttc)),
+        ZC_TurnToCamera(dynamic_cast<const ZC_TurnToCamera&>(tsttc))
+    {
+        this->rsController.SetUniformsData(ZC_UN_unModel, &(this->model));
+    }
+};
+
+struct ZC_TextWindowIntoScene : public ZC_TextData
+{
+    //  try next: calculate position on cpu, use ZC_TurnToCamera update model, use ZC_TextWindow shader
 };
 
                                         //     add ZC_RLDText
-// ZC_TextWindow* pText;
-// void SetColor(float);
+ZC_TextSceneTurnedToCamera* pText;
+void SetColor(float);
+
+void MouseMove(float x, float y, float xrel, float yrel, float time)
+{
+    ZC_cout("x = " + std::to_string(x) + "; [-1,1] = " + std::to_string(ZC_ToMinusPlusOneRange(x / 800.f))
+        + ";     y = " + std::to_string(y) + "; [-1,1] = " + std::to_string((1.f - (y / 600.f)) * 2 - 1.f));
+}
+
+//  3.62132025 2.41421342 9.81981945 10
 int ZC_main()
 {
-    // ZC_Vec3<float> zy0(2.f, 0, 0);
-    // auto lengthZY0 = ZC_Vec::Length(zy0);
-    // auto leg1 = ZC_Vec::MoveByLength({0,0,0}, {1.f, -1.f, 0}, 2.f);
-    // auto lengthLeg1 = ZC_Vec::Length(leg1);
-    // auto leg2 = ZC_Vec::MoveByLength({0,0,0}, {1.f, -1.f, 1.f}, 2.f);
-    // auto lengthLeg2 = ZC_Vec::Length(leg2);
+    auto view = ZC_Mat::LookAt<float>({0.f, -10.f, 0.f}, {0.f,0.f,0.f}, {0.f,0.f,1.f});
+    auto persp = ZC_Mat::Perspective(45.f, 800.f / 600.f, 0.1f, 100.f);
+    auto ortho = ZC_Mat::Ortho(0.f, 800.f, 0.f, 600.f);
 
-    // auto dot1 = zy0[0] * leg1[0] + zy0[1] * leg1[1] + zy0[2] * leg1[2];
-    // auto dot2 = zy0[0] * leg2[0] + zy0[1] * leg2[1] + zy0[2] * leg2[2];
+    ZC_Mat4<float> model(1.f);
+    ZC_Vec4<float> pos(2.f, 0.f, 1.f, 1.f);
 
-    // auto cos1 = dot1 / (lengthLeg1 * lengthZY0);
-    // auto cos2 = dot2 / (lengthLeg2 * lengthZY0);
+    auto result = persp * view * pos;
+    // auto result = ortho * pos;
+
 
     using namespace ZC_Window;
     ZC_Window::MakeWindow(ZC_Window_Multisampling_4 | ZC_Window_Border, 800.f, 600.f, "ZeroCreator");
@@ -1067,7 +1147,7 @@ int ZC_main()
     //     else
     //         str[i] = ' ';
     // }
-    std::string str = "D I M A";
+    std::string str = "T.O.P\nD I M A";
 
     // ZC_TextScene text1({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left);
     // text1.SetColor({1.f, 0.f, 0.f});
@@ -1078,11 +1158,15 @@ int ZC_main()
     // auto text2 = text1.MakeCopy(&text2Pos, &text2RotAngle, &text2Rotaxises, nullptr);
     // text2.SetColor({0.f, 0.f, 1.f});
 
-    // ZC_TextWindow text({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, 0.f, 0.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel);
+    // ZC_TextWindow text({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Right, 0.f, 0.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel);
 
 
-    ZC_TextSceneTurnedToCamera textSceneTurn({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, {20,20,10});
-    // ZC_TextSceneTurnedToCamera textSceneTurn({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, {0,0,0});
+    // ZC_TextSceneTurnedToCamera textSceneTurn({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, {20,20,10});
+    // ZC_TextSceneTurnedToCamera textSceneTurn({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, {5.f, 0.f, 2.f});
+    ZC_TextSceneTurnedToCamera textSceneTurn({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, {0.f, 0.f, 0.f});
+    auto textSceneTurn2 = textSceneTurn.MakeCopy();
+    textSceneTurn2.SetPosition({7.f, 0.f, 0.f});
+    pText = &textSceneTurn;
 
 
     // pText = &text;
@@ -1090,7 +1174,9 @@ int ZC_main()
     // text1.SetColor({0, 1.f, 0});
     // text1.SetIndentData(20.f, 40.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel);
 
-    // ZC_Events::ConnectButtonDown(ZC_ButtonID::K_Q, {&SetColor});
+    ZC_Events::ConnectButtonDown(ZC_ButtonID::K_Q, {&SetColor});
+
+    ZC_Events::ConnectMouseMove({&MouseMove});
 
     ZC_Window::RuntMainCycle();
     
@@ -1102,25 +1188,34 @@ std::string first = "first\nLol\nsdaasdffffffafsdf\nsdaf",
     current = first;
 
 
-// void SetColor(float)
-// {
-//     if (current == first)
-//     {
-//         // pText->NeedDraw(false);
-//         // pText->SetTextAndAlignment(second, ZC_TextAlignment::Left);
-//         // pText->SetColor({1.f, 1.f, 0.f});
-//         pText->SetIndentData(0.2f, 90.f, ZC_WOIF__X_Left_Percent | ZC_WOIF__Y_Center);
-//         current = second;
-//     }
-//     else
-//     {
-//         // pText->NeedDraw(true);
-//         // pText->SetTextAndAlignment(first, ZC_TextAlignment::Right);
-//         // pText->SetColor({0.f, 1.f, 1.f});
-//         pText->SetIndentData(20.f, 40.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel);
-//         current = first;
-//     }
-// }
+void SetColor(float)
+{
+    if (current == first)
+    {
+        // pText->NeedDraw(false);
+        // pText->SetTextAndAlignment(second, ZC_TextAlignment::Left);
+        // pText->SetColor({1.f, 1.f, 0.f});
+        // pText->SetIndentData(0.2f, 90.f, ZC_WOIF__X_Left_Percent | ZC_WOIF__Y_Center);
+        // pText->SetPosition({5.f, 0.f, 2.f});
+        // pText->SetScale(0.001);
+        // pText->SetAlignment(ZC_TA_Left);
+        // pText->SetColor({1.f, 0.f, 0.f});
+        pText->NeedDraw(true);
+        current = second;
+    }
+    else
+    {
+        // pText->NeedDraw(true);
+        // pText->SetTextAndAlignment(first, ZC_TextAlignment::Right);
+        // pText->SetColor({0.f, 1.f, 1.f});
+        // pText->SetIndentData(20.f, 40.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel);
+        // pText->SetPosition({0.f, 0.f, 0.f});
+        // pText->SetScale(0.01);
+        // pText->SetAlignment(ZC_TA_Right);
+        pText->NeedDraw(false);
+        current = first;
+    }
+}
         
 
 //     enum En
