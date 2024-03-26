@@ -5,7 +5,7 @@
 
 ZCR_Camera::ZCR_Camera()
     : camera(ZC_Camera::CreateCamera({ZC_Perspective(45.f, 0.01f, 100.f),
-        ZC_View({0.f, 0.f, 0.f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 1.f}, true)}, ZC_Ortho())),
+        ZC_View({0.f, -10.f, 0.f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 1.f}, true)}, ZC_Ortho())),
     orientatoin3D(camera->GetWindowAspect()),
     sconButton_M_MIDLE(ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::ButtonMouseWheelDown, this })),
     sconMouse(ZC_Events::ConnectMouseScrollOnceInFrame({ &ZCR_Camera::MouseScroll, this }))

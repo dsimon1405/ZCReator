@@ -293,8 +293,15 @@ struct ZC_Fonts
                 width;
         };
 
+        enum Origin
+        {
+            center,
+            bottomLeft,
+            bottomCenter
+        };
+
         //  makeOriginCenter - make origin center of text (by default origin bottom left for indent translates in ZC_TextWindow)
-        std::vector<Point> FillCoords(const std::string& text, bool makeOriginCenter, ZC_TextAlignment alignment, float& rTextWidth, float& rTextHeight)
+        std::vector<Point> FillCoords(const std::string& text, Origin origin, ZC_TextAlignment alignment, float& rTextWidth, float& rTextHeight)
         {
             auto newLineCount = std::count(text.begin(), text.end(), '\n');
             std::vector<LineData> linesData;
@@ -305,8 +312,12 @@ struct ZC_Fonts
 
             FillCoordsAndLines(text, coords, linesData, rTextWidth, rTextHeight);
 
-            makeOriginCenter ? CalcutatePositionXYWithOriginCenter(linesData, coords, alignment, rTextWidth, rTextHeight)
-                : CalcutatePositionXY(linesData, coords, alignment, rTextWidth);
+            switch (origin)
+            {
+            case Origin::center: CalcutateXYOriginCenter(linesData, coords, alignment, rTextWidth, rTextHeight); break;
+            case Origin::bottomLeft: CalcutateXYOriginBottomLeft(linesData, coords, alignment, rTextWidth); break;
+            case Origin::bottomCenter: CalcutateXYOriginBottomCenter(linesData, coords, alignment, rTextWidth); break;
+            }
 
             return coords;
         }
@@ -365,7 +376,41 @@ struct ZC_Fonts
             AddLine(lineHeightBottomTail, lineHeightWithoughtBottomTail, rLinesData, coordsStartIndex, coordsCount, startX, rTotalWidth, rTotalHeight);
         }
 
-        void CalcutatePositionXY(std::vector<LineData>& rLinesData, std::vector<Point>& rCoords, ZC_TextAlignment alignment, float textWidth)
+        void CalcutateXYOriginBottomLeft(std::vector<LineData>& rLinesData, std::vector<Point>& rCoords, ZC_TextAlignment alignment, float textWidth)
+        {
+            UpY(rLinesData, rCoords);
+
+            if (alignment == ZC_TA_Left) return;    //  Alignment_Left is default
+
+            for (auto& lineData : rLinesData)    //  X alignment
+            {
+                if (lineData.width == textWidth) continue;
+                float offsetX = alignment == ZC_TA_Right ? textWidth - lineData.width : (textWidth - lineData.width) / 2.f;  //  otherwise Alignment_Center
+                for (size_t i = lineData.coordsStartIndex; i < lineData.coordsStartIndex + lineData.coordsCount; ++i)
+                    rCoords[i].x += offsetX;                
+            }
+        }
+
+        void CalcutateXYOriginCenter(std::vector<LineData>& rLinesData, std::vector<Point>& rCoords,
+            ZC_TextAlignment alignment, float textWidth, float textHeight)
+        {
+            float halfTextHeight = textHeight / 2.f;
+            for (auto& lineData : rLinesData)    // Y alignment (down tails and next lines height)
+            {
+                for (size_t i = lineData.coordsStartIndex; i < lineData.coordsStartIndex + lineData.coordsCount; ++i)
+                    rCoords[i].y += lineData.mustBeUp_Y - halfTextHeight;    //  - halfTextHeight (make texts Y origin center)
+            }
+            
+            MakeCenterX(rLinesData, rCoords, alignment, textWidth);
+        }
+
+        void CalcutateXYOriginBottomCenter(std::vector<LineData>& rLinesData, std::vector<Point>& rCoords, ZC_TextAlignment alignment, float textWidth)
+        {
+            UpY(rLinesData, rCoords);
+            MakeCenterX(rLinesData, rCoords, alignment, textWidth);
+        }
+
+        void UpY(std::vector<LineData>& rLinesData, std::vector<Point>& rCoords)
         {
             for (auto& lineData : rLinesData)    // Y alignment (down tails and next lines height)
             {
@@ -373,34 +418,16 @@ struct ZC_Fonts
                 for (size_t i = lineData.coordsStartIndex; i < lineData.coordsStartIndex + lineData.coordsCount; ++i)
                     rCoords[i].y += lineData.mustBeUp_Y;
             }
-
-            if (alignment == ZC_TA_Left) return;
-
-            for (auto& lineData : rLinesData)    //  X alignment
-            {
-                if (lineData.width == textWidth) continue;
-                float offsetX = alignment == ZC_TA_Right ? textWidth - lineData.width : (textWidth - lineData.width) / 2.f;  //  otherwise Alignment_Center, Alignment_Left is default
-                for (size_t i = lineData.coordsStartIndex; i < lineData.coordsStartIndex + lineData.coordsCount; ++i)
-                    rCoords[i].x += offsetX;                
-            }
         }
 
-        void CalcutatePositionXYWithOriginCenter(std::vector<LineData>& rLinesData, std::vector<Point>& rCoords,
-            ZC_TextAlignment alignment, float rTextWidth, float rTextHeight)
+        void MakeCenterX(std::vector<LineData>& rLinesData, std::vector<Point>& rCoords, ZC_TextAlignment alignment, float textWidth)
         {
-            float halfTextHeight = rTextHeight / 2.f;
-            for (auto& lineData : rLinesData)    // Y alignment (down tails and next lines height)
-            {
-                for (size_t i = lineData.coordsStartIndex; i < lineData.coordsStartIndex + lineData.coordsCount; ++i)
-                    rCoords[i].y += lineData.mustBeUp_Y - halfTextHeight;    //  - halfTextHeight (make texts Y origin center)
-            }
-
-            float halfTextWidth = rTextWidth / 2.f;
+            float halfTextWidth = textWidth / 2.f;
             for (auto& lineData : rLinesData)    //  X alignment
             {
                 float offsetX = -halfTextWidth;     //  make texts X origin center
-                if (alignment != ZC_TA_Left && lineData.width != rTextWidth)
-                    offsetX += alignment == ZC_TA_Right ? rTextWidth - lineData.width : (rTextWidth - lineData.width) / 2.f;  //  otherwise Alignment_Center
+                if (alignment != ZC_TA_Left && lineData.width != textWidth)
+                    offsetX += alignment == ZC_TA_Right ? textWidth - lineData.width : (textWidth - lineData.width) / 2.f;  //  otherwise Alignment_Center
                 for (size_t i = lineData.coordsStartIndex; i < lineData.coordsStartIndex + lineData.coordsCount; ++i)
                     rCoords[i].x += offsetX;                
             }
@@ -613,13 +640,6 @@ ZC_DA<uchar> GetTriangleElements(size_t& rElementsCount, GLenum& rElementsType, 
     return elements;
 }
 
-struct ZC_TextSharedData
-{
-    std::string text;
-    ZC_TextAlignment alignment;
-    ZC_RendererSet rendererSet;
-};
-
 struct ZC_TextData
 {
 public:
@@ -627,7 +647,7 @@ public:
 
     void NeedDraw(bool needDraw)
     {
-        needDraw ? rsController.SwitchToLvl(isParantOf_ZCTextWindow ? ZC_RendererLevels::TextWindow : ZC_RendererLevels::TextScene)
+        needDraw ? rsController.SwitchToLvl(rendererLevel)
             : rsController.SwitchToLvl(ZC_RL_None);
     }
 
@@ -685,20 +705,30 @@ public:
     }
 
 protected:
+    struct SharedData
+    {
+        std::string text;
+        ZC_TextAlignment alignment;
+        ZC_RendererSet rendererSet;
+    };
+
     typedef typename ZC_Fonts::Font Font;
+    typedef typename Font::Origin FontOrigin;
     Font* pFont;
-    bool isParantOf_ZCTextWindow;
-    ZC_sptr<ZC_TextSharedData> spTextSharedData;
+    FontOrigin fontOrigin;
+    ZC_sptr<SharedData> spTextSharedData;
     ZC_RSController rsController;
     float textWidth,
         textHeight;
+    ZC_RendererLevel rendererLevel;
 
-    ZC_TextData(bool _isParantOf_ZCTextWindow, typename ZC_Fonts::NameHeight fontData, const std::string& _text,
-            ZC_TextAlignment _alignment)
+    ZC_TextData(typename ZC_ShProgs::ShPInitSet* pShPIS, FontOrigin _fontOrigin, typename ZC_Fonts::NameHeight fontData, const std::string& _text,
+            ZC_TextAlignment _alignment, ZC_RendererLevel _rendererLevel)
         : pFont(ZC_Fonts::GetFont(fontData)),
-        isParantOf_ZCTextWindow(_isParantOf_ZCTextWindow),
-        spTextSharedData(ZC_sptrMake<ZC_TextSharedData>(_text, _alignment, MakeRendererSet(_text, _alignment))),
-        rsController(spTextSharedData->rendererSet.MakeZC_RSController())
+        fontOrigin(_fontOrigin),
+        spTextSharedData(ZC_sptrMake<SharedData>(_text, _alignment, MakeRendererSet(pShPIS, _text, _alignment))),
+        rsController(spTextSharedData->rendererSet.MakeZC_RSController()),
+        rendererLevel(_rendererLevel)
     {
         rsController.pTexture = &(pFont->texture);  //  the texture pointer is manually set because in the case of Text one texture can be used in multiple objects and is stored in Font::Font and not in ZC_RendererSet::texSets
         rsController.texturesCount = 1;
@@ -708,11 +738,12 @@ protected:
 
     ZC_TextData(const ZC_TextData& td)
         : pFont(td.pFont),
-        isParantOf_ZCTextWindow(td.isParantOf_ZCTextWindow),
+        fontOrigin(td.fontOrigin),
         spTextSharedData(td.spTextSharedData),
         rsController(td.rsController.MakeCopy()),
         textWidth(td.textWidth),
-        textHeight(td.textHeight)
+        textHeight(td.textHeight),
+        rendererLevel(td.rendererLevel)
     {
         NeedDraw(true);
     }
@@ -720,9 +751,8 @@ protected:
 private:
     virtual void SetNewTextSize() {};
     
-    ZC_RendererSet MakeRendererSet(const std::string& _text, ZC_TextAlignment _alignment)
+    ZC_RendererSet MakeRendererSet(typename ZC_ShProgs::ShPInitSet* pShPIS, const std::string& _text, ZC_TextAlignment _alignment)
     {
-        auto pShPIS = ZC_ShProgs::Get(isParantOf_ZCTextWindow ? ZC_ShProgs::Name::ZC_TextWindow : ZC_ShProgs::Name::ZC_TextScene);
         ZC_Buffer vbo(GL_ARRAY_BUFFER);
         ZC_Buffer ebo(GL_ELEMENT_ARRAY_BUFFER);
         ZC_VAO vao;
@@ -741,7 +771,7 @@ private:
     {
         textWidth = 0;
         textHeight = 0;
-        auto pointsCoords = pFont->FillCoords(text, !isParantOf_ZCTextWindow, alignment, textWidth, textHeight);
+        auto pointsCoords = pFont->FillCoords(text, fontOrigin, alignment, textWidth, textHeight);
 
         rVBO.BufferData(pointsCoords.size() * sizeof(typename Font::Point), &(pointsCoords[0]), GL_STATIC_DRAW);
   
@@ -778,11 +808,11 @@ public:
     ZC_TextWindow(typename ZC_Fonts::NameHeight fontData, const std::string& _text, ZC_TextAlignment _alignment,
             float windowIndentX, float windowIndentY, ZC_WindowOrthoIndentFlags indentFlags)
         : ZC_WindowOrthoIndent(false, 0, 0, windowIndentX, windowIndentY, indentFlags),
-        ZC_TextData(true, fontData, _text, _alignment)
+        ZC_TextData(ZC_ShProgs::Get(ZC_ShProgs::Name::ZC_TextWindow), FontOrigin::bottomLeft, fontData, _text, _alignment, ZC_RendererLevels::TextWindow)
     {
         SetNewTextSize();
 
-        ZC_RSPDUniformData unPosition(ZC_UN_unPosition, this->currentIndents);
+        ZC_RSPDUniformData unPosition(ZC_UN_unPositionWindow, this->currentIndents);
         rsController.SetData(ZC_RSPDC_uniforms, &unPosition);
     }
 
@@ -820,7 +850,7 @@ private:
         : ZC_WindowOrthoIndent(dynamic_cast<const ZC_WindowOrthoIndent&>(tw)),
         ZC_TextData(dynamic_cast<const ZC_TextData&>(tw))
     {
-        rsController.SetUniformsData(ZC_UN_unPosition, this->currentIndents);
+        rsController.SetUniformsData(ZC_UN_unPositionWindow, this->currentIndents);
     }
 
     void SetNewTextSize() override
@@ -841,7 +871,7 @@ public:
     color - texts color.
     */
     ZC_TextScene(typename ZC_Fonts::NameHeight fontData, const std::string& _text, ZC_TextAlignment _alignment)
-        : ZC_TextData(false, fontData, _text, _alignment)
+        : ZC_TextData(ZC_ShProgs::Get(ZC_ShProgs::Name::ZC_TextScene), FontOrigin::center, fontData, _text, _alignment, ZC_RendererLevels::TextScene)
     {
         rsController.SetUniformsData(ZC_UN_unModel, &(model.Scale(scale, scale, scale)));
     }
@@ -1073,7 +1103,7 @@ struct ZC_TextSceneTurnedToCamera : public ZC_TextData, public ZC_TurnToCamera
 {
     ZC_TextSceneTurnedToCamera(typename ZC_Fonts::NameHeight fontData, const std::string& _text, ZC_TextAlignment _alignment,
             const ZC_Vec3<float>& _position, float _scale = 0.f)
-        : ZC_TextData(false, fontData, _text, _alignment),
+        : ZC_TextData(ZC_ShProgs::Get(ZC_ShProgs::Name::ZC_TextScene), FontOrigin::center, fontData, _text, _alignment, ZC_RendererLevels::TextScene),
         ZC_TurnToCamera(_position, _scale == 0.f ? 0.01f : _scale)
     {
         this->rsController.SetUniformsData(ZC_UN_unModel, &(this->model));
@@ -1095,38 +1125,52 @@ private:
 
 struct ZC_TextWindowIntoScene : public ZC_TextData
 {
-    //  try next: calculate position on cpu, use ZC_TurnToCamera update model, use ZC_TextWindow shader
+    ZC_TextWindowIntoScene(typename ZC_Fonts::NameHeight fontData, const std::string &_text, ZC_TextAlignment _alignment,
+            const ZC_Vec3<float>& position)
+        : ZC_TextData(ZC_ShProgs::Get(ZC_ShProgs::Name::ZC_TextWindowIntoScene), FontOrigin::bottomCenter, fontData, _text, _alignment, ZC_RendererLevels::TextWindowIntoScene),
+        positionIntoScene(position)
+    {
+        rsController.SetUniformsData(ZC_UN_unPositionScene, positionIntoScene.Begin());
+    }
+
+    void SetPosition(const ZC_Vec3<float>& position) noexcept
+    {
+        positionIntoScene = position;
+    }
+
+    ZC_TextWindowIntoScene MakeCopy()
+    {
+        return { *this };
+    }
+
+private:
+    ZC_Vec3<float> positionIntoScene;
+
+    ZC_TextWindowIntoScene(const ZC_TextWindowIntoScene& twis)
+        : ZC_TextData(dynamic_cast<const ZC_TextData&>(twis)),
+        positionIntoScene(twis.positionIntoScene)
+    {
+        rsController.SetUniformsData(ZC_UN_unPositionScene, positionIntoScene.Begin());
+    }
 };
 
-                                        //     add ZC_RLDText
-ZC_TextSceneTurnedToCamera* pText;
+//              add support of users renderer levels in ZC_TextData, add Text in core
+ZC_TextWindowIntoScene* pText;
 void SetColor(float);
 
-void MouseMove(float x, float y, float xrel, float yrel, float time)
-{
-    ZC_cout("x = " + std::to_string(x) + "; [-1,1] = " + std::to_string(ZC_ToMinusPlusOneRange(x / 800.f))
-        + ";     y = " + std::to_string(y) + "; [-1,1] = " + std::to_string((1.f - (y / 600.f)) * 2 - 1.f));
-}
+// void MouseMove(float x, float y, float xrel, float yrel, float time)
+// {
+//     ZC_cout("x = " + std::to_string(x) + "; [-1,1] = " + std::to_string(ZC_ToMinusPlusOneRange(x / 800.f))
+//         + ";     y = " + std::to_string(y) + "; [-1,1] = " + std::to_string((1.f - (y / 600.f)) * 2 - 1.f));
+// }
 
-//  3.62132025 2.41421342 9.81981945 10
 int ZC_main()
 {
-    auto view = ZC_Mat::LookAt<float>({0.f, -10.f, 0.f}, {0.f,0.f,0.f}, {0.f,0.f,1.f});
-    auto persp = ZC_Mat::Perspective(45.f, 800.f / 600.f, 0.1f, 100.f);
-    auto ortho = ZC_Mat::Ortho(0.f, 800.f, 0.f, 600.f);
-
-    ZC_Mat4<float> model(1.f);
-    ZC_Vec4<float> pos(2.f, 0.f, 1.f, 1.f);
-
-    auto result = persp * view * pos;
-    // auto result = ortho * pos;
-
-
     using namespace ZC_Window;
     ZC_Window::MakeWindow(ZC_Window_Multisampling_4 | ZC_Window_Border, 800.f, 600.f, "ZeroCreator");
     // window->SetFPS(0);
 
-    size_t textHeight = 200;
+    size_t textHeight = 100;
     ZC_Fonts::NameHeight fonts{ZC_FontName::Arial, textHeight};
     ZC_Fonts::Load(&fonts, 1);
 
@@ -1147,7 +1191,7 @@ int ZC_main()
     //     else
     //         str[i] = ' ';
     // }
-    std::string str = "T.O.P\nD I M A";
+    std::string str = "T.O.P\np'opK_a\nD I M A";
 
     // ZC_TextScene text1({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left);
     // text1.SetColor({1.f, 0.f, 0.f});
@@ -1158,25 +1202,29 @@ int ZC_main()
     // auto text2 = text1.MakeCopy(&text2Pos, &text2RotAngle, &text2Rotaxises, nullptr);
     // text2.SetColor({0.f, 0.f, 1.f});
 
-    // ZC_TextWindow text({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Right, 0.f, 0.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel);
+    // ZC_TextWindow text({ZC_FontName::Arial, textHeight}, str, ZC_TA_Right, 0.f, 0.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel);
 
 
     // ZC_TextSceneTurnedToCamera textSceneTurn({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, {20,20,10});
     // ZC_TextSceneTurnedToCamera textSceneTurn({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::Left, {5.f, 0.f, 2.f});
-    ZC_TextSceneTurnedToCamera textSceneTurn({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, {0.f, 0.f, 0.f});
-    auto textSceneTurn2 = textSceneTurn.MakeCopy();
-    textSceneTurn2.SetPosition({7.f, 0.f, 0.f});
-    pText = &textSceneTurn;
+    // ZC_TextSceneTurnedToCamera textSceneTurn({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, {0.f, 0.f, 0.f});
+    // auto textSceneTurn2 = textSceneTurn.MakeCopy();
+    // textSceneTurn2.SetPosition({7.f, 0.f, 0.f});
+    // pText = &textSceneTurn;
+
+    ZC_TextWindowIntoScene textWIS({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Center, {5.f, 3.f, 2.f});
+    auto copy = textWIS.MakeCopy();
+    copy.SetPosition({-4.f, -5.f, -3});
 
 
-    // pText = &text;
+    pText = &copy;
     // auto text1 = text.MakeCopy();
     // text1.SetColor({0, 1.f, 0});
     // text1.SetIndentData(20.f, 40.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel);
 
     ZC_Events::ConnectButtonDown(ZC_ButtonID::K_Q, {&SetColor});
 
-    ZC_Events::ConnectMouseMove({&MouseMove});
+    // ZC_Events::ConnectMouseMove({&MouseMove});
 
     ZC_Window::RuntMainCycle();
     
@@ -1199,8 +1247,8 @@ void SetColor(float)
         // pText->SetPosition({5.f, 0.f, 2.f});
         // pText->SetScale(0.001);
         // pText->SetAlignment(ZC_TA_Left);
-        // pText->SetColor({1.f, 0.f, 0.f});
-        pText->NeedDraw(true);
+        pText->SetColor({1.f, 0.f, 0.f});
+        // pText->NeedDraw(true);
         current = second;
     }
     else
@@ -1212,11 +1260,20 @@ void SetColor(float)
         // pText->SetPosition({0.f, 0.f, 0.f});
         // pText->SetScale(0.01);
         // pText->SetAlignment(ZC_TA_Right);
-        pText->NeedDraw(false);
+        pText->SetColor({0.f, 1.f, 0.f});
+        // pText->NeedDraw(false);
         current = first;
     }
 }
+
+
+//  pos = perspView * pos       -> with w divisor component
+//  x = pos.x / pos.w; y = pos.y / pos.w        -> x, y [-1,1]
+//  z = pos.z / pos.w       -> depth valid values [0,1] -> 0 closer, 1 further; if (> 1 and < 0) -> out of frustrum
+
+//  pos = ortho * vec4      -> x, y [-1,1]
         
+
 
 //     enum En
 // {
