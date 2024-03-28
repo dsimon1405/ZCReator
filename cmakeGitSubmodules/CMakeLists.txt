@@ -23,8 +23,8 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/.git")
 endif()
 
 #	git submodule update --init --recursive
-message(STATUS "Git updates submodules")
-execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+message(STATUS "Git submodule update --remote --merge")
+execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --remote --merge
                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-                RESULT_VARIABLE ZC_GIT_SUBMOD_RESULT)
-F_FATAL_EQUAL(${ZC_GIT_SUBMOD_RESULT} 0 "git submodule update --init --recursive => failed with: ${ZC_GIT_SUBMOD_RESULT}")
+                RESULT_VARIABLE process_result)
+F_FATAL_EQUAL(${process_result} 0 "git submodule update --init --recursive => failed with: ${process_result}")

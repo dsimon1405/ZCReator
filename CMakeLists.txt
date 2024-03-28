@@ -12,7 +12,7 @@ set(ZCR_ASSETS_DIRECTORY_NAME assets)
 set(ZCR_ASSETS_DESTINATION_PATH 
     ${PROJECT_BINARY_DIR}/$<$<PLATFORM_ID:Windows>:$<IF:$<CONFIG:Debug>,Debug/,Release/>>${ZCR_ASSETS_DIRECTORY_NAME})   #   windows?
 
-set(ZCR_MY_DEBUG 1)
+set(ZCR_MY_DEBUG 1)     # 1 true, 0 false   =>  use if(ZCR_MY_DEBUG EQUAL 1) - true; if(NOT ZCR_MY_DEBUG) - false
 
 #========================= external libs
 #   add submodules
@@ -31,12 +31,13 @@ set(ZC_AUDIO OFF)
 set(ZC_IMGUI ON)
 set(ZC_STATIC ON)
 # set(ZC_STATIC OFF)
-if(ZCR_MY_DEBUG)
+if(ZCR_MY_DEBUG EQUAL 1)
     set(ZC_MY_DEBUG 1)
+    add_subdirectory(ZeroCore)
 else()
     set(ZC_MY_DEBUG 0)
+    add_subdirectory(external/ZeroCore)
 endif()
-add_subdirectory(external/ZeroCore)
 set(ZCR_LINK_LIBS ${ZCR_LINK_LIBS} PUBLIC ZeroCore)
 
 #========================= ZERO CREATOR =========================
