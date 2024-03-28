@@ -6,9 +6,7 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/build/external/ZeroCore/config",
                 "/home/dmitry/projects/external/SDL3/include",
-                "/home/dmitry/projects/external/glm/include",
-                "${workspaceFolder}/external/ZeroCore/src",
-                "/usr/include/freetype2"
+                "/home/dmitry/projects/external/glm/include"
             ],
             "defines": [],
             "cStandard": "c17",

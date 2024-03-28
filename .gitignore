@@ -1,2 +1,3 @@
 build
-external
+# external/*    comented, while in wxternal only submodules
+imgui.ini

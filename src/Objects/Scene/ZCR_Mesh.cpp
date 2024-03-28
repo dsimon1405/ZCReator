@@ -76,7 +76,7 @@ ZC_uptr<ZC_RendererSet> ZCR_Mesh::MakeRendererSet(float totalLength)
 
     auto upGLDraw = ZC_uptrMakeFromChild<ZC_GLDraw, ZC_DrawArrays>(GL_LINES, 0, vertices.size);
 
-    typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZCR_LineMesh);
+    typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ShPN_ZCR_LineMesh);
 
     ZC_VAO vao;
     vao.Config(pShPIS->vaoConfigData, vbo, nullptr, 0, 0);

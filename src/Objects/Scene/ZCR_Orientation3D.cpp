@@ -56,7 +56,7 @@ ZC_uptr<ZC_RendererSet> ZCR_Orientation3D::MakeRSLine()
     
     auto upDraw = ZC_uptrMakeFromChild<ZC_GLDraw, ZC_DrawArrays>(GL_POINTS, 0, 3);   //  draw as GL_POINTS but drawing 3 lines in geometry shader
 
-    typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZCR_LineOrientation3D);
+    typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ShPN_ZCR_LineOrientation3D);
 
     ZC_VAO vao;
     vao.Config(pShPIS->vaoConfigData, vbo, nullptr, 0, 3);   //  last param = 3, vertices amount
@@ -140,7 +140,7 @@ ZC_uptr<ZC_RendererSet> ZCR_Orientation3D::MakeRendererSetAxice()
     
     auto upDraw = ZC_uptrMakeFromChild<ZC_GLDraw, ZC_DrawArrays>(GL_TRIANGLE_FAN, 0, 24);   //  24 vertices amount
 
-    typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ZC_ShProgs::Name::ZCR_QuadOrientation3D);
+    typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ShPN_ZCR_QuadOrientation3D);
 
     ZC_VAO vao;
     vao.Config(pShPIS->vaoConfigData, vbo, nullptr, 0, 24);   //  24 vertices amount

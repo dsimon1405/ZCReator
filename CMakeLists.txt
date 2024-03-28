@@ -10,9 +10,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #========================= assets path
 set(ZCR_ASSETS_DIRECTORY_NAME assets)
 set(ZCR_ASSETS_DESTINATION_PATH 
-    ${PROJECT_BINARY_DIR}/$<$<PLATFORM_ID:Windows>:$<IF:$<CONFIG:Debug>,Debug,Release>>/${ZCR_ASSETS_DIRECTORY_NAME})   #   windows?
+    ${PROJECT_BINARY_DIR}/$<$<PLATFORM_ID:Windows>:$<IF:$<CONFIG:Debug>,Debug/,Release/>>${ZCR_ASSETS_DIRECTORY_NAME})   #   windows?
 
 #========================= external libs
+#   add submodules
+# add_subdirectory(cmakeGitSubmodules)
+
 set(ZCR_INCLUDE_DIRS)
 set(ZCR_LINK_LIBS)
 
@@ -67,11 +70,10 @@ target_compile_options(${PROJECT_NAME}
             $<$<CONFIG:Release>:-O3>
     )
 
-# #========================= copy assets
-
+#========================= copy assets
 add_custom_target(ZCR_COPY_ASSETS ALL
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/${ZCR_ASSETS_DIRECTORY_NAME} ${ZCR_ASSETS_DESTINATION_PATH}
-    COMMENT "Copy assets")
+    COMMENT "Copy assets ${PROJECT_SOURCE_DIR}/${ZCR_ASSETS_DIRECTORY_NAME} => ${ZCR_ASSETS_DESTINATION_PATH}")
 add_dependencies(${PROJECT_NAME} ZCR_COPY_ASSETS)
 
 
