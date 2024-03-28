@@ -12,9 +12,13 @@ set(ZCR_ASSETS_DIRECTORY_NAME assets)
 set(ZCR_ASSETS_DESTINATION_PATH 
     ${PROJECT_BINARY_DIR}/$<$<PLATFORM_ID:Windows>:$<IF:$<CONFIG:Debug>,Debug/,Release/>>${ZCR_ASSETS_DIRECTORY_NAME})   #   windows?
 
+set(ZCR_MY_DEBUG 1)
+
 #========================= external libs
 #   add submodules
-# add_subdirectory(cmakeGitSubmodules)
+if(NOT ZCR_MY_DEBUG)
+    add_subdirectory(cmakeGitSubmodules)
+endif()
 
 set(ZCR_INCLUDE_DIRS)
 set(ZCR_LINK_LIBS)
@@ -27,6 +31,11 @@ set(ZC_AUDIO OFF)
 set(ZC_IMGUI ON)
 set(ZC_STATIC ON)
 # set(ZC_STATIC OFF)
+if(ZCR_MY_DEBUG)
+    set(ZC_MY_DEBUG 1)
+else()
+    set(ZC_MY_DEBUG 0)
+endif()
 add_subdirectory(external/ZeroCore)
 set(ZCR_LINK_LIBS ${ZCR_LINK_LIBS} PUBLIC ZeroCore)
 
