@@ -22,9 +22,10 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/.git")
 	F_FATAL_EQUAL(${process_result} 0 "git init => failed with: ${process_result}")
 endif()
 
-#	git submodule update --init --recursive
-message(STATUS "Git submodule update --remote --merge")
-execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --remote --merge
+#	git submodule update --init --remote --merge (updates(clone from remote repository) all submodules,
+#	and makes (checkout) for each submodule, to last (commit) in remote repository (of selected branch in submodule, default main)).
+message(STATUS "Git submodule update --init --remote --merge")
+execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --remote --merge
                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
                 RESULT_VARIABLE process_result)
 F_FATAL_EQUAL(${process_result} 0 "git submodule update --init --recursive => failed with: ${process_result}")
