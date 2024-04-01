@@ -9,7 +9,7 @@ ZCR_Point::ZCR_Point()
 
 ZC_sptr<ZC_RendererSet> ZCR_Point::MakePointRendererSet()
 {
-    size_t elementsCount = 0;
+    ulong elementsCount = 0;
     GLenum elementsType = 0;
     ZC_DA<uchar> elements = GetPointElements(elementsCount, elementsType);
 
@@ -29,10 +29,10 @@ ZC_sptr<ZC_RendererSet> ZCR_Point::MakePointRendererSet()
     return ZC_RendererSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
 }
 
-ZC_DA<uchar> ZCR_Point::GetPointElements(size_t& rElementsCount, GLenum& rElementsType)
+ZC_DA<uchar> ZCR_Point::GetPointElements(ulong& rElementsCount, GLenum& rElementsType)
 {
     GetPoints(rElementsCount);
-    size_t storingTypeSize = 0;
+    ulong storingTypeSize = 0;
     ZC_Buffer::GetElementsData(rElementsCount - 1, storingTypeSize, rElementsType);
     ZC_DA<uchar> elements(storingTypeSize * rElementsCount);
     switch (storingTypeSize)
@@ -44,19 +44,19 @@ ZC_DA<uchar> ZCR_Point::GetPointElements(size_t& rElementsCount, GLenum& rElemen
     return elements;
 }
 
-void ZCR_Point::GetPoints(size_t& rElementsCount)
+void ZCR_Point::GetPoints(ulong& rElementsCount)
 {
     spPoints = std::move(ZC_sptr<std::list<Points>>(new std::list<Points>()));
 
     auto pVertexHeadOfTriangles = spTriangles ? &(spTriangles->Begin()->bl) : nullptr;
-    for (size_t i = 0; i < (spTriangles ? spTriangles->size : 0); ++i)
+    for (ulong i = 0; i < (spTriangles ? spTriangles->size : 0); ++i)
     {
         rElementsCount += FillPoints(&((*spTriangles)[i].bl), false, pVertexHeadOfTriangles);
         rElementsCount += FillPoints(&((*spTriangles)[i].tc), false, pVertexHeadOfTriangles);
         rElementsCount += FillPoints(&((*spTriangles)[i].br), false, pVertexHeadOfTriangles);  
     }
     auto pVertexHeadOfQuads = spQuads ? &(spQuads->Begin()->bl) : nullptr;
-    for (size_t i = 0; i < (spQuads ? spQuads->size : 0); ++i)
+    for (ulong i = 0; i < (spQuads ? spQuads->size : 0); ++i)
     {
         rElementsCount += FillPoints(&((*spQuads)[i].bl), true, pVertexHeadOfQuads);
         rElementsCount += FillPoints(&((*spQuads)[i].tl), true, pVertexHeadOfQuads);
@@ -65,17 +65,17 @@ void ZCR_Point::GetPoints(size_t& rElementsCount)
     }
 }
 
-size_t ZCR_Point::FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>* pVertexContainerHead)
+ulong ZCR_Point::FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>* pVertexContainerHead)
 {
     auto pPoints = ZC_Find(*spPoints, pVertex);
     if(pPoints)
     {
-        pPoints->samePoints.emplace_front(Points::SamePoint{ pVertex, isQuad, static_cast<size_t>(pVertex - pVertexContainerHead) });
+        pPoints->samePoints.emplace_front(Points::SamePoint{ pVertex, isQuad, static_cast<ulong>(pVertex - pVertexContainerHead) });
         return 0;   //  in ebo point is one value, if found same return 0
     }
     else
     {
-        spPoints->emplace_back(Points{ { Points::SamePoint{ pVertex, isQuad, static_cast<size_t>(pVertex - pVertexContainerHead) } } });
+        spPoints->emplace_back(Points{ { Points::SamePoint{ pVertex, isQuad, static_cast<ulong>(pVertex - pVertexContainerHead) } } });
         return 1;   //  in ebo point is one value, if not found same return 1 (new point)
     }
 }

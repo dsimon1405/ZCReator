@@ -12,7 +12,7 @@ set(ZCR_ASSETS_DIRECTORY_NAME assets)
 set(ZCR_ASSETS_DESTINATION_PATH 
     ${PROJECT_BINARY_DIR}/$<$<PLATFORM_ID:Windows>:$<IF:$<CONFIG:Debug>,Debug/,Release/>>${ZCR_ASSETS_DIRECTORY_NAME})   #   windows?
 
-set(ZCR_MY_DEBUG 1)     # 1 true, 0 false   =>  use if(ZCR_MY_DEBUG EQUAL 1) - true; if(NOT ZCR_MY_DEBUG) - false
+set(ZCR_MY_DEBUG 0)     # 1 true, 0 false   =>  use if(ZCR_MY_DEBUG EQUAL 1) - true; if(NOT ZCR_MY_DEBUG) - false
 
 #========================= external libs
 #   add submodules

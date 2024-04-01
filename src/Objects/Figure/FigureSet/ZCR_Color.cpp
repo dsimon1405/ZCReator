@@ -8,7 +8,7 @@ void ZCR_Color::FillColorsAllAsPassive(bool needBufferData)
 
 void ZCR_Color::FillColorsAllAsActive(bool needBufferData)
 {
-    for (size_t i = 0; i < colors.size; ++i) colors[i] = colorActivePoint;
+    for (ulong i = 0; i < colors.size; ++i) colors[i] = colorActivePoint;
     if (needBufferData) BufferSubDataAllStoredType(StoredType_Color, colors.pHead, false);
 }
 

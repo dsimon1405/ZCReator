@@ -8,7 +8,7 @@
 ZCR_Scene::ZCR_Scene()
     : mesh(100.f)
 {
-    ZCR_IconTexture::iconTexture = std::move(ZC_Textures::LoadTexture2D(ZC_FSPath(ZCR_ZCRTexturePath).append("sceneIcons.png").c_str()));
+    ZCR_IconTexture::iconTexture = std::move(ZC_Textures::LoadTexture2D(ZC_FSPath(ZCR_ZCRTexturePath).append("sceneIcons.png").string().c_str()));
     pScene = this;
 }
 

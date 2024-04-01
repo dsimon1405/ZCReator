@@ -13,7 +13,7 @@ ZCR_IGWFigures::ZCR_IGWFigures()
 void ZCR_IGWFigures::DrawWindow()
 {
     static float createIconSize = 100.f;
-    static float columns = 4.f;
+    static int columns = 4;
     if (ImGui::BeginTable("FiguresTable", columns, 0, ImVec2(450.f, 0)))
     {
         static ImVec2 iconSize(createIconSize, createIconSize);
@@ -21,25 +21,26 @@ void ZCR_IGWFigures::DrawWindow()
             colorPassive(1.f, 1.f, 1.f, 0.5f);
         
         ImGui::TableNextColumn();
-        if (ImGui::ImageButton("Cube", reinterpret_cast<ImTextureID>(ZCR_IconTexture::iconTexture.GetId()),
+        static int iconTextureId = ZCR_IconTexture::iconTexture.GetId();
+        if (ImGui::ImageButton("Cube", reinterpret_cast<ImTextureID>(&iconTextureId),
                 iconSize, ZCR_IconTexture::tcCreateCube.tl, ZCR_IconTexture::tcCreateCube.br))
             FigureCreation(ZCR_Figure::Name::Cube);
         ImGui::IsItemHovered() ? ImGui::TextColored(colorActive, "      Cube") : ImGui::TextColored(colorPassive, "      Cube");
         
         ImGui::TableNextColumn();
-        if (ImGui::ImageButton("Cylinder", reinterpret_cast<ImTextureID>(ZCR_IconTexture::iconTexture.GetId()),
+        if (ImGui::ImageButton("Cylinder", reinterpret_cast<ImTextureID>(&iconTextureId),
                 iconSize, ZCR_IconTexture::tcCreateCylinder.tl, ZCR_IconTexture::tcCreateCylinder.br))
             FigureCreation(ZCR_Figure::Name::Cube);
         ImGui::IsItemHovered() ? ImGui::TextColored(colorActive, "    Cylinder") : ImGui::TextColored(colorPassive, "    Cylinder");
 
         ImGui::TableNextColumn();
-        if (ImGui::ImageButton("Cone", reinterpret_cast<ImTextureID>(ZCR_IconTexture::iconTexture.GetId()),
+        if (ImGui::ImageButton("Cone", reinterpret_cast<ImTextureID>(&iconTextureId),
                 iconSize, ZCR_IconTexture::tcCreateCone.tl, ZCR_IconTexture::tcCreateCone.br))
             FigureCreation(ZCR_Figure::Name::Cube);
         ImGui::IsItemHovered() ? ImGui::TextColored(colorActive, "      Cone") : ImGui::TextColored(colorPassive, "      Cone");
 
         ImGui::TableNextColumn();
-        if (ImGui::ImageButton("Sphere", reinterpret_cast<ImTextureID>(ZCR_IconTexture::iconTexture.GetId()),
+        if (ImGui::ImageButton("Sphere", reinterpret_cast<ImTextureID>(&iconTextureId),
                 iconSize, ZCR_IconTexture::tcCreateSphere.tl, ZCR_IconTexture::tcCreateSphere.br))
             FigureCreation(ZCR_Figure::Name::Cube);
         ImGui::IsItemHovered() ? ImGui::TextColored(colorActive, "     Sphere") : ImGui::TextColored(colorPassive, "     Sphere");

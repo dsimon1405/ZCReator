@@ -9,7 +9,7 @@ ZCR_Line::ZCR_Line()
 
 ZC_sptr<ZC_RendererSet> ZCR_Line::MakeLineRendererSet()
 {
-    size_t elementsCount = 0;
+    ulong elementsCount = 0;
     GLenum elementsType = 0;
     ZC_DA<uchar> elements = GetLineElements(elementsCount, elementsType);
 
@@ -29,10 +29,10 @@ ZC_sptr<ZC_RendererSet> ZCR_Line::MakeLineRendererSet()
     return ZC_RendererSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
 }
 
-ZC_DA<uchar> ZCR_Line::GetLineElements(size_t& rElementsCount, GLenum& rElementsType)
+ZC_DA<uchar> ZCR_Line::GetLineElements(ulong& rElementsCount, GLenum& rElementsType)
 {
     std::forward_list<Lines> lines = GetLines(rElementsCount);
-    size_t storingTypeSize = 0;
+    ulong storingTypeSize = 0;
     ZC_Buffer::GetElementsData(rElementsCount - 1, storingTypeSize, rElementsType);
     ZC_DA<uchar> elements(storingTypeSize * rElementsCount);
     switch (storingTypeSize)
@@ -44,7 +44,7 @@ ZC_DA<uchar> ZCR_Line::GetLineElements(size_t& rElementsCount, GLenum& rElements
     return elements;
 }
 
-std::forward_list<typename ZCR_Line::Lines> ZCR_Line::GetLines(size_t& rElementsCount)
+std::forward_list<typename ZCR_Line::Lines> ZCR_Line::GetLines(ulong& rElementsCount)
 {
     typename std::forward_list<Lines> lines;
 
@@ -65,13 +65,13 @@ std::forward_list<typename ZCR_Line::Lines> ZCR_Line::GetLines(size_t& rElements
             return 2;   //  in ebo line is two values, if not found same return 2 (new line)
         }
     };
-    for (size_t i = 0; i < (spTriangles ? spTriangles->size : 0); ++i)
+    for (ulong i = 0; i < (spTriangles ? spTriangles->size : 0); ++i)
     {
         rElementsCount += linesAdd((*spTriangles)[i].bl, (*spTriangles)[i].tc, false);
         rElementsCount += linesAdd((*spTriangles)[i].tc, (*spTriangles)[i].br, false);
         rElementsCount += linesAdd((*spTriangles)[i].br, (*spTriangles)[i].bl, false);
     }
-    for (size_t i = 0; i < (spQuads ? spQuads->size : 0); ++i)
+    for (ulong i = 0; i < (spQuads ? spQuads->size : 0); ++i)
     {
         rElementsCount += linesAdd((*spQuads)[i].bl, (*spQuads)[i].tl, true);
         rElementsCount += linesAdd((*spQuads)[i].tl, (*spQuads)[i].tr, true);

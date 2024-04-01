@@ -9,7 +9,7 @@ ZCR_Surface::ZCR_Surface()
 
 ZC_sptr<ZC_RendererSet> ZCR_Surface::MakeSurfaceRendererSet()
 {
-    size_t elementsCount = 0;
+    ulong elementsCount = 0;
     GLenum elementsType = 0;
     ZC_DA<uchar> elements = GetTriangleElements(elementsCount, elementsType);
 
@@ -45,20 +45,20 @@ ZC_RSController ZCR_Surface::MakeSurfaceRSController()
     return spRendererSetsSucafe->MakeZC_RSController(-1, std::move(persDatas));
 }
 
-ZC_DA<uchar> ZCR_Surface::GetTriangleElements(size_t& rElementsCount, GLenum& rElementsType)
+ZC_DA<uchar> ZCR_Surface::GetTriangleElements(ulong& rElementsCount, GLenum& rElementsType)
 {
-    size_t quadsElementsCount = spQuads ? (spQuads->size * 6) : 0,     //  6 elements in ebo on one quad
+    ulong quadsElementsCount = spQuads ? (spQuads->size * 6) : 0,     //  6 elements in ebo on one quad
         trianglesElementsCount = spTriangles ? (spTriangles->size * 3) : 0;     //  3 elements in ebo on one triangle
     rElementsCount = quadsElementsCount + trianglesElementsCount;  
-    size_t verticesInVBO = (spQuads ? (spQuads->size * 4) : 0) + trianglesElementsCount,     //  4 vertices in vbo on one quad
+    ulong verticesInVBO = (spQuads ? (spQuads->size * 4) : 0) + trianglesElementsCount,     //  4 vertices in vbo on one quad
         storingTypeSize = 0;
     ZC_Buffer::GetElementsData(verticesInVBO - 1, storingTypeSize, rElementsType);
     ZC_DA<uchar> elements(storingTypeSize * rElementsCount);
     switch (storingTypeSize)
     {
-    case 1: FillTriangleElements(elements.pHead, elements.size, quadsElementsCount); break;
-    case 2: FillTriangleElements(reinterpret_cast<ushort*>(elements.pHead), elements.size / 2, quadsElementsCount); break;
-    case 4: FillTriangleElements(reinterpret_cast<uint*>(elements.pHead), elements.size / 4, quadsElementsCount); break;
+    case 1: FillTriangleElements<uchar>(elements.pHead, elements.size, quadsElementsCount); break;
+    case 2: FillTriangleElements<ushort>(reinterpret_cast<ushort*>(elements.pHead), elements.size / 2, quadsElementsCount); break;
+    case 4: FillTriangleElements<uint>(reinterpret_cast<uint*>(elements.pHead), elements.size / 4, quadsElementsCount); break;
     }
     return elements;
 }

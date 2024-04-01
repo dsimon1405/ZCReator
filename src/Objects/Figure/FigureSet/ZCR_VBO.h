@@ -30,7 +30,7 @@ protected:
     pData - pointer on data.
     isVertexQuad - must be true if storing vertices of quads, and falls if triangle. In other cases no metter.
     */
-    void BufferSubDataIndex(StoredType storedType, bool isQuad, size_t vertexIndex, const void* pData);
+    void BufferSubDataIndex(StoredType storedType, bool isQuad, ulong vertexIndex, const void* pData);
 
     /*
     Storing data in vbo for one of types: vertex(quads or triangles), colors, normals, texCoords
@@ -43,9 +43,9 @@ protected:
     void BufferSubDataAllStoredType(StoredType storedType, const void* pData, bool isVertexQuad);
 
 private:
-    size_t trianglesStartIndex = 0;
-    size_t colorsStartIndex = 0;
-    size_t normatlsStartIndex = 0;
-    size_t texCoordsStartIndex = 0;
-    size_t texCoordsBSize = 0;
+    ulong trianglesStartIndex = 0;
+    ulong colorsStartIndex = 0;
+    ulong normatlsStartIndex = 0;
+    ulong texCoordsStartIndex = 0;
+    ulong texCoordsBSize = 0;
 };

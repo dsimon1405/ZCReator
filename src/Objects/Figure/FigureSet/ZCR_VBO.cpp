@@ -10,13 +10,13 @@ ZCR_VBO::ZCR_VBO(ZC_sptr<ZC_DA<ZC_Quad>>&& _spQuads, ZC_sptr<ZC_DA<ZC_Triangle>>
 void ZCR_VBO::FillVBO()
 {
     trianglesStartIndex = spQuads ? spQuads->BytesSize() : 0;   //  quads byte size
-    size_t trianglesBSize = spTriangles ? spTriangles->BytesSize() : 0,
+    ulong trianglesBSize = spTriangles ? spTriangles->BytesSize() : 0,
         colorsBSize = colors.BytesSize(),
         normalsBSize = spNormals->BytesSize();
     texCoordsBSize = spTexCoords ? spTexCoords->BytesSize() : 0;
     colorsStartIndex = trianglesStartIndex + trianglesBSize;
     normatlsStartIndex = colorsStartIndex + colorsBSize;
-    size_t texCoordsStartIndex = normatlsStartIndex + normalsBSize,
+    ulong texCoordsStartIndex = normatlsStartIndex + normalsBSize,
         vboSize = texCoordsStartIndex + texCoordsBSize;
     if (trianglesStartIndex != 0) vbo->BufferData(vboSize, &(spQuads->Begin()->bl), GL_DYNAMIC_DRAW);
     if (trianglesBSize != 0) vbo->BufferSubData(trianglesStartIndex, trianglesBSize, spTriangles->Begin());
@@ -25,15 +25,15 @@ void ZCR_VBO::FillVBO()
     if (texCoordsBSize != 0) vbo->BufferSubData(texCoordsStartIndex, texCoordsBSize, spTexCoords->Begin());
 }
 
-void ZCR_VBO::BufferSubDataIndex(StoredType storedType, bool isQuad, size_t vertexIndex, const void* pData)
+void ZCR_VBO::BufferSubDataIndex(StoredType storedType, bool isQuad, ulong vertexIndex, const void* pData)
 {
-    static const size_t vertexByteSize = sizeof(ZC_Vec3<float>);
-    static const size_t colorByteSize = sizeof(ZC_Vec3<uchar>);
-    static const size_t normalByteSize = sizeof(int);
-    static const size_t texCoordByteSize = sizeof(ZC_DA<ZC_Vec2<float>>);
-    size_t offset = 0;
-    size_t byteSize = 0;
-    auto setOffsetAndSize = [&offset, &byteSize, isQuad, vertexIndex](size_t startIndex, size_t typesByteSize, size_t trianglesStartIndex)
+    static const ulong vertexByteSize = sizeof(ZC_Vec3<float>);
+    static const ulong colorByteSize = sizeof(ZC_Vec3<uchar>);
+    static const ulong normalByteSize = sizeof(int);
+    static const ulong texCoordByteSize = sizeof(ZC_DA<ZC_Vec2<float>>);
+    ulong offset = 0;
+    ulong byteSize = 0;
+    auto setOffsetAndSize = [&offset, &byteSize, isQuad, vertexIndex](ulong startIndex, ulong typesByteSize, ulong trianglesStartIndex)
     {
         offset = isQuad ? startIndex + (vertexIndex * typesByteSize) : (startIndex + trianglesStartIndex + (vertexIndex * typesByteSize));
         byteSize = vertexByteSize;

@@ -27,8 +27,8 @@ struct ZCR_Line : public virtual ZCR_VBO
     };
 
     ZC_sptr<ZC_RendererSet> MakeLineRendererSet();
-    ZC_DA<uchar> GetLineElements(size_t& rElementsCount, GLenum& rElementsType);
-    std::forward_list<Lines> GetLines(size_t& rElementsCount);
+    ZC_DA<uchar> GetLineElements(ulong& rElementsCount, GLenum& rElementsType);
+    std::forward_list<Lines> GetLines(ulong& rElementsCount);
     template<typename TElement>
     void FillLineElements(std::forward_list<Lines>& lines, TElement* pElement);
 
@@ -38,8 +38,8 @@ struct ZCR_Line : public virtual ZCR_VBO
 template<typename TElement>
 void ZCR_Line::FillLineElements(typename std::forward_list<Lines>& lines, TElement* pElement)
 {
-    size_t trianglesStartOffsetInEBO = spQuads ? (spQuads->size * 4) : 0;    //  triangles start index in ebo
-    size_t pElementI = 0;
+    ulong trianglesStartOffsetInEBO = spQuads ? (spQuads->size * 4) : 0;    //  triangles start index in ebo
+    ulong pElementI = 0;
     auto pQuadsHead = spQuads ? &(spQuads->Begin()->bl) : nullptr;
     auto pTrianglesHead = spTriangles ? &(spTriangles->Begin()->bl) : nullptr;
     for (auto& line : lines)

@@ -11,7 +11,7 @@ protected:
         {
             ZC_Vec3<float>* pVertex;
             bool isQuad;
-            size_t indexInQuadsOrTriangles;
+            ulong indexInQuadsOrTriangles;
         };
 
         std::forward_list<SamePoint> samePoints;
@@ -30,5 +30,5 @@ private:
     static inline const ZC_Vec3<uchar> colorPassivePoint { 0, 0, 0 };        //  black
     static inline const ZC_Vec3<uchar> colorActivePoint { 253, 127, 57 };    //  orange
 
-    size_t trianglesStartVertexIndex = spQuads->size * 4;
+    ulong trianglesStartVertexIndex = spQuads->size * 4;
 };

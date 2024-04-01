@@ -27,200 +27,200 @@
 #include <ZC/Tools/Container/ZC_ContFunc.h>
 
 
-struct NewSquare
-{
-    ZC_Quad bl;
-    ZC_Quad tl;
-    ZC_Quad tr;
-    ZC_Quad br;
-    void SetCenter(const ZC_Vec3<float>& center) { bl.tr = tl.br = tr.bl = br.tl = center; }
-    ZC_Vec3<float>& GetCenter() { return bl.tr; }
-    void SetEdgePointL(const ZC_Vec3<float>& point) { bl.tl = tl.bl = point; }
-    void SetEdgePointT(const ZC_Vec3<float>& point) { tl.tr = tr.tl = point; }
-    void SetEdgePointR(const ZC_Vec3<float>& point) { tr.br = br.tr = point; }
-    void SetEdgePointB(const ZC_Vec3<float>& point) { bl.br = br.bl = point; }
-};
+// struct NewSquare
+// {
+//     ZC_Quad bl;
+//     ZC_Quad tl;
+//     ZC_Quad tr;
+//     ZC_Quad br;
+//     void SetCenter(const ZC_Vec3<float>& center) { bl.tr = tl.br = tr.bl = br.tl = center; }
+//     ZC_Vec3<float>& GetCenter() { return bl.tr; }
+//     void SetEdgePointL(const ZC_Vec3<float>& point) { bl.tl = tl.bl = point; }
+//     void SetEdgePointT(const ZC_Vec3<float>& point) { tl.tr = tr.tl = point; }
+//     void SetEdgePointR(const ZC_Vec3<float>& point) { tr.br = br.tr = point; }
+//     void SetEdgePointB(const ZC_Vec3<float>& point) { bl.br = br.bl = point; }
+// };
 
-struct Square
-{
-    ZC_Vec3<float> edgeCenterL,
-        edgeCenterT,
-        edgeCenterR,
-        edgeCenterB;
-    bool isEdgePointL = false,  //  is left edge point calculated
-        isEdgePointT = false,
-        isEdgePointR = false,
-        isEdgePointB = false;
-};
+// struct Square
+// {
+//     ZC_Vec3<float> edgeCenterL,
+//         edgeCenterT,
+//         edgeCenterR,
+//         edgeCenterB;
+//     bool isEdgePointL = false,  //  is left edge point calculated
+//         isEdgePointT = false,
+//         isEdgePointR = false,
+//         isEdgePointB = false;
+// };
 
-struct VertexData
-{
-    NewSquare& rNS;
-    ZC_Vec3<float>& rNewPoint,
-        & rEC1,
-        & rEC2,
-        & rCorner1,
-        & rCorner2;
-    void(NewSquare::*pSetEP1)(const ZC_Vec3<float>&);
-    void(NewSquare::*pSetEP2)(const ZC_Vec3<float>&);
-    bool& rIsEP1,
-        rIsEP2;
+// struct VertexData
+// {
+//     NewSquare& rNS;
+//     ZC_Vec3<float>& rNewPoint,
+//         & rEC1,
+//         & rEC2,
+//         & rCorner1,
+//         & rCorner2;
+//     void(NewSquare::*pSetEP1)(const ZC_Vec3<float>&);
+//     void(NewSquare::*pSetEP2)(const ZC_Vec3<float>&);
+//     bool& rIsEP1,
+//         rIsEP2;
 
-    VertexData(NewSquare& _rNewSquare,
-                ZC_Vec3<float>& _rNewPoint,
-                ZC_Vec3<float>& _rEdgeCenter1,
-                ZC_Vec3<float>& _rEdgeCenter2,
-                ZC_Vec3<float>& _rCorner1,
-                ZC_Vec3<float>& _rCorner2,
-                void(NewSquare::*_pSetEdgePoint1)(const ZC_Vec3<float>&),
-                void(NewSquare::*_pSetEdgePoint2)(const ZC_Vec3<float>&),
-                bool& _rIsEdgePoint1,
-                bool& _rIsEdgePoint2)
-    : rNS(_rNewSquare),
-    rNewPoint(_rNewPoint),
-    rEC1(_rEdgeCenter1),
-    rEC2(_rEdgeCenter2),
-    rCorner1(_rCorner1),
-    rCorner2(_rCorner2),
-    pSetEP1(_pSetEdgePoint1),
-    pSetEP2(_pSetEdgePoint2),
-    rIsEP1(_rIsEdgePoint1),
-    rIsEP2(_rIsEdgePoint2)
-    {}
-};
+//     VertexData(NewSquare& _rNewSquare,
+//                 ZC_Vec3<float>& _rNewPoint,
+//                 ZC_Vec3<float>& _rEdgeCenter1,
+//                 ZC_Vec3<float>& _rEdgeCenter2,
+//                 ZC_Vec3<float>& _rCorner1,
+//                 ZC_Vec3<float>& _rCorner2,
+//                 void(NewSquare::*_pSetEdgePoint1)(const ZC_Vec3<float>&),
+//                 void(NewSquare::*_pSetEdgePoint2)(const ZC_Vec3<float>&),
+//                 bool& _rIsEdgePoint1,
+//                 bool& _rIsEdgePoint2)
+//     : rNS(_rNewSquare),
+//     rNewPoint(_rNewPoint),
+//     rEC1(_rEdgeCenter1),
+//     rEC2(_rEdgeCenter2),
+//     rCorner1(_rCorner1),
+//     rCorner2(_rCorner2),
+//     pSetEP1(_pSetEdgePoint1),
+//     pSetEP2(_pSetEdgePoint2),
+//     rIsEP1(_rIsEdgePoint1),
+//     rIsEP2(_rIsEdgePoint2)
+//     {}
+// };
 
-struct CC
-{
-    struct Vertex
-    {
-        ZC_Vec3<float> vertex;
-        std::list<VertexData> vdList;
+// struct CC
+// {
+//     struct Vertex
+//     {
+//         ZC_Vec3<float> vertex;
+//         std::list<VertexData> vdList;
 
-        bool operator == (const ZC_Vec3<float>& _v) const noexcept
-        {
-            return vertex == _v;
-        }
-    };
+//         bool operator == (const ZC_Vec3<float>& _v) const noexcept
+//         {
+//             return vertex == _v;
+//         }
+//     };
 
-    ZC_DA<Square> squares;
-    NewSquare* newSquares;
-    size_t squaresCount;
-    std::list<Vertex> vertices;
+//     ZC_DA<Square> squares;
+//     NewSquare* newSquares;
+//     ulong squaresCount;
+//     std::list<Vertex> vertices;
 
-    CC(ZC_DA<ZC_Quad>& quads)
-        : squares(quads.size),
-        newSquares(new NewSquare[quads.size])
-    {
-        for (size_t _squaresIndex = 0; _squaresIndex < quads.size; ++_squaresIndex)
-        {
-            Square& rSSq = squares[_squaresIndex];
-            ZC_Quad* pQSq = quads.pHead;
-            rSSq.edgeCenterL = (pQSq->bl + pQSq->tl) / 2.f;
-            rSSq.edgeCenterT = (pQSq->tl + pQSq->tr) / 2.f;
-            rSSq.edgeCenterR = (pQSq->tr + pQSq->br) / 2.f;
-            rSSq.edgeCenterB = (pQSq->br + pQSq->bl) / 2.f;
-            NewSquare& rNS = newSquares[_squaresIndex];
-            rNS.SetCenter(quads.pHead->Center());
-            Add(pQSq->bl, VertexData(rNS, rNS.bl.bl, rSSq.edgeCenterB, rSSq.edgeCenterL, pQSq->br, pQSq->tl,
-                &NewSquare::SetEdgePointB, &NewSquare::SetEdgePointL, rSSq.isEdgePointB, rSSq.isEdgePointL));
-            Add(pQSq->tl, VertexData(rNS, rNS.tl.tl, rSSq.edgeCenterT, rSSq.edgeCenterL, pQSq->tr, pQSq->bl,
-                &NewSquare::SetEdgePointT, &NewSquare::SetEdgePointL, rSSq.isEdgePointT, rSSq.isEdgePointL));
-            Add(pQSq->tr, VertexData(rNS, rNS.tr.tr, rSSq.edgeCenterT, rSSq.edgeCenterR, pQSq->tl, pQSq->br,
-                &NewSquare::SetEdgePointT, &NewSquare::SetEdgePointR, rSSq.isEdgePointT, rSSq.isEdgePointR));
-            Add(pQSq->br, VertexData(rNS, rNS.br.br, rSSq.edgeCenterB, rSSq.edgeCenterR, pQSq->bl, pQSq->tr,
-                &NewSquare::SetEdgePointB, &NewSquare::SetEdgePointR, rSSq.isEdgePointB, rSSq.isEdgePointR));
-        }
-    }
+//     CC(ZC_DA<ZC_Quad>& quads)
+//         : squares(quads.size),
+//         newSquares(new NewSquare[quads.size])
+//     {
+//         for (ulong _squaresIndex = 0; _squaresIndex < quads.size; ++_squaresIndex)
+//         {
+//             Square& rSSq = squares[_squaresIndex];
+//             ZC_Quad* pQSq = quads.pHead;
+//             rSSq.edgeCenterL = (pQSq->bl + pQSq->tl) / 2.f;
+//             rSSq.edgeCenterT = (pQSq->tl + pQSq->tr) / 2.f;
+//             rSSq.edgeCenterR = (pQSq->tr + pQSq->br) / 2.f;
+//             rSSq.edgeCenterB = (pQSq->br + pQSq->bl) / 2.f;
+//             NewSquare& rNS = newSquares[_squaresIndex];
+//             rNS.SetCenter(quads.pHead->Center());
+//             Add(pQSq->bl, VertexData(rNS, rNS.bl.bl, rSSq.edgeCenterB, rSSq.edgeCenterL, pQSq->br, pQSq->tl,
+//                 &NewSquare::SetEdgePointB, &NewSquare::SetEdgePointL, rSSq.isEdgePointB, rSSq.isEdgePointL));
+//             Add(pQSq->tl, VertexData(rNS, rNS.tl.tl, rSSq.edgeCenterT, rSSq.edgeCenterL, pQSq->tr, pQSq->bl,
+//                 &NewSquare::SetEdgePointT, &NewSquare::SetEdgePointL, rSSq.isEdgePointT, rSSq.isEdgePointL));
+//             Add(pQSq->tr, VertexData(rNS, rNS.tr.tr, rSSq.edgeCenterT, rSSq.edgeCenterR, pQSq->tl, pQSq->br,
+//                 &NewSquare::SetEdgePointT, &NewSquare::SetEdgePointR, rSSq.isEdgePointT, rSSq.isEdgePointR));
+//             Add(pQSq->br, VertexData(rNS, rNS.br.br, rSSq.edgeCenterB, rSSq.edgeCenterR, pQSq->bl, pQSq->tr,
+//                 &NewSquare::SetEdgePointB, &NewSquare::SetEdgePointR, rSSq.isEdgePointB, rSSq.isEdgePointR));
+//         }
+//     }
     
-    void Add(const ZC_Vec3<float>& vertex, const VertexData& vData)
-    {
-        auto pVertex = ZC_Find(vertices, vertex);
-        if (pVertex) pVertex->vdList.emplace_back(vData);
-        else vertices.emplace_back(Vertex{vertex, {vData}});
-    }
+//     void Add(const ZC_Vec3<float>& vertex, const VertexData& vData)
+//     {
+//         auto pVertex = ZC_Find(vertices, vertex);
+//         if (pVertex) pVertex->vdList.emplace_back(vData);
+//         else vertices.emplace_back(Vertex{vertex, {vData}});
+//     }
 
-    //  Catmull Clark https://en.wikipedia.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
-    ZC_DA<ZC_Quad> Calculate()
-    {
-        for (auto& vert : vertices)
-        {
-            size_t faces = vert.vdList.size();
-            auto vdI = vert.vdList.begin();
-            if (faces == 1)   //  point alone
-            {
-                //  set edges points as edges center
-                (vdI->rNS.*vdI->pSetEP1)(vdI->rEC1);
-                (vdI->rNS.*vdI->pSetEP2)(vdI->rEC2);
-                //  move the center in the direction of the corner + edge centers, by an average length to the center of each edge
-                //  (If the figure is a square, the result will be movement by the radius of the inscribed circle)
-                vdI->rNewPoint = ZC_Vec::MoveByLength(vdI->rNS.GetCenter(), (vert.vertex + vdI->rEC1 + vdI->rEC2) / 3.f - vdI->rNS.GetCenter(),
-                    (ZC_Vec::Length(vdI->rNS.GetCenter() - vdI->rEC1) + ZC_Vec::Length(vdI->rNS.GetCenter() - vdI->rEC2)) / 2.f);
-                continue;
-            }
+//     //  Catmull Clark https://en.wikipedia.org/wiki/Catmull%E2%80%93Clark_subdivision_surface
+//     ZC_DA<ZC_Quad> Calculate()
+//     {
+//         for (auto& vert : vertices)
+//         {
+//             ulong faces = vert.vdList.size();
+//             auto vdI = vert.vdList.begin();
+//             if (faces == 1)   //  point alone
+//             {
+//                 //  set edges points as edges center
+//                 (vdI->rNS.*vdI->pSetEP1)(vdI->rEC1);
+//                 (vdI->rNS.*vdI->pSetEP2)(vdI->rEC2);
+//                 //  move the center in the direction of the corner + edge centers, by an average length to the center of each edge
+//                 //  (If the figure is a square, the result will be movement by the radius of the inscribed circle)
+//                 vdI->rNewPoint = ZC_Vec::MoveByLength(vdI->rNS.GetCenter(), (vert.vertex + vdI->rEC1 + vdI->rEC2) / 3.f - vdI->rNS.GetCenter(),
+//                     (ZC_Vec::Length(vdI->rNS.GetCenter() - vdI->rEC1) + ZC_Vec::Length(vdI->rNS.GetCenter() - vdI->rEC2)) / 2.f);
+//                 continue;
+//             }
     
-            ZC_Vec3<float> centersSum,
-                commonEdgesCentersSum,
-                singleEgdesCentersSum;
-            unsigned short commonEdges = 0;
-            unsigned short singleEdges = 0;
-            //  find edges points
-            for (; vdI != vert.vdList.end(); ++vdI)
-            {
-                centersSum += vdI->rNS.GetCenter();
-                for (auto vdI2 = vdI; vdI2 != vert.vdList.end() && (!vdI->rIsEP1 || !vdI->rIsEP2); ++vdI2)
-                {
-                    if (!vdI->rIsEP1 && !vdI2->rIsEP1 && vdI->rEC1 == vdI2->rEC1)   //  common edge, calculate edge point
-                        CommonEdgeCenter(commonEdgesCentersSum, vdI->rEC1, (vert.vertex + vdI->rCorner1 + vdI->rNS.GetCenter() + vdI2->rNS.GetCenter()) / 4.f,
-                            vdI->rIsEP1, vdI2->rIsEP1, vdI->rNS, vdI2->rNS, vdI->pSetEP1, vdI2->pSetEP1, commonEdges);
-                    if (!vdI->rIsEP1 && !vdI2->rIsEP2 && vdI->rEC1 == vdI2->rEC2)
-                        CommonEdgeCenter(commonEdgesCentersSum, vdI->rEC1, (vert.vertex + vdI->rCorner1 + vdI->rNS.GetCenter() + vdI2->rNS.GetCenter()) / 4.f,
-                            vdI->rIsEP1, vdI2->rIsEP2, vdI->rNS, vdI2->rNS, vdI->pSetEP1, vdI2->pSetEP2, commonEdges);
-                    if (!vdI->rIsEP2 && !vdI2->rIsEP1 && vdI->rEC2 == vdI2->rEC1)
-                        CommonEdgeCenter(commonEdgesCentersSum, vdI->rEC2, (vert.vertex + vdI->rCorner2 + vdI->rNS.GetCenter() + vdI2->rNS.GetCenter()) / 4.f,
-                            vdI->rIsEP2, vdI2->rIsEP1, vdI->rNS, vdI2->rNS, vdI->pSetEP2, vdI2->pSetEP1, commonEdges);
-                    if (!vdI->rIsEP2 && !vdI2->rIsEP2 && vdI->rEC2 == vdI2->rEC2)
-                        CommonEdgeCenter(commonEdgesCentersSum, vdI->rEC2, (vert.vertex + vdI->rCorner2 + vdI->rNS.GetCenter() + vdI2->rNS.GetCenter()) / 4.f,
-                            vdI->rIsEP2, vdI2->rIsEP2, vdI->rNS, vdI2->rNS, vdI->pSetEP2, vdI2->pSetEP2, commonEdges);
-                }  //  no common edges, set edge point as edge center
-                if (!vdI->rIsEP1) SingleEdgeCenter(vdI->rEC1, vdI->rIsEP1, vdI->rNS, vdI->pSetEP1, singleEgdesCentersSum, singleEdges);
-                if (!vdI->rIsEP2) SingleEdgeCenter(vdI->rEC2, vdI->rIsEP2, vdI->rNS, vdI->pSetEP2, singleEgdesCentersSum, singleEdges);
-            }
+//             ZC_Vec3<float> centersSum,
+//                 commonEdgesCentersSum,
+//                 singleEgdesCentersSum;
+//             unsigned short commonEdges = 0;
+//             unsigned short singleEdges = 0;
+//             //  find edges points
+//             for (; vdI != vert.vdList.end(); ++vdI)
+//             {
+//                 centersSum += vdI->rNS.GetCenter();
+//                 for (auto vdI2 = vdI; vdI2 != vert.vdList.end() && (!vdI->rIsEP1 || !vdI->rIsEP2); ++vdI2)
+//                 {
+//                     if (!vdI->rIsEP1 && !vdI2->rIsEP1 && vdI->rEC1 == vdI2->rEC1)   //  common edge, calculate edge point
+//                         CommonEdgeCenter(commonEdgesCentersSum, vdI->rEC1, (vert.vertex + vdI->rCorner1 + vdI->rNS.GetCenter() + vdI2->rNS.GetCenter()) / 4.f,
+//                             vdI->rIsEP1, vdI2->rIsEP1, vdI->rNS, vdI2->rNS, vdI->pSetEP1, vdI2->pSetEP1, commonEdges);
+//                     if (!vdI->rIsEP1 && !vdI2->rIsEP2 && vdI->rEC1 == vdI2->rEC2)
+//                         CommonEdgeCenter(commonEdgesCentersSum, vdI->rEC1, (vert.vertex + vdI->rCorner1 + vdI->rNS.GetCenter() + vdI2->rNS.GetCenter()) / 4.f,
+//                             vdI->rIsEP1, vdI2->rIsEP2, vdI->rNS, vdI2->rNS, vdI->pSetEP1, vdI2->pSetEP2, commonEdges);
+//                     if (!vdI->rIsEP2 && !vdI2->rIsEP1 && vdI->rEC2 == vdI2->rEC1)
+//                         CommonEdgeCenter(commonEdgesCentersSum, vdI->rEC2, (vert.vertex + vdI->rCorner2 + vdI->rNS.GetCenter() + vdI2->rNS.GetCenter()) / 4.f,
+//                             vdI->rIsEP2, vdI2->rIsEP1, vdI->rNS, vdI2->rNS, vdI->pSetEP2, vdI2->pSetEP1, commonEdges);
+//                     if (!vdI->rIsEP2 && !vdI2->rIsEP2 && vdI->rEC2 == vdI2->rEC2)
+//                         CommonEdgeCenter(commonEdgesCentersSum, vdI->rEC2, (vert.vertex + vdI->rCorner2 + vdI->rNS.GetCenter() + vdI2->rNS.GetCenter()) / 4.f,
+//                             vdI->rIsEP2, vdI2->rIsEP2, vdI->rNS, vdI2->rNS, vdI->pSetEP2, vdI2->pSetEP2, commonEdges);
+//                 }  //  no common edges, set edge point as edge center
+//                 if (!vdI->rIsEP1) SingleEdgeCenter(vdI->rEC1, vdI->rIsEP1, vdI->rNS, vdI->pSetEP1, singleEgdesCentersSum, singleEdges);
+//                 if (!vdI->rIsEP2) SingleEdgeCenter(vdI->rEC2, vdI->rIsEP2, vdI->rNS, vdI->pSetEP2, singleEgdesCentersSum, singleEdges);
+//             }
 
-            ZC_Vec3<float> newPoint;
-            if (singleEdges == 0) newPoint = ((centersSum / faces) + (commonEdgesCentersSum / commonEdges) * 2.f + vert.vertex * (commonEdges - 3.f)) / commonEdges;  //  barycenter
-            else if (singleEdges == 2) newPoint = (singleEgdesCentersSum + vert.vertex * 2.f) / 4.f;
-            else newPoint = vert.vertex;
+//             ZC_Vec3<float> newPoint;
+//             if (singleEdges == 0) newPoint = ((centersSum / faces) + (commonEdgesCentersSum / commonEdges) * 2.f + vert.vertex * (commonEdges - 3.f)) / commonEdges;  //  barycenter
+//             else if (singleEdges == 2) newPoint = (singleEgdesCentersSum + vert.vertex * 2.f) / 4.f;
+//             else newPoint = vert.vertex;
 
-            for (auto& rvd : vert.vdList) rvd.rNewPoint = newPoint;
-        }
+//             for (auto& rvd : vert.vdList) rvd.rNewPoint = newPoint;
+//         }
 
-        ZC_DA<ZC_Quad> result(reinterpret_cast<ZC_Quad*>(newSquares), squares.size * 4);
-        squares.pHead = nullptr;
-        return result;
-    }
+//         ZC_DA<ZC_Quad> result(reinterpret_cast<ZC_Quad*>(newSquares), squares.size * 4);
+//         squares.pHead = nullptr;
+//         return result;
+//     }
 
-    void SingleEdgeCenter(const ZC_Vec3<float>& point, bool& rIsEP, NewSquare& rNS, void(NewSquare::*pSet)(const ZC_Vec3<float>&),
-        ZC_Vec3<float>& rSECS, unsigned short& rSingleEdges)
-    {
-        rIsEP = true;
-        (rNS.*pSet)(point);
-        rSECS += point;
-        ++rSingleEdges;
-    }
+//     void SingleEdgeCenter(const ZC_Vec3<float>& point, bool& rIsEP, NewSquare& rNS, void(NewSquare::*pSet)(const ZC_Vec3<float>&),
+//         ZC_Vec3<float>& rSECS, unsigned short& rSingleEdges)
+//     {
+//         rIsEP = true;
+//         (rNS.*pSet)(point);
+//         rSECS += point;
+//         ++rSingleEdges;
+//     }
 
-    void CommonEdgeCenter(ZC_Vec3<float>& rCECSum, ZC_Vec3<float>& rCEC, const ZC_Vec3<float>& point, bool& rIsEP1, bool& rIsEP2, NewSquare& rNS1, NewSquare& rNS2,
-        void(NewSquare::*pSet1)(const ZC_Vec3<float>&), void(NewSquare::*pSet2)(const ZC_Vec3<float>&), unsigned short& rCommonEdges)
-    {
-        rCECSum += rCEC;
-        rIsEP1 = true;
-        (rNS1.*pSet1)(point);
-        rIsEP1 = true;
-        (rNS2.*pSet2)(point);
-        ++rCommonEdges;
-    }
-};
+//     void CommonEdgeCenter(ZC_Vec3<float>& rCECSum, ZC_Vec3<float>& rCEC, const ZC_Vec3<float>& point, bool& rIsEP1, bool& rIsEP2, NewSquare& rNS1, NewSquare& rNS2,
+//         void(NewSquare::*pSet1)(const ZC_Vec3<float>&), void(NewSquare::*pSet2)(const ZC_Vec3<float>&), unsigned short& rCommonEdges)
+//     {
+//         rCECSum += rCEC;
+//         rIsEP1 = true;
+//         (rNS1.*pSet1)(point);
+//         rIsEP1 = true;
+//         (rNS2.*pSet2)(point);
+//         ++rCommonEdges;
+//     }
+// };
 
-
+//              check sizeof long long ZC_VAOConfig.cpp
 //                  freetype cmake(windows), imgui disable in renderer, textWindow and textWindowIntoScene in one renderer
 
 //  ZCR_Camera scroll and IGWindow for axis
@@ -237,10 +237,10 @@ void SetColor(float);
 int ZC_main()
 {
     using namespace ZC_Window;
-    ZC_Window::MakeWindow(ZC_Window_Multisampling_4 | ZC_Window_Border, 800.f, 600.f, "ZeroCreator");
+    ZC_Window::MakeWindow(ZC_Window_Multisampling_4 | ZC_Window_Border, 800, 600, "ZeroCreator");
     // window->SetFPS(0);
 
-    size_t textHeight = 200;
+    ulong textHeight = 200;
     ZC_FontNameHeight fonts{ZC_FontName::Arial, textHeight};
     ZC_Fonts::Load(&fonts, 1);
 

@@ -27,7 +27,7 @@ ZCR_Orientation3D::ZCR_Orientation3D(float windowAspect)
     
     rsControllerLine.SwitchToLvl(ZC_RL_Drawing);
 
-    for (size_t i = 0; i < 6; i++) rsControllerAxises[i].SwitchToLvl(ZC_RL_Drawing);
+    for (ulong i = 0; i < 6; i++) rsControllerAxises[i].SwitchToLvl(ZC_RL_Drawing);
 }
 float verticalAngle = 0, horizontalAngle = 0;
 void ZCR_Orientation3D::MoveAroundObject(float _verticalAngle, float _horizontalAngle, bool _isNormalHorizontalOrientation)
@@ -50,7 +50,7 @@ ZC_uptr<ZC_RendererSet> ZCR_Orientation3D::MakeRSLine()
     };
 
     ZC_Buffer vbo(GL_ARRAY_BUFFER);
-    const size_t threeVerticesByteSize = sizeof(ZC_Vec4<float>) * 3;
+    const ulong threeVerticesByteSize = sizeof(ZC_Vec4<float>) * 3;
     vbo.BufferData(threeVerticesByteSize + sizeof(colors), nullptr, GL_DYNAMIC_DRAW);
     vbo.BufferSubData(threeVerticesByteSize, sizeof(colors), colors);
     
@@ -149,7 +149,7 @@ ZC_uptr<ZC_RendererSet> ZCR_Orientation3D::MakeRendererSetAxice()
     buffers.emplace_front(std::move(vbo));
 
     auto votc = pShPIS->texSets.GetCreator();
-    votc.Add(ZC_Textures::LoadTexture2D(ZC_FSPath(ZCR_ZCRTexturePath).append("sceneIcons.png").c_str()));
+    votc.Add(ZC_Textures::LoadTexture2D(ZC_FSPath(ZCR_ZCRTexturePath).append("sceneIcons.png").string().c_str()));
     std::forward_list<ZC_TexturesSet> texSets;
     texSets.emplace_front(0, votc.GetVector());
     
@@ -186,7 +186,7 @@ void ZCR_Orientation3D::RotateLinesAndTranslateQuads()
         perspView * positiveZ,   //  + z
     };
 
-    const size_t threeVerticesByteSize = sizeof(ZC_Vec4<float>) * 3;
+    const ulong threeVerticesByteSize = sizeof(ZC_Vec4<float>) * 3;
     upRendSetLine->buffers.begin()->BufferSubData(0, threeVerticesByteSize, positivePointsOfLines);
 
     ZC_Mat4<float> mod(1.f);

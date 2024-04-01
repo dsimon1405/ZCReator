@@ -16,9 +16,9 @@ struct ZCR_Point : public ZCR_Color
     ZC_RSController rsControllerPoint;
 
     ZC_sptr<ZC_RendererSet> MakePointRendererSet();
-    ZC_DA<uchar> GetPointElements(size_t& rElementsCount, GLenum& rElementsType);
-    void GetPoints(size_t& rElementsCount);
-    size_t FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>* pVertexContainerHead);
+    ZC_DA<uchar> GetPointElements(ulong& rElementsCount, GLenum& rElementsType);
+    void GetPoints(ulong& rElementsCount);
+    ulong FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>* pVertexContainerHead);
     template<typename TElement>
     void FillPointElements(TElement* pIndex);
 
@@ -31,8 +31,8 @@ struct ZCR_Point : public ZCR_Color
 template<typename TElement>
 void ZCR_Point::FillPointElements(TElement* pElement)
 {
-    size_t trianglesStartOffsetInEBO = spQuads ? (spQuads->size * 4) : 0;    //  triangles start index in ebo
-    size_t pElementI = 0;
+    ulong trianglesStartOffsetInEBO = spQuads ? (spQuads->size * 4) : 0;    //  triangles start index in ebo
+    ulong pElementI = 0;
     auto pQuadsHead = spQuads ? &(spQuads->Begin()->bl) : nullptr;
     auto pTrianglesHead = spTriangles ? &(spTriangles->Begin()->bl) : nullptr;
     for (auto& point : *spPoints)
