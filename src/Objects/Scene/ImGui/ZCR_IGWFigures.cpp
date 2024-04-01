@@ -22,25 +22,25 @@ void ZCR_IGWFigures::DrawWindow()
         
         ImGui::TableNextColumn();
         static int iconTextureId = ZCR_IconTexture::iconTexture.GetId();
-        if (ImGui::ImageButton("Cube", reinterpret_cast<ImTextureID>(&iconTextureId),
+        if (ImGui::ImageButton("Cube", reinterpret_cast<ImTextureID>((long long)iconTextureId),
                 iconSize, ZCR_IconTexture::tcCreateCube.tl, ZCR_IconTexture::tcCreateCube.br))
             FigureCreation(ZCR_Figure::Name::Cube);
         ImGui::IsItemHovered() ? ImGui::TextColored(colorActive, "      Cube") : ImGui::TextColored(colorPassive, "      Cube");
         
         ImGui::TableNextColumn();
-        if (ImGui::ImageButton("Cylinder", reinterpret_cast<ImTextureID>(&iconTextureId),
+        if (ImGui::ImageButton("Cylinder", reinterpret_cast<ImTextureID>((long long)iconTextureId),
                 iconSize, ZCR_IconTexture::tcCreateCylinder.tl, ZCR_IconTexture::tcCreateCylinder.br))
             FigureCreation(ZCR_Figure::Name::Cube);
         ImGui::IsItemHovered() ? ImGui::TextColored(colorActive, "    Cylinder") : ImGui::TextColored(colorPassive, "    Cylinder");
 
         ImGui::TableNextColumn();
-        if (ImGui::ImageButton("Cone", reinterpret_cast<ImTextureID>(&iconTextureId),
+        if (ImGui::ImageButton("Cone", reinterpret_cast<ImTextureID>((long long)iconTextureId),
                 iconSize, ZCR_IconTexture::tcCreateCone.tl, ZCR_IconTexture::tcCreateCone.br))
             FigureCreation(ZCR_Figure::Name::Cube);
         ImGui::IsItemHovered() ? ImGui::TextColored(colorActive, "      Cone") : ImGui::TextColored(colorPassive, "      Cone");
 
         ImGui::TableNextColumn();
-        if (ImGui::ImageButton("Sphere", reinterpret_cast<ImTextureID>(&iconTextureId),
+        if (ImGui::ImageButton("Sphere", reinterpret_cast<ImTextureID>((long long)iconTextureId),
                 iconSize, ZCR_IconTexture::tcCreateSphere.tl, ZCR_IconTexture::tcCreateSphere.br))
             FigureCreation(ZCR_Figure::Name::Cube);
         ImGui::IsItemHovered() ? ImGui::TextColored(colorActive, "     Sphere") : ImGui::TextColored(colorPassive, "     Sphere");
