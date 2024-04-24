@@ -29,28 +29,21 @@ ZCR_Mesh::ZCR_Mesh(float totalLength)
     SwitchToCoordSystem(CoordSystem::xy);
 }
 
-void ZCR_Mesh::SwitchToCoordSystem(CoordSystem _coordSystem)
+void ZCR_Mesh::SetAxis(ZCR_Axis axis)
 {
-    if (coordSystem == _coordSystem) ZC_ErrorLogger::Err("Why called SwitchToCoordSystem() with same param?", __FILE__,__LINE__);
-
-    switch (coordSystem)
+    switch (axis)
     {
-    case CoordSystem::none: break;
-    case CoordSystem::xy: rsController_axisXY.SwitchToLvl(ZC_RL_None); break;
-    case CoordSystem::xz: rsController_axisXZ.SwitchToLvl(ZC_RL_None); break;
-    case CoordSystem::yz: rsController_axisYZ.SwitchToLvl(ZC_RL_None); break;
-    }
-    coordSystem = _coordSystem;
-    switch (coordSystem)
-    {
-    case CoordSystem::none: break;
-    case CoordSystem::xy: rsController_axisXY.SwitchToLvl(ZC_RL_Drawing); break;
-    case CoordSystem::xz: rsController_axisXZ.SwitchToLvl(ZC_RL_Drawing); break;
-    case CoordSystem::yz: rsController_axisYZ.SwitchToLvl(ZC_RL_Drawing); break;
+    case ZCR_A_PositiveX: SwitchToCoordSystem(); break;
+    case ZCR_A_NegativeX: SwitchToCoordSystem(); break;
+    case ZCR_A_PositiveY: SwitchToCoordSystem(); break;
+    case ZCR_A_NegativeY: SwitchToCoordSystem(); break;
+    case ZCR_A_PositiveZ: SwitchToCoordSystem(); break;
+    case ZCR_A_NegativeZ: SwitchToCoordSystem(); break;
+    case ZCR_A_Free: SwitchToCoordSystem(); break;
     }
 }
 
-ZC_uptr<ZC_RendererSet> ZCR_Mesh::MakeRendererSet(float totalLength)
+ZC_uptr<ZC_RenderSet> ZCR_Mesh::MakeRendererSet(float totalLength)
 {
     //  (* 2 -> two vertices on one line) (+ 2 -> last line, if totalLength 10 than fifth line(center line) gonna be colored and 5 grey lines from sides
     ZC_DA<ZC_Vec3<float>> vertices((static_cast<ulong>(totalLength) * 2 + 2) * 2);  //  last (* 2) -> pluss same count perpendicular lines 
@@ -83,5 +76,26 @@ ZC_uptr<ZC_RendererSet> ZCR_Mesh::MakeRendererSet(float totalLength)
 
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(vbo));
-    return ZC_RendererSet::CreateUptr(pShPIS, std::move(vao), std::move(upGLDraw), std::move(buffers));
+    return ZC_RenderSet::CreateUptr(pShPIS, std::move(vao), std::move(upGLDraw), std::move(buffers));
+}
+
+void ZCR_Mesh::SwitchToCoordSystem(CoordSystem _coordSystem)
+{
+    if (coordSystem == _coordSystem) ZC_ErrorLogger::Err("Why called SwitchToCoordSystem() with same param?", __FILE__,__LINE__);
+
+    switch (coordSystem)
+    {
+    case CoordSystem::none: break;
+    case CoordSystem::xy: rsController_axisXY.SwitchToDrawLvl(ZC_FB_Default, ZC_DL_None); break;
+    case CoordSystem::xz: rsController_axisXZ.SwitchToDrawLvl(ZC_FB_Default, ZC_DL_None); break;
+    case CoordSystem::yz: rsController_axisYZ.SwitchToDrawLvl(ZC_FB_Default, ZC_DL_None); break;
+    }
+    coordSystem = _coordSystem;
+    switch (coordSystem)
+    {
+    case CoordSystem::none: break;
+    case CoordSystem::xy: rsController_axisXY.SwitchToDrawLvl(ZC_FB_Default, ZC_DL_Drawing); break;
+    case CoordSystem::xz: rsController_axisXZ.SwitchToDrawLvl(ZC_FB_Default, ZC_DL_Drawing); break;
+    case CoordSystem::yz: rsController_axisYZ.SwitchToDrawLvl(ZC_FB_Default, ZC_DL_Drawing); break;
+    }
 }

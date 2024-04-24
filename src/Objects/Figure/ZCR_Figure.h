@@ -19,15 +19,13 @@ struct ZCR_Figure
 
     void Translate(const ZC_Vec3<float>& trans);
 
-    typedef typename ZCR_Scene::SceneMode SceneMode;
-    void ChangeSceneMode(SceneMode sceneMode);
+    void ChangeSceneMode(ZCR_SceneModes sceneMode);
     void ChangeSceneActivity(bool _isActiveOnScene);
-    void ChangeSceneModeAndActivity(SceneMode sceneMode, bool _isActiveOnScene);
+    void ChangeSceneModeAndActivity(ZCR_SceneModes sceneMode, bool _isActiveOnScene);
 
 private:
     std::string name;
     ZCR_FigureSet figureSet;
-    bool isActiveOnScene = false;
 
     static std::string GetName(Name standartFigure);
     static ZC_sptr<ZC_DA<ZC_Quad>> GetQuads(Name standartFigure);

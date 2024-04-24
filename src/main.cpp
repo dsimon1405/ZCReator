@@ -19,7 +19,7 @@
 
 #include <ZC/Tools/Math/ZC_Figures.h>
 
-#include <ZC/Video/OpenGL/Texture/ZC_Textures.h>
+#include <ZC/Video/OpenGL/Texture/ZC_Texture.h>
 
 // #include <Objects/ImGui/ZCR_ImGui.h>
 #include <Objects/Scene/ZCR_Scene.h>
@@ -220,10 +220,7 @@
 //     }
 // };
 
-//              check sizeof long long ZC_VAOConfig.cpp
-//                  freetype cmake(windows), imgui disable in renderer, textWindow and textWindowIntoScene in one renderer
-
-//  ZCR_Camera scroll and IGWindow for axis
+//  IGWindow for axis
 
 #include <ZC/Objects/Text/ZC_Fonts.h>
 #include <ZC/Objects/Text/ZC_TextWindow.h>
@@ -231,18 +228,113 @@
 #include <ZC/Objects/Text/ZC_TextSceneTurnedToCamera.h>
 #include <ZC/Objects/Text/ZC_TextWindowIntoScene.h>
 
-ZC_TextWindow* pText;
+#include <Renderer/ZCR_RendererLevelDrawer.h>
+#include <ZC/Video/OpenGL/ZC_Framebuffer.h>
+#include <ZC/Video/OpenGL/ZC_Viewport.h>
+
+#include <ZC/Video/OpenGL/ZC_FBO.h>
+#include <ZCR_Load.h>
+#include <ZC/Tools/ZC_OrthoSquare.h>
+#include <ZC/Collision/ZC_MouseCollisionWindow.h>
+
+struct Q : public ZC_MouseCollisionWindow
+{
+    float blX = 100.f,
+        blY = 100.f,
+        width = 100.f,
+        height = 100.f;
+
+    Q()
+        : ZC_MouseCollisionWindow(ZC_MouseCollisionWindow::E_Move | ZC_MouseCollisionWindow::E_Down_Mouse_Right | ZC_MouseCollisionWindow::E_Down_Mouse_Left,
+        &blX, &blY, &width, &height, true)
+    {
+        // this->ConnectMouseCollision();
+        this->UseManualMove(true);
+    }
+
+    void VMouseMoveCollision(float time) override
+    {
+        ZC_cout("lol");
+    }
+    void VMouseMoveCollisionEnd(float time) override
+    {
+        ZC_cout("end");
+    }
+    void VMouseRightDownCollision(float time) override
+    {
+        ZC_cout("right");
+    }
+    void VMouseLeftDownCollision(float time) override
+    {
+        ZC_cout("left");
+    }
+};
+
+struct Z : public ZC_MouseCollisionWindow
+{
+    float blX = 500.f,
+        blY = 500.f,
+        width = 100.f,
+        height = 100.f;
+
+    Z()
+        : ZC_MouseCollisionWindow(ZC_MouseCollisionWindow::E_Move | ZC_MouseCollisionWindow::E_Down_Mouse_Right | ZC_MouseCollisionWindow::E_Down_Mouse_Left,
+        &blX, &blY, &width, &height, true, ZC_MouseCollisionWindow::Border(450.f, 450.f, 700.f, 700.f))
+    {
+        // this->ConnectMouseCollision();
+        this->UseManualMove(true);
+    }
+
+    void VMouseMoveCollision(float time) override
+    {
+        ZC_cout("lol1");
+    }
+    void VMouseMoveCollisionEnd(float time) override
+    {
+        ZC_cout("end1");
+    }
+    void VMouseRightDownCollision(float time) override
+    {
+        ZC_cout("right1");
+    }
+    void VMouseLeftDownCollision(float time) override
+    {
+        ZC_cout("left1");
+    }
+};
+
 void SetColor(float);
 
 int ZC_main()
 {
-    using namespace ZC_Window;
-    ZC_Window::MakeWindow(ZC_Window_Multisampling_4 | ZC_Window_Border, 800, 600, "ZeroCreator");
-    // window->SetFPS(0);
 
-    ulong textHeight = 200;
-    ZC_FontNameHeight fonts{ZC_FontName::Arial, textHeight};
-    ZC_Fonts::Load(&fonts, 1);
+    using namespace ZC_Window;
+    ZC_Window::MakeWindow(
+        // ZC_Window_Multisampling_2 | 
+        ZC_Window_Border, 800, 600, "ZeroCreator");
+    ZC_Window::SetFPS(0);
+    ZC_Window::NeedDrawFPS(true);
+
+    ZCR_LoadFonts();
+
+    // Q q;
+    // Z z;
+
+    // ZC_FBO fbo(ZC_Viewport::CreateStandardWindowViewport(), 4, ZC_FBO::CIF_None, ZC_FBO::DSIF_GL_DEPTH24_STENCIL8, ZC_FBO::RT_Depth_Stencil);
+
+    // fbo.Use();
+    // fbo.Finish();
+
+    // // auto tex = ZC_Texture::LoadTexture2D("/home/dmitry/Загрузки/awesomeface.png");
+    // // ZC_OrthoSquare os(&tex, 100, 100, 100, 100, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, ZC_FB_Default);
+    // ZC_OrthoSquare os(ZC_Texture::LoadTexture2D("/home/dmitry/Загрузки/awesomeface.png"), 100, 100, 100, 100, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, ZC_FB_Default);
+    // os.NeedDraw(true);
+    // os1 = &os;
+    
+    ulong textHeight = 150;
+    ulong textHeight1 = 151;
+    ZC_FontData fonts[]{ { ZC_FontName::ZC_F_Arial, textHeight },{ ZC_FontName::ZC_F_Arial, textHeight1 } };
+    ZC_Fonts::Load(fonts, 2);
 
     ZC_Window::GlClearColor(0.3f, 0.3f, 0.3f, 1.f);
     ZC_Window::GlEnablePointSize();
@@ -251,18 +343,28 @@ int ZC_main()
 
     std::string str = "Dimp\nL";
 
-    ZC_TextWindow text({ZC_FontName::Arial, textHeight}, str, ZC_TA_Left, 0.f, 0.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel);
-    ZC_TextScene text1({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right);
-    ZC_TextSceneTurnedToCamera textSceneTurn({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, {10.f, 3.f, 0.f});
-    ZC_TextWindowIntoScene textWIS({ZC_FontName::Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Center, {5.f, 3.f, 0.f});
+    // ZC_TextWindow text({ZC_F_Arial, textHeight}, str, ZC_TA_Left, 0.f, 0.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel);
+    // text.SetColorFloat(1,0,0);
+    // text.SetAlpha(0.5f);
+    // text.NeedDraw(true);
+    // ZC_TextScene text1({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right);
+    // text1.SetPosition({ 0,-4,0 });
+    // text1.SetColorFloat(0,1,0);
+    // text1.NeedDraw(true);
+    // // text1.SetRendererLevel(ZC_DrawLevels::TextScene);
+    // // text2.SetRendererLevel(ZC_DrawLevels::TextScene);
+    // ZC_TextSceneTurnedToCamera textSceneTurn({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, {10.f, 3.f, 0.f});
+    // textSceneTurn.SetColorFloat(1,1,1);
+    // textSceneTurn.NeedDraw(true);
 
+    // ZC_TextWindowIntoScene textWIS({ZC_F_Arial, textHeight}, ZC_FO_bottomCenter, str, ZC_TextAlignment::ZC_TA_Center, {0.f, 0.f, 0.f});
+    // textWIS.NeedDraw(true);
+    // // ZC_TextWindowIntoScene text2({ZC_F_Arial, textHeight1}, ZC_FO_center, str, ZC_TextAlignment::ZC_TA_Right, { 5, 3, 3 });
+    // // text2.SetColorFloat(0,0,1);
+    
+    
 
-    pText = &text;
-    // auto text1 = text.MakeCopy();
-    // text1.SetColor({0, 1.f, 0});
-    // text1.SetIndentData(20.f, 40.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel);
-
-    ZC_Events::ConnectButtonDown(ZC_ButtonID::K_Q, {&SetColor});
+    ZC_Events::ConnectButtonDown(ZC_ButtonID::K_Q, {&SetColor}, false);
 
     ZC_Window::RuntMainCycle();
     
@@ -273,9 +375,11 @@ std::string first = "first\nLol\nsdaasdffffffafsdf\nsdaf",
     second = "{seconD}}\nasdf'_",
     current = first;
 
-
+bool needDraw = true;
 void SetColor(float)
 {
+    needDraw = !needDraw;
+    // ZC_IGWindow::NeedImGuiDraw(needDraw);
     if (current == first)
     {
         // pText->NeedDraw(false);
@@ -284,10 +388,13 @@ void SetColor(float)
         // pText->SetIndentData(0.2f, 90.f, ZC_WOIF__X_Left_Percent | ZC_WOIF__Y_Center);
         // pText->SetPosition({5.f, 0.f, 2.f});
         // pText->SetScale(0.001);
-        pText->SetAlignment(ZC_TA_Left);
-        pText->SetColor({1.f, 0.f, 0.f});
+        // pText->SetAlignment(ZC_TA_Left);
+        // pText->SetColor({1.f, 0.f, 0.f});
         // pText->NeedDraw(true);
-        // pText->SetRendererLevel(ZC_RendererLevels::TextScene);
+        // pText->SetRendererLevel(ZC_DrawLevels::TextScene);
+        // os1->NeedDraw(false);
+        // os1->SetAlpha(0.5f);
+        // os1->SetSize(400,100);
         current = second;
     }
     else
@@ -298,10 +405,13 @@ void SetColor(float)
         // pText->SetIndentData(20.f, 40.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel);
         // pText->SetPosition({0.f, 0.f, 0.f});
         // pText->SetScale(0.01);
-        pText->SetAlignment(ZC_TA_Right);
-        pText->SetColor({0.f, 1.f, 0.f});
+        // pText->SetAlignment(ZC_TA_Right);
+        // pText->SetColor({0.f, 1.f, 0.f});
         // pText->NeedDraw(false);
-        // pText->SetRendererLevel(ZC_RendererLevels::TextWindow);
+        // pText->SetRendererLevel(ZC_DrawLevels::OrthoBlend);
+        // os1->NeedDraw(true);
+        // os1->SetAlpha(1.f);
+        // os1->SetSize(100,100);
         current = first;
     }
 }
@@ -321,6 +431,14 @@ void SetColor(float)
 //         + ";     y = " + std::to_string(y) + "; [-1,1] = " + std::to_string((1.f - (y / 600.f)) * 2 - 1.f));
 // }
 
+
+//  transparency => create framebuffer(if main multisampled create multisampled and then blit in another, created with texture2d attachment)
+//  Color attachment finaly must be on one texture2d for each transparency object(don't forgot alpha channel in GL_RGBA or in separate uniform for each object).
+//  Depth attachment uses main renderbuffer (0), but don't write there (glDepthMasr(GL_FALSE)),
+//  cause if creates several transparency object they must have different fbo but use main depth rbo for depth testing with not transparent scene.
+//  Drawing must be started after scene objects but before window objects(to avoid clearing of the depth buffer, like in ZC_TextWindowIntoScene::VDraw()).
+//  Finaly create shader that may attach (teoreticly) 16 color textures (max count) (if alpha in separated uniforms, don't forgot them), there we blending the color of
+//  each texture (transparency objects) with scene framebuffer (main buffer attachmant 0).
 
 //     enum En
 // {

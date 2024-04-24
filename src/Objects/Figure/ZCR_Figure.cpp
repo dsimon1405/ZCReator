@@ -14,21 +14,19 @@ bool ZCR_Figure::operator == (ZCR_Figure* fig) const noexcept
     return this == fig;
 }
 
-void ZCR_Figure::ChangeSceneMode(SceneMode sceneMode)
+void ZCR_Figure::ChangeSceneMode(ZCR_SceneModes sceneMode)
 {
-    figureSet.SwitchToSceneMode(sceneMode, isActiveOnScene);
+    figureSet.SwitchToSceneMode(sceneMode, figureSet.IsActiveOnScene());
 }
 
-void ZCR_Figure::ChangeSceneActivity(bool _isActiveOnScene)
+void ZCR_Figure::ChangeSceneActivity(bool isActiveOnScene)
 {
-    if (isActiveOnScene == _isActiveOnScene) return;
-    isActiveOnScene = _isActiveOnScene;
+    if (figureSet.IsActiveOnScene() == isActiveOnScene) return;
     figureSet.SwitchToSceneMode(ZCR_Scene::GetActiveSceneMode(), isActiveOnScene);
 }
 
-void ZCR_Figure::ChangeSceneModeAndActivity(SceneMode sceneMode, bool _isActiveOnScene)
+void ZCR_Figure::ChangeSceneModeAndActivity(ZCR_SceneModes sceneMode, bool isActiveOnScene)
 {
-    isActiveOnScene = _isActiveOnScene;
     figureSet.SwitchToSceneMode(sceneMode, isActiveOnScene);
 }
 

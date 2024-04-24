@@ -1,5 +1,7 @@
 #include "ZCR_FigureSet.h"
 
+#include <Renderer/ZCR_FrameBuffer.h>
+
 ZCR_FigureSet::ZCR_FigureSet(ZC_sptr<ZC_DA<ZC_Quad>>&& _quads, ZC_sptr<ZC_DA<ZC_Triangle>>&& _triangles, ZC_sptr<ZC_DA<int>>&& _normals)
     : ZCR_VBO(std::move(_quads), std::move(_triangles), std::move(_normals))
 {
@@ -10,51 +12,50 @@ ZCR_FigureSet::ZCR_FigureSet(ZC_sptr<ZC_DA<ZC_Quad>>&& _quads, ZC_sptr<ZC_DA<ZC_
     for (auto& point : *spPoints) allActivePoints.emplace_back(&point);
     MakePointsActive(std::move(allActivePoints));
 
-    ZC_RSPDUniformData unModel(ZC_UN_unModel, spMatModel->Begin());
-    rsControllerPoint.SetData(ZC_RSPDC_uniforms, &unModel);
-    rsControllerLine.SetData(ZC_RSPDC_uniforms, &unModel);
-    rsControllerSurface.SetData(ZC_RSPDC_uniforms, &unModel);
-    // rsControllerPoint->SetUniformsData(UName::unModel, spMatModel->Begin());
-    // rsControllerLine->SetUniformsData(UName::unModel, spMatModel->Begin());
-    // rsControllerSurface->SetUniformsData(UName::unModel, spMatModel->Begin());
+    rsControllerPoint.SetUniformsData(ZC_UN_unModel, spMatModel->Begin());
+    rsControllerSurface.SetUniformsData(ZC_UN_unAlpha, &alpha);
+    rsControllerSurface.SetUniformsData(ZCR_UN_unUseLight, &useLight);
 
-    spMatModel->Translate(3.f, 1.f, 2.f);
+    rsControllerLine.SetUniformsData(ZC_UN_unModel, spMatModel->Begin());
+    rsControllerSurface.SetUniformsData(ZC_UN_unModel, spMatModel->Begin());
+
+    static bool first = true;
+    if (first)
+    {
+        spMatModel->Translate(3.f, 1.f, 2.f);
+        // alpha = 0.8f;
+        // useLight = false;
+
+        first = false;
+    }
 }
 
-// ZCR_FigureSet::ZCR_FigureSet(ZCR_FigureSet&& tr)
-//     : spVBO(std::move(tr.spVBO)),
-//     spQuads(std::move(tr.spQuads)),
-//     spTriangles(std::move(tr.spTriangles)),
-//     spNormals(std::move(tr.spNormals)),
-//     spTexCoords(std::move(tr.spTexCoords)),
-//     colors(std::move(tr.colors)),
-//     spMatModel(tr.spMatModel),
-//     spPoints(std::move(tr.spPoints)),
-//     activePoints(std::move(tr.activePoints)),
-//     spRendererSets{ std::move(tr.spRendererSets[GLElement::Triangle]) },
-//     spRSADSs{ std::move(tr.spRSADSs[GLElement::Triangle]) }
-// {}
-
-void ZCR_FigureSet::SwitchToSceneMode(SceneMode sceneMode, bool isActiveOnScene)
+void ZCR_FigureSet::SwitchToSceneMode(ZCR_SceneModes sceneMode, bool _isActiveOnScene)
 {
+    isActiveOnScene = _isActiveOnScene;
     switch (sceneMode)
     {
-    case SceneMode::Model:
+    case ZCR_SM_Model:
     {
-        if (isActiveOnScene) SwitchGLElementOnRSLevel(ZC_RL_StencilBorder, ZC_RL_None, ZC_RL_None);
-        else SwitchGLElementOnRSLevel(Drawing, ZC_RL_None, ZC_RL_None);
+        ZC_DrawLevel surfaceLevel =
+            isActiveOnScene ?
+                alpha == 1.f ? ZC_DL_StencilBorder
+                    : alpha == 0.f ? (ZC_DrawLevel)ZC_DL_None : ZCR_DL_AlphaBlending
+                : ZC_DL_Drawing;
+        SwitchGLElementOnRendererLevel(surfaceLevel, ZC_DL_None, ZC_DL_None);
         break;
     }
-    case SceneMode::Edit:
+    case ZCR_SM_Edit:
     {
-        if (isActiveOnScene) SwitchGLElementOnRSLevel(Drawing, Drawing, Drawing);
-        else SwitchGLElementOnRSLevel(Drawing, ZC_RL_None, ZC_RL_None);
+        if (isActiveOnScene) SwitchGLElementOnRendererLevel(alpha == 0.f ? (ZC_DrawLevel)ZC_DL_None : ZCR_DL_AlphaBlending,
+            ZC_DL_Drawing, ZC_DL_Drawing);
+        else SwitchGLElementOnRendererLevel(ZC_DL_Drawing, ZC_DL_None, ZC_DL_None);
         break;
     }
-    case SceneMode::Sculpting:
+    case ZCR_SM_Sculpting:
     {
-        if (isActiveOnScene) SwitchGLElementOnRSLevel(Drawing, ZC_RL_None, ZC_RL_None);
-        else SwitchGLElementOnRSLevel(ZC_RL_None, ZC_RL_None, ZC_RL_None);
+        if (isActiveOnScene) SwitchGLElementOnRendererLevel(ZC_DL_Drawing, ZC_DL_None, ZC_DL_None);
+        else SwitchGLElementOnRendererLevel(ZC_DL_None, ZC_DL_None, ZC_DL_None);
         break;
     }
     }
@@ -65,12 +66,35 @@ void ZCR_FigureSet::TranslateModelMatrix(const ZC_Vec3<float>& trans)
     spMatModel->Translate(trans);
 }
 
-void ZCR_FigureSet::SwitchGLElementOnRSLevel(ZC_RendererLevel triangle, ZC_RendererLevel point, ZC_RendererLevel line)
+void ZCR_FigureSet::SetAlpha(float _alpha)
 {
-    SwitchRSandDSTriangle(triangle);
-    SwitchRSandDSPoint(point);
-    SwitchRSandDSLine(line);
-    // spRSADSs[GLElement::Triangle]->SwitchToLvl(triangle);
-    // spRSADSs[GLElement::Point]->SwitchToLvl(point);
-    // spRSADSs[GLElement::Line]->SwitchToLvl(line);
+    if (alpha == _alpha) return;
+    alpha = _alpha < 0.f ? 0.f
+        :_alpha > 1.f ? 1.f
+        : _alpha;
+
+    switch (ZCR_Scene::GetActiveSceneMode())
+    {
+    case ZCR_SM_Model: SwitchRSControllerTriangle(isActiveOnScene ? alpha == 1.f ? ZC_DL_StencilBorder
+        : alpha == 0.f ? (ZC_DrawLevel)ZC_DL_None : ZCR_DL_AlphaBlending : ZC_DL_Drawing); break;
+    case ZCR_SM_Edit: SwitchRSControllerTriangle(isActiveOnScene ? alpha == 0.f ? (ZC_DrawLevel)ZC_DL_None : ZCR_DL_AlphaBlending : ZC_DL_Drawing); break;
+    case ZCR_SM_Sculpting: SwitchRSControllerTriangle(isActiveOnScene ? ZC_DL_Drawing : ZC_DL_None); break;
+    }
+}
+
+void ZCR_FigureSet::SetUseLight(bool _useLight)
+{
+    useLight = _useLight;
+}
+
+bool ZCR_FigureSet::IsActiveOnScene() const noexcept
+{
+    return isActiveOnScene;
+}
+
+void ZCR_FigureSet::SwitchGLElementOnRendererLevel(ZC_DrawLevel triangle, ZC_DrawLevel point, ZC_DrawLevel line)
+{
+    SwitchRSControllerTriangle(triangle);
+    SwitchRSControllerPoint(point);
+    SwitchRSControllerLine(line);
 }

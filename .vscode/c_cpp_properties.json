@@ -4,9 +4,9 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/build/external/ZeroCore/config",
                 "/home/dmitry/projects/external/SDL3/include",
-                "/home/dmitry/projects/external/glm/include"
+                "/home/dmitry/projects/external/glm/include",
+                "/usr/include/freetype2"
             ],
             "defines": [],
             "cStandard": "c17",

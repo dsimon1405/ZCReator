@@ -12,7 +12,7 @@ set(ZCR_ASSETS_DIRECTORY_NAME assets)
 set(ZCR_ASSETS_DESTINATION_PATH 
     ${PROJECT_BINARY_DIR}/$<$<PLATFORM_ID:Windows>:$<IF:$<CONFIG:Debug>,Debug/,Release/>>${ZCR_ASSETS_DIRECTORY_NAME})   #   windows?
 
-set(ZCR_MY_DEBUG 0)     # 1 true, 0 false   =>  use if(ZCR_MY_DEBUG EQUAL 1) - true; if(NOT ZCR_MY_DEBUG) - false
+set(ZCR_MY_DEBUG 1)     # 1 true, 0 false   =>  use if(ZCR_MY_DEBUG EQUAL 1) - true; if(NOT ZCR_MY_DEBUG) - false
 
 #========================= external libs
 #   add submodules
@@ -45,6 +45,7 @@ set(ZCR_LINK_LIBS ${ZCR_LINK_LIBS} PUBLIC ZeroCore)
 #========================= sources
 set(ZCR_SRC_FILES ${ZCR_SRC_FILES}
     ${PROJECT_SOURCE_DIR}/src/main.cpp
+    ${PROJECT_SOURCE_DIR}/src/ZCR_Load.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Figure/ZCR_Figure.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Figure/ZCR_Figures.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Figure/ZCR_ActiveFigures.cpp
@@ -58,9 +59,13 @@ set(ZCR_SRC_FILES ${ZCR_SRC_FILES}
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ZCR_Scene.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ZCR_Mesh.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ZCR_Camera.cpp
-    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ZCR_Orientation3D.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWCreateAndMode.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWFigures.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/Orientation3D/ZCR_Orientation3D.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/Orientation3D/ZCR_TextAxis.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/Orientation3D/ZCR_TextAxises.cpp
+    ${PROJECT_SOURCE_DIR}/src/Renderer/ZCR_RendererLevelDrawer.cpp
+    ${PROJECT_SOURCE_DIR}/src/Renderer/ZCR_RLDAlphaBlending.cpp
     )
 
 add_executable(${PROJECT_NAME} ${ZCR_SRC_FILES})

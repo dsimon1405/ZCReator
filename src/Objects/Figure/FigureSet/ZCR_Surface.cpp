@@ -7,7 +7,7 @@ ZCR_Surface::ZCR_Surface()
     rsControllerSurface(MakeSurfaceRSController())
 {}
 
-ZC_sptr<ZC_RendererSet> ZCR_Surface::MakeSurfaceRendererSet()
+ZC_sptr<ZC_RenderSet> ZCR_Surface::MakeSurfaceRendererSet()
 {
     ulong elementsCount = 0;
     GLenum elementsType = 0;
@@ -26,7 +26,7 @@ ZC_sptr<ZC_RendererSet> ZCR_Surface::MakeSurfaceRendererSet()
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(ebo));
 
-    return ZC_RendererSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
+    return ZC_RenderSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
     // switch (element)
     // {
     // case GLElement::Triangle: return { new ZC_RSNonTex(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
@@ -63,7 +63,7 @@ ZC_DA<uchar> ZCR_Surface::GetTriangleElements(ulong& rElementsCount, GLenum& rEl
     return elements;
 }
 
-void ZCR_Surface::SwitchRSandDSTriangle(ZC_RendererLevel lvl)
+void ZCR_Surface::SwitchRSControllerTriangle(ZC_DrawLevel drawLevel)
 {
-    rsControllerSurface.SwitchToLvl(lvl);
+    rsControllerSurface.SwitchToDrawLvl(ZC_FB_Default, drawLevel);
 }

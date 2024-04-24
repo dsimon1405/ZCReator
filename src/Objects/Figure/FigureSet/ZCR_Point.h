@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ZCR_Color.h"
-#include <ZC/Video/OpenGL/Renderer/ZC_RendererSet.h>
+#include <ZC/Video/OpenGL/Renderer/ZC_RenderSet.h>
 
 #include <list>
 
@@ -12,17 +12,17 @@ struct ZCR_Point : public ZCR_Color
     ZC_sptr<std::list<Points>> spPoints;    //  fill in GetPoints
     std::list<Points*> activePoints {};
 
-    ZC_sptr<ZC_RendererSet> spRendererSetsPoint;
+    ZC_sptr<ZC_RenderSet> spRendererSetsPoint;
     ZC_RSController rsControllerPoint;
 
-    ZC_sptr<ZC_RendererSet> MakePointRendererSet();
+    ZC_sptr<ZC_RenderSet> MakePointRenderSet();
     ZC_DA<uchar> GetPointElements(ulong& rElementsCount, GLenum& rElementsType);
     void GetPoints(ulong& rElementsCount);
     ulong FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>* pVertexContainerHead);
     template<typename TElement>
     void FillPointElements(TElement* pIndex);
 
-    void SwitchRSandDSPoint(ZC_RendererLevel lvl);
+    void SwitchRSControllerPoint(ZC_DrawLevel drawLevel);
 
     void MakePointsActive(std::list<Points*>&& points);
 };
