@@ -13,8 +13,9 @@ void ZCR_IGWCreateAndMode::DrawWindow()
     // ImGui::ShowDemoWindow();
 
     if (ImGui::Button("Create Figure", { 130.f, 20.f })) winFigures.NeedDraw(true);
-
-    if (ImGui::RadioButton("Model", ZCR_Scene::GetActiveSceneMode() == ZCR_SM_Model)) ZCR_Scene::SetActiveSceneMode(ZCR_SM_Model, true);
-    if (ImGui::RadioButton("Edit", ZCR_Scene::GetActiveSceneMode() == ZCR_SM_Edit)) ZCR_Scene::SetActiveSceneMode(ZCR_SM_Edit, true);
-    if (ImGui::RadioButton("Sculpting", ZCR_Scene::GetActiveSceneMode() == ZCR_SM_Sculpting)) ZCR_Scene::SetActiveSceneMode(ZCR_SM_Sculpting, true);
+    
+    ZCR_Scene* pScene = ZCR_Scene::GetScene();
+    if (ImGui::RadioButton("Model", pScene->GetActiveSceneMode() == ZCR_SM_Model)) pScene->SetActiveSceneMode(ZCR_SM_Model, true);
+    if (ImGui::RadioButton("Edit", pScene->GetActiveSceneMode() == ZCR_SM_Edit)) pScene->SetActiveSceneMode(ZCR_SM_Edit, true);
+    if (ImGui::RadioButton("Sculpting", pScene->GetActiveSceneMode() == ZCR_SM_Sculpting)) pScene->SetActiveSceneMode(ZCR_SM_Sculpting, true);
 }

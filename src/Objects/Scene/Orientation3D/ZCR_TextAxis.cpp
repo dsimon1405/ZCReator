@@ -3,16 +3,14 @@
 #include <Renderer/ZCR_FrameBuffer.h>
 #include <Objects/Scene/ZCR_Scene.h>
 
-ZCR_TextAxis::ZCR_TextAxis(ZCR_Axis _axis, const ZC_Vec3<float>& _startPosition, const std::string& text, uchar _red, uchar _green, uchar _blue)
+ZCR_TextAxis::ZCR_TextAxis(ZCR_Axis _axis, const ZC_Vec3<float>& _startPosition, const std::string& text, uint _defaultColor)
     : axis(_axis),
     startPosition(_startPosition),
     textWindowIntoScene({ ZC_FontName::ZC_F_ChunkFivePrint, 18 }, ZC_FO_center, text, ZC_TA_Center, {}, false),
-    red(_red),
-    green(_green),
-    blue(_blue)
+    defaultColor(_defaultColor)
 {
     textWindowIntoScene.SetFrameBuffer(ZCR_FB_Orientation3D);
-    textWindowIntoScene.SetColorUChar(red, green, blue);
+    textWindowIntoScene.SetColorUInt(defaultColor);
     textWindowIntoScene.NeedDraw(true);
 }
 
@@ -47,13 +45,19 @@ bool ZCR_TextAxis::MakeCursorCollision(float cursorX, float cursorY, float activ
     return blX < cursorX && blY < cursorY && trX > cursorX && trY > cursorY && depth < activeDepth;
 }
 
-void ZCR_TextAxis::SetColor(bool setWhite)
+void ZCR_TextAxis::SetColor(Color color)
 {
-    setWhite ? textWindowIntoScene.SetColorUChar(255,255,255) : textWindowIntoScene.SetColorUChar(red, green, blue);
+    static uint colorActiveAxis = ZC_PackColorUCharToUInt(255, 255, 255);   //  white color
+    switch (color)
+    {
+    case C_Defualt: textWindowIntoScene.SetColorUInt(defaultColor); break;
+    case C_ActiveMove: textWindowIntoScene.SetColorUInt(0); break;      //  black color
+    case C_ActiveAxis: textWindowIntoScene.SetColorUInt(colorActiveAxis); break;
+    }
 }
-// #include <ZC/Tools/Console/ZC_cout.h>
+
 void ZCR_TextAxis::MouseLeftButtonDown()
 {
-    ZCR_Scene::SetAxise(axis);
-    // ZC_cout(textWindowIntoScene.GetText());
+    ZCR_Scene::GetScene()->SetAxise(axis);
+    SetColor(C_ActiveAxis);
 }

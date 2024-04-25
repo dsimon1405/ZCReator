@@ -73,7 +73,7 @@ void ZCR_FigureSet::SetAlpha(float _alpha)
         :_alpha > 1.f ? 1.f
         : _alpha;
 
-    switch (ZCR_Scene::GetActiveSceneMode())
+    switch (ZCR_Scene::GetScene()->GetActiveSceneMode())
     {
     case ZCR_SM_Model: SwitchRSControllerTriangle(isActiveOnScene ? alpha == 1.f ? ZC_DL_StencilBorder
         : alpha == 0.f ? (ZC_DrawLevel)ZC_DL_None : ZCR_DL_AlphaBlending : ZC_DL_Drawing); break;

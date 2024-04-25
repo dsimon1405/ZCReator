@@ -237,83 +237,71 @@
 #include <ZC/Tools/ZC_OrthoSquare.h>
 #include <ZC/Collision/ZC_MouseCollisionWindow.h>
 
-struct Q : public ZC_MouseCollisionWindow
+struct Q
 {
     float blX = 100.f,
-        blY = 100.f,
-        width = 100.f,
-        height = 100.f;
-
-    Q()
-        : ZC_MouseCollisionWindow(ZC_MouseCollisionWindow::E_Move | ZC_MouseCollisionWindow::E_Down_Mouse_Right | ZC_MouseCollisionWindow::E_Down_Mouse_Left,
-        &blX, &blY, &width, &height, true)
-    {
-        // this->ConnectMouseCollision();
-        this->UseManualMove(true);
-    }
-
-    void VMouseMoveCollision(float time) override
-    {
-        ZC_cout("lol");
-    }
-    void VMouseMoveCollisionEnd(float time) override
-    {
-        ZC_cout("end");
-    }
-    void VMouseRightDownCollision(float time) override
-    {
-        ZC_cout("right");
-    }
-    void VMouseLeftDownCollision(float time) override
-    {
-        ZC_cout("left");
-    }
+        blY = 100.f;
 };
 
-struct Z : public ZC_MouseCollisionWindow
+struct Z
 {
     float blX = 500.f,
         blY = 500.f,
         width = 100.f,
         height = 100.f;
-
-    Z()
-        : ZC_MouseCollisionWindow(ZC_MouseCollisionWindow::E_Move | ZC_MouseCollisionWindow::E_Down_Mouse_Right | ZC_MouseCollisionWindow::E_Down_Mouse_Left,
-        &blX, &blY, &width, &height, true, ZC_MouseCollisionWindow::Border(450.f, 450.f, 700.f, 700.f))
-    {
-        // this->ConnectMouseCollision();
-        this->UseManualMove(true);
-    }
-
-    void VMouseMoveCollision(float time) override
-    {
-        ZC_cout("lol1");
-    }
-    void VMouseMoveCollisionEnd(float time) override
-    {
-        ZC_cout("end1");
-    }
-    void VMouseRightDownCollision(float time) override
-    {
-        ZC_cout("right1");
-    }
-    void VMouseLeftDownCollision(float time) override
-    {
-        ZC_cout("left1");
-    }
 };
+
+struct R
+{
+    float blX = 500.f,
+        blY = 500.f,
+        width = 100.f,
+        height = 100.f;
+};
+
+
+template<typename T>
+auto Returner()
+{
+    if constexpr (std::same_as<T,R>) return R();
+    else if constexpr (std::same_as<T,Q>) return Q();
+    else if constexpr (std::same_as<T,Z>) return Z();
+    else return 16;
+}
+
+template<typename T1, typename T2, typename T3>
+struct W
+{
+    T1 q;
+    T2 z;
+    T3 r;
+    W(T1 _q, T2 _z, T3 _r)
+        : q(_q),
+        z(_z),
+        r(_r)
+    {}
+};
+
+template<typename... T>
+auto Func()
+{
+    return W<T...>(Returner<T>()...);
+}
+
+#include <ZC/Video/OpenGL/Renderer/ZC_RDComplex.h>
 
 void SetColor(float);
 
 int ZC_main()
 {
+    auto q = Func<Q,Z,R>();
 
     using namespace ZC_Window;
     ZC_Window::MakeWindow(
         // ZC_Window_Multisampling_2 | 
         ZC_Window_Border, 800, 600, "ZeroCreator");
     ZC_Window::SetFPS(0);
-    ZC_Window::NeedDrawFPS(true);
+    // ZC_Window::NeedDrawFPS(true);
 
     ZCR_LoadFonts();
 
@@ -340,6 +328,8 @@ int ZC_main()
     ZC_Window::GlEnablePointSize();
     
     ZCR_Scene scene;
+    // scene.SetMeshSpecificCoordSystem(ZCR_Mesh::CS_YZ);
+
 
     std::string str = "Dimp\nL";
 

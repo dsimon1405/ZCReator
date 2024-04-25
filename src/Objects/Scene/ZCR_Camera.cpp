@@ -22,10 +22,10 @@ ZCR_Camera::ZCR_Camera()
     // ZC_Mouse::ConnectMove({&ZCR_Camera::MouseMoveAroundObject, this});
 
     MouseMoveCallback(0, 0, 45, -45, 0);
-    SetLookOn({3.f, 0.f, 2.f});
+    SetCameraLookOn({3.f, 0.f, 2.f});
 }
 
-bool ZCR_Camera::UseEvents(bool needUse)
+bool ZCR_Camera::SetCameraUseEvents(bool needUse)
 {
     if (needUseEvents == needUse) return isRotation;
     needUseEvents = needUse;
@@ -42,7 +42,7 @@ bool ZCR_Camera::UseEvents(bool needUse)
     return isRotation;
 }
 
-void ZCR_Camera::SetAxis(ZCR_Axis axis)
+void ZCR_Camera::SetCameraAxis(ZCR_Axis axis)
 {
     switch (axis)
     {
@@ -70,7 +70,7 @@ void ZCR_Camera::SetAxis(ZCR_Axis axis)
     RotateAroundObject();
 }
 
-void ZCR_Camera::SetLookOn(const ZC_Vec3<float>& lookOn)
+void ZCR_Camera::SetCameraLookOn(const ZC_Vec3<float>& lookOn)
 {
     auto curLookOn = camera.GetLookOn();
     if (curLookOn == lookOn) return;
@@ -126,7 +126,7 @@ void ZCR_Camera::MouseMoveCallback(float x, float y, float xRel, float yRel, flo
 
     RotateAroundObject();
 
-    ZCR_Scene::SetAxise(ZCR_A_Free);
+    ZCR_Scene::GetScene()->SetAxise(ZCR_A_Free);
 }
 
 void ZCR_Camera::SetVerticalAngleMoreOrLessThan90(bool isMoreThan90)

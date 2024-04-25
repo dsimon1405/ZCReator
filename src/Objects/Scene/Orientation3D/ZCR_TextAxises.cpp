@@ -20,23 +20,31 @@ bool ZCR_TextAxises::MakeCursorMoveCollision()
 
     ZCR_TextAxis* pNewActiveText = nullptr;
     for (auto& text : texts)
-        if (text.MakeCursorCollision(cursorX, cursorY, pNewActiveText ? pNewActiveText->depth : 1.f))
-            pNewActiveText = &text;
+    {
+        if (text.MakeCursorCollision(cursorX, cursorY, pNewActiveText ? pNewActiveText->depth : 1.f)) pNewActiveText = &text;
+        if (pActiveAxisText && pNewActiveText == pActiveAxisText) return false;  //  cursor on active axis text, that is closest (depth) text
+    }
     
-    if (pActiveText == pNewActiveText) return false;
+    if (pNewActiveText == pActiveMoveText) return false;
 
-    if (pActiveText) pActiveText->SetColor(false);
-    pActiveText = pNewActiveText;
-    if (pActiveText) pActiveText->SetColor(true);
+    if (pActiveMoveText) pActiveMoveText->SetColor(ZCR_TextAxis::C_Defualt);
+    pActiveMoveText = pNewActiveText;
+    if (pActiveMoveText) pActiveMoveText->SetColor(ZCR_TextAxis::C_ActiveMove);
     return true;
 }
 
 void ZCR_TextAxises::LeaveActiveArea()
 {
-    if (pActiveText) pActiveText->SetColor(false);
+    if (pActiveMoveText) pActiveMoveText->SetColor(ZCR_TextAxis::C_Defualt);
 }
 
 void ZCR_TextAxises::MouseLeftButtonDown()
 {
-    if (pActiveText) pActiveText->MouseLeftButtonDown();
+    if (pActiveMoveText)
+    {
+        if (pActiveAxisText) pActiveAxisText->SetColor(ZCR_TextAxis::C_Defualt);
+        pActiveAxisText = pActiveMoveText;
+        pActiveMoveText = nullptr;
+        pActiveAxisText->MouseLeftButtonDown();
+    }
 }

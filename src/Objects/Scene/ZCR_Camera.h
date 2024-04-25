@@ -7,7 +7,10 @@
 class ZCR_Camera
 {
 public:
-    ZCR_Camera();
+    virtual ~ZCR_Camera() = default;
+
+    //  Change camera's look on. New position of camera save previous position's (camPos - lookOn) vector.
+    void SetCameraLookOn(const ZC_Vec3<float>& lookOn);
     
     /*
     Trys to connect/disconnect camera's events, like start rotation or change position on mouse scroll. Can't do disconnection if camera allready rotate.
@@ -18,9 +21,12 @@ public:
     Return:
     true if camera already rotate, otherwise false. 
     */
-    bool UseEvents(bool needUse);
-    void SetAxis(ZCR_Axis axis);
-    void SetLookOn(const ZC_Vec3<float>& lookOn);
+    bool SetCameraUseEvents(bool needUse);
+
+protected:
+    ZCR_Camera();
+
+    void SetCameraAxis(ZCR_Axis axis);
 
 private:
     ZC_Camera camera;
@@ -61,6 +67,4 @@ private:
     void MouseWheelDown(float time);
     void MouseWheelUp(float time);
     void MouseWheelScroll(float rotationHorizontal, float rotationVertical, float time);
-
-    ZC_Vec3<float> CalculateOrientation3DPosition();
 };

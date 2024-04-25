@@ -1,10 +1,11 @@
 #include "ZCR_Orientation3D.h"
 
 #include <Renderer/ZCR_FrameBuffer.h>
+#include <Objects/Scene/ZCR_Scene.h>
 
 #include <cassert>
 
-ZCR_Orientation3D::ZCR_Orientation3D(ZCR_Camera* _pZCR_Camera)
+ZCR_Orientation3D::ZCR_Orientation3D()
     : ZC_MouseCollisionWindow(ZC_MouseCollisionWindow::E_Move | ZC_MouseCollisionWindow::E_Down_Mouse_Left,
         &textureSize, &textureSize, &textureSize, &textureSize, true),
     pRender(ZC_Renders::CreateRender(ZCR_FB_Orientation3D, ZC_Render::DS_None,
@@ -13,7 +14,6 @@ ZCR_Orientation3D::ZCR_Orientation3D(ZCR_Camera* _pZCR_Camera)
         ZC_Perspective(45.f, textureSize / textureSize, 0.01f, 100.f), ZC_Ortho(0.f, textureSize, 0.f, textureSize), false, ZCR_FB_Orientation3D),
     orthoSquare(pRender->GetColorTexture(), textureSize, textureSize, 0.f, 0.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel, ZC_FB_Default, true, {}),
     sconCamPosChange(ZC_Camera::GetActiveCamera()->ConnectChangeCameraPosition({ &ZCR_Orientation3D::SetPosition, this })),
-    pZCR_Camera(_pZCR_Camera),
     scbMouseLeft(ZC_ButtonID::M_LEFT, { &ZCR_Orientation3D::MouseLeftButtonDown, this }, nullptr)
 {
     const ZC_Vec2<float>& squareCoords = orthoSquare.GetIndents();
@@ -42,7 +42,7 @@ void ZCR_Orientation3D::SetPosition(const ZC_Vec3<float>& camPos)
 
 void ZCR_Orientation3D::VMouseMoveCollision(float time)
 {
-    if (pZCR_Camera->UseEvents(false)) return;  // camera rotates, can't start cursor collision event before stopping
+    if (ZCR_Scene::GetScene()->SetCameraUseEvents(false)) return;  // camera rotates, can't start cursor collision event before stopping
 
     if (needCalculateTextQuads)
     {
@@ -57,7 +57,7 @@ void ZCR_Orientation3D::VMouseMoveCollision(float time)
 
 void ZCR_Orientation3D::VMouseMoveCollisionEnd(float time)
 {
-    pZCR_Camera->UseEvents(true);
+    ZCR_Scene::GetScene()->SetCameraUseEvents(true);
     textAxices.LeaveActiveArea();
     scbMouseLeft.Disconnect();
 }

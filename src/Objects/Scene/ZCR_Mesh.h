@@ -3,22 +3,30 @@
 #include <ZC/Video/OpenGL/Renderer/ZC_RenderSet.h>
 #include "ZCR_Axis.h"
 
-struct ZCR_Mesh
+class ZCR_Mesh
 {
-
-    ZCR_Mesh(float meshLength);
-    void SetAxis(ZCR_Axis axis);
-
-private:
+public:
     enum CoordSystem
     {
-        none,
-        xy,
-        xz,
-        yz
+        CS_None,    //  don't draw mesh
+        CS_XY,
+        CS_XZ,
+        CS_YZ,
+        CS_Nothing  //  added for specificCoordSystem
     };
 
-    CoordSystem coordSystem { CoordSystem::none };
+    virtual ~ZCR_Mesh() = default;
+
+    void SetMeshSpecificCoordSystem(CoordSystem _coordSystem);
+
+protected:
+    ZCR_Mesh(float meshLength);
+    
+    void SetMeshAxis(ZCR_Axis axis);
+
+private:
+    CoordSystem coordSystem { CoordSystem::CS_None };
+    CoordSystem specificCoordSystem { CoordSystem::CS_Nothing };
     ZC_uptr<ZC_RenderSet> upRendererSet;
     ZC_RSController rsController_axisXY;
     ZC_RSController rsController_axisXZ;

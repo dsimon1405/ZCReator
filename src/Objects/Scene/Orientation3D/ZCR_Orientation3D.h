@@ -1,15 +1,15 @@
 #pragma once
 
 #include <ZC/Tools/ZC_OrthoSquare.h>
-#include <Objects/Scene/ZCR_Camera.h>
 #include <ZC/Collision/ZC_MouseCollisionWindow.h>
 #include <ZC/Events/ZC_SingleClickButton.h>
 #include "ZCR_TextAxises.h"
+#include <ZC/Objects/Camera/ZC_Camera.h>
 
 class ZCR_Orientation3D : public ZC_MouseCollisionWindow
 {
 public:
-    ZCR_Orientation3D(ZCR_Camera* _pZCR_Camera);
+    ZCR_Orientation3D();
 
 private:
     static inline const float textureSize = 100.f;
@@ -19,7 +19,6 @@ private:
     ZCR_TextAxises textAxices;
     ZC_OrthoSquare orthoSquare;
     ZC_SConnection sconCamPosChange;
-    ZCR_Camera* pZCR_Camera;
     bool needCalculateTextQuads = true;   //  calculating textAxices collision quads, only once, on first call VMouseMoveCollision() after camera rotetion
     ZC_SingleClickButton scbMouseLeft;
 

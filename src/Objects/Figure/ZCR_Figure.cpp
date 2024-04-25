@@ -22,7 +22,7 @@ void ZCR_Figure::ChangeSceneMode(ZCR_SceneModes sceneMode)
 void ZCR_Figure::ChangeSceneActivity(bool isActiveOnScene)
 {
     if (figureSet.IsActiveOnScene() == isActiveOnScene) return;
-    figureSet.SwitchToSceneMode(ZCR_Scene::GetActiveSceneMode(), isActiveOnScene);
+    figureSet.SwitchToSceneMode(ZCR_Scene::GetScene()->GetActiveSceneMode(), isActiveOnScene);
 }
 
 void ZCR_Figure::ChangeSceneModeAndActivity(ZCR_SceneModes sceneMode, bool isActiveOnScene)

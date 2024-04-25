@@ -6,9 +6,9 @@
 
 void ZCR_Figures::CreateFigure(typename ZCR_Figure::Name name)
 {
-    if (ZCR_Scene::GetActiveSceneMode() != ZCR_SM_Model)
+    if (ZCR_Scene::GetScene()->GetActiveSceneMode() != ZCR_SM_Model)
     {
-        ZCR_Scene::SetActiveSceneMode(ZCR_SM_Model, false);
+        ZCR_Scene::GetScene()->SetActiveSceneMode(ZCR_SM_Model, false);
         ZCR_ActiveFigures::Clear(false);
         for (auto& upFigure : figures) upFigure->ChangeSceneModeAndActivity(ZCR_SM_Model, false);
     }
