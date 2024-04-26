@@ -22,5 +22,5 @@ private:
     int useLight = true;    //  uses as int in uniform
     bool isActiveOnScene = false;
 
-    void SwitchGLElementOnRendererLevel(ZC_DrawLevel triangle, ZC_DrawLevel line, ZC_DrawLevel point);
+    void SwitchGLElementOnRendererLevel(ZC_DrawerLevel triangle, ZC_DrawerLevel line, ZC_DrawerLevel point);
 };

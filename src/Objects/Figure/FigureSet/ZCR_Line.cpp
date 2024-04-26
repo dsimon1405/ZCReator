@@ -3,11 +3,11 @@
 #include <ZC/Tools/Container/ZC_ContFunc.h>
 
 ZCR_Line::ZCR_Line()
-    : spRendererSetsLine(MakeLineRendererSet()),
-    rsControllerLine(spRendererSetsLine->MakeZC_RSController())
+    : spDrawerSetsLine(CreateLineDrawerSet()),
+    dsControllerLine(spDrawerSetsLine->MakeZC_DSController())
 {}
 
-ZC_sptr<ZC_RenderSet> ZCR_Line::MakeLineRendererSet()
+ZC_sptr<ZC_DrawerSet> ZCR_Line::CreateLineDrawerSet()
 {
     ulong elementsCount = 0;
     GLenum elementsType = 0;
@@ -26,7 +26,7 @@ ZC_sptr<ZC_RenderSet> ZCR_Line::MakeLineRendererSet()
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(ebo));
 
-    return ZC_RenderSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
+    return ZC_DrawerSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
 }
 
 ZC_DA<uchar> ZCR_Line::GetLineElements(ulong& rElementsCount, GLenum& rElementsType)
@@ -81,9 +81,9 @@ std::forward_list<typename ZCR_Line::Lines> ZCR_Line::GetLines(ulong& rElementsC
     return lines;
 }
 
-void ZCR_Line::SwitchRSControllerLine(ZC_DrawLevel drawLevel)
+void ZCR_Line::SwitchRSControllerLine(ZC_DrawerLevel drawerLevel)
 {
-    rsControllerLine.SwitchToDrawLvl(ZC_FB_Default, drawLevel);
+    dsControllerLine.SwitchToDrawLvl(ZC_RL_Default, drawerLevel);
 }
 
 

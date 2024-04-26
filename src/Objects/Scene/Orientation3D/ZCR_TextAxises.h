@@ -20,6 +20,7 @@ struct ZCR_TextAxises
     void CalculateQuads(const ZC_Mat4<float>& perspView, const ZC_Vec2<float>& indents, float textureWidth, float textureHeight);
     //  returns true if need redraw texture (were changed pActiveText)
     bool MakeCursorMoveCollision();
-    void LeaveActiveArea();
+    //  returns true if need redraw texture (were changed pActiveText)
+    bool LeaveActiveArea();
     void MouseLeftButtonDown();
 };

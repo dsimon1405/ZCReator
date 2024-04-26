@@ -1,14 +1,14 @@
 #pragma once
 
 #include "ZCR_VBO.h"
-#include <ZC/Video/OpenGL/Renderer/ZC_RenderSet.h>
+#include <ZC/Video/OpenGL/Renderer/ZC_DrawerSet.h>
 
 struct ZCR_Line : public virtual ZCR_VBO
 {
     ZCR_Line();
 
-    ZC_sptr<ZC_RenderSet> spRendererSetsLine;
-    ZC_RSController rsControllerLine;
+    ZC_sptr<ZC_DrawerSet> spDrawerSetsLine;
+    ZC_DSController dsControllerLine;
 
     struct Lines
     {
@@ -26,13 +26,13 @@ struct ZCR_Line : public virtual ZCR_VBO
         Corners& GetCorners();
     };
 
-    ZC_sptr<ZC_RenderSet> MakeLineRendererSet();
+    ZC_sptr<ZC_DrawerSet> CreateLineDrawerSet();
     ZC_DA<uchar> GetLineElements(ulong& rElementsCount, GLenum& rElementsType);
     std::forward_list<Lines> GetLines(ulong& rElementsCount);
     template<typename TElement>
     void FillLineElements(std::forward_list<Lines>& lines, TElement* pElement);
 
-    void SwitchRSControllerLine(ZC_DrawLevel drawLevel);
+    void SwitchRSControllerLine(ZC_DrawerLevel drawerLevel);
 };
 
 template<typename TElement>

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <ZC/Video/OpenGL/Renderer/ZC_RenderLevelDrawer.h>
+#include <ZC/Video/OpenGL/Renderer/ZC_Drawer.h>
 
-struct ZCR_RendererLevelDrawer
+struct ZCR_DrawerCreator
 {
 private:
     static bool Init();
 
     static inline bool init = Init();
 
-    static ZC_uptr<ZC_RenderLevelDrawer> GetRendererLevelDrawer(ZC_DrawLevel lvl);
+    static ZC_uptr<ZC_Drawer> GetRendererLevelDrawer(ZC_DrawerLevel lvl);
 };

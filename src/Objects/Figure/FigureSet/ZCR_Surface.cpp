@@ -3,11 +3,11 @@
 #include <ZC/Tools/Math/ZC_Math.h>
 
 ZCR_Surface::ZCR_Surface()
-    : spRendererSetsSucafe(MakeSurfaceRendererSet()),
-    rsControllerSurface(MakeSurfaceRSController())
+    : spDrawerSetsSucafe(CreateSurfaceDrawerSet()),
+    dsControllerSurface(MakeSurfaceRSController())
 {}
 
-ZC_sptr<ZC_RenderSet> ZCR_Surface::MakeSurfaceRendererSet()
+ZC_sptr<ZC_DrawerSet> ZCR_Surface::CreateSurfaceDrawerSet()
 {
     ulong elementsCount = 0;
     GLenum elementsType = 0;
@@ -26,7 +26,7 @@ ZC_sptr<ZC_RenderSet> ZCR_Surface::MakeSurfaceRendererSet()
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(ebo));
 
-    return ZC_RenderSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
+    return ZC_DrawerSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
     // switch (element)
     // {
     // case GLElement::Triangle: return { new ZC_RSNonTex(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
@@ -35,14 +35,14 @@ ZC_sptr<ZC_RenderSet> ZCR_Surface::MakeSurfaceRendererSet()
     // }
 }
 
-ZC_RSController ZCR_Surface::MakeSurfaceRSController()
+ZC_DSController ZCR_Surface::MakeSurfaceRSController()
 {
     // std::forward_list<ZC_uptr<ZC_RSPersonalData>>{ZC_RSPDStencilBorder::Make({ 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) })};
     // ZC_RSPDStencilBorder::Make({ 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) });
 
     std::forward_list<ZC_uptr<ZC_RSPersonalData>> persDatas;
     persDatas.emplace_front(ZC_RSPDStencilBorder::Make({ 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) }));    //  stencil border color {r = 255, g = 90, b = 0}
-    return spRendererSetsSucafe->MakeZC_RSController(-1, std::move(persDatas));
+    return spDrawerSetsSucafe->MakeZC_DSController(-1, std::move(persDatas));
 }
 
 ZC_DA<uchar> ZCR_Surface::GetTriangleElements(ulong& rElementsCount, GLenum& rElementsType)
@@ -63,7 +63,7 @@ ZC_DA<uchar> ZCR_Surface::GetTriangleElements(ulong& rElementsCount, GLenum& rEl
     return elements;
 }
 
-void ZCR_Surface::SwitchRSControllerTriangle(ZC_DrawLevel drawLevel)
+void ZCR_Surface::SwitchRSControllerTriangle(ZC_DrawerLevel drawerLevel)
 {
-    rsControllerSurface.SwitchToDrawLvl(ZC_FB_Default, drawLevel);
+    dsControllerSurface.SwitchToDrawLvl(ZC_RL_Default, drawerLevel);
 }

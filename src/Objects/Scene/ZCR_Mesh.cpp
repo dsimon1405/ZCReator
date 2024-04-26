@@ -1,9 +1,5 @@
 #include "ZCR_Mesh.h"
 
-#include <ZC/Video/OpenGL/Buffer/ZC_Buffer.h>
-#include <ZC/Video/OpenGL/Renderer/ZC_Draw.h>
-#include <ZC/Video/OpenGL/Shader/ZC_ShProgs.h>
-#include <ZC/Video/OpenGL/VAO/ZC_VAOs.h>
 #include <ZC/Tools/Math/ZC_Mat4.h>
 
 void ZCR_Mesh::SetMeshSpecificCoordSystem(CoordSystem _coordSystem)
@@ -13,20 +9,20 @@ void ZCR_Mesh::SetMeshSpecificCoordSystem(CoordSystem _coordSystem)
 }
 
 ZCR_Mesh::ZCR_Mesh(float totalLength)
-    : upRendererSet(MakeRendererSet(totalLength)),
-    rsController_axisXY(upRendererSet->MakeZC_RSController()),
-    rsController_axisXZ(upRendererSet->MakeZC_RSController()),
-    rsController_axisYZ(upRendererSet->MakeZC_RSController())
+    : drawerSet(CreateDrawerSet(totalLength)),
+    dsController_axisXY(drawerSet.MakeZC_DSController()),
+    dsController_axisXZ(drawerSet.MakeZC_DSController()),
+    dsController_axisYZ(drawerSet.MakeZC_DSController())
 {
-    rsController_axisXY.SetUniformsData(ZC_UN_unModel, ZC_Mat4<float>{1.f}.Begin());
+    dsController_axisXY.SetUniformsData(ZC_UN_unModel, ZC_Mat4<float>{1.f}.Begin());
 
     ZC_Mat4<float> modelXZ(1.f);
     modelXZ.Rotate(90.f, {1.f, 0.f, 0.f});
-    rsController_axisXZ.SetUniformsData(ZC_UN_unModel, modelXZ.Begin());
+    dsController_axisXZ.SetUniformsData(ZC_UN_unModel, modelXZ.Begin());
 
     ZC_Mat4<float> modelYZ(1.f);
     modelYZ.Rotate(90.f, {0.f, 1.f, 0.f});
-    rsController_axisYZ.SetUniformsData(ZC_UN_unModel, modelYZ.Begin());
+    dsController_axisYZ.SetUniformsData(ZC_UN_unModel, modelYZ.Begin());
     
     SwitchToCoordSystem(CoordSystem::CS_XY);
 }
@@ -46,7 +42,7 @@ void ZCR_Mesh::SetMeshAxis(ZCR_Axis axis)
     }
 }
 
-ZC_uptr<ZC_RenderSet> ZCR_Mesh::MakeRendererSet(float totalLength)
+ZC_DrawerSet ZCR_Mesh::CreateDrawerSet(float totalLength)
 {
     //  (* 2 -> two vertices on one line) (+ 2 -> last line, if totalLength 10 than fifth line(center line) gonna be colored and 5 grey lines from sides
     ZC_DA<ZC_Vec3<float>> vertices((static_cast<ulong>(totalLength) * 2 + 2) * 2);  //  last (* 2) -> pluss same count perpendicular lines 
@@ -79,7 +75,7 @@ ZC_uptr<ZC_RenderSet> ZCR_Mesh::MakeRendererSet(float totalLength)
 
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(vbo));
-    return ZC_RenderSet::CreateUptr(pShPIS, std::move(vao), std::move(upGLDraw), std::move(buffers));
+    return ZC_DrawerSet(pShPIS, std::move(vao), std::move(upGLDraw), std::move(buffers));
 }
 
 void ZCR_Mesh::SwitchToCoordSystem(CoordSystem _coordSystem)
@@ -89,18 +85,18 @@ void ZCR_Mesh::SwitchToCoordSystem(CoordSystem _coordSystem)
     switch (coordSystem)
     {
     case CoordSystem::CS_None: break;
-    case CoordSystem::CS_XY: rsController_axisXY.SwitchToDrawLvl(ZC_FB_Default, ZC_DL_None); break;
-    case CoordSystem::CS_XZ: rsController_axisXZ.SwitchToDrawLvl(ZC_FB_Default, ZC_DL_None); break;
-    case CoordSystem::CS_YZ: rsController_axisYZ.SwitchToDrawLvl(ZC_FB_Default, ZC_DL_None); break;
+    case CoordSystem::CS_XY: dsController_axisXY.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None); break;
+    case CoordSystem::CS_XZ: dsController_axisXZ.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None); break;
+    case CoordSystem::CS_YZ: dsController_axisYZ.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None); break;
     default: break;
     }
     coordSystem = _coordSystem;
     switch (coordSystem)
     {
     case CoordSystem::CS_None: break;
-    case CoordSystem::CS_XY: rsController_axisXY.SwitchToDrawLvl(ZC_FB_Default, ZC_DL_Drawing); break;
-    case CoordSystem::CS_XZ: rsController_axisXZ.SwitchToDrawLvl(ZC_FB_Default, ZC_DL_Drawing); break;
-    case CoordSystem::CS_YZ: rsController_axisYZ.SwitchToDrawLvl(ZC_FB_Default, ZC_DL_Drawing); break;
+    case CoordSystem::CS_XY: dsController_axisXY.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_Drawing); break;
+    case CoordSystem::CS_XZ: dsController_axisXZ.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_Drawing); break;
+    case CoordSystem::CS_YZ: dsController_axisYZ.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_Drawing); break;
     default: break;
     }
 }

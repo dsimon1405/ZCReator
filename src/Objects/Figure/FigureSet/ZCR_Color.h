@@ -2,6 +2,8 @@
 
 #include "ZCR_VBO.h"
 
+#include <forward_list>
+
 struct ZCR_Color : public virtual ZCR_VBO
 {
 protected:

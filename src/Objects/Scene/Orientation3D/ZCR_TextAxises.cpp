@@ -27,22 +27,25 @@ bool ZCR_TextAxises::MakeCursorMoveCollision()
     
     if (pNewActiveText == pActiveMoveText) return false;
 
-    if (pActiveMoveText) pActiveMoveText->SetColor(ZCR_TextAxis::C_Defualt);
+    if (pActiveMoveText) pActiveMoveText->SetColor(ZCR_TextAxis::S_Defualt);
     pActiveMoveText = pNewActiveText;
-    if (pActiveMoveText) pActiveMoveText->SetColor(ZCR_TextAxis::C_ActiveMove);
+    if (pActiveMoveText) pActiveMoveText->SetColor(ZCR_TextAxis::S_UnderCursor);
     return true;
 }
 
-void ZCR_TextAxises::LeaveActiveArea()
+bool ZCR_TextAxises::LeaveActiveArea()
 {
-    if (pActiveMoveText) pActiveMoveText->SetColor(ZCR_TextAxis::C_Defualt);
+    if (!pActiveMoveText) return false;
+    
+    pActiveMoveText->SetColor(ZCR_TextAxis::S_Defualt);
+    return true;
 }
 
 void ZCR_TextAxises::MouseLeftButtonDown()
 {
     if (pActiveMoveText)
     {
-        if (pActiveAxisText) pActiveAxisText->SetColor(ZCR_TextAxis::C_Defualt);
+        if (pActiveAxisText) pActiveAxisText->SetColor(ZCR_TextAxis::S_Defualt);
         pActiveAxisText = pActiveMoveText;
         pActiveMoveText = nullptr;
         pActiveAxisText->MouseLeftButtonDown();

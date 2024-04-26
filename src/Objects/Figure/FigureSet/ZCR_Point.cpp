@@ -3,11 +3,11 @@
 #include <ZC/Tools/Container/ZC_ContFunc.h>
 
 ZCR_Point::ZCR_Point()
-    : spRendererSetsPoint(MakePointRenderSet()),
-    rsControllerPoint(spRendererSetsPoint->MakeZC_RSController())
+    : spDrawerSetsPoint(CreatePointDrawerSet()),
+    dsControllerPoint(spDrawerSetsPoint->MakeZC_DSController())
 {}
 
-ZC_sptr<ZC_RenderSet> ZCR_Point::MakePointRenderSet()
+ZC_sptr<ZC_DrawerSet> ZCR_Point::CreatePointDrawerSet()
 {
     ulong elementsCount = 0;
     GLenum elementsType = 0;
@@ -26,7 +26,7 @@ ZC_sptr<ZC_RenderSet> ZCR_Point::MakePointRenderSet()
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(ebo));
 
-    return ZC_RenderSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
+    return ZC_DrawerSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
 }
 
 ZC_DA<uchar> ZCR_Point::GetPointElements(ulong& rElementsCount, GLenum& rElementsType)
@@ -80,9 +80,9 @@ ulong ZCR_Point::FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>
     }
 }
 
-void ZCR_Point::SwitchRSControllerPoint(ZC_DrawLevel drawLevel)
+void ZCR_Point::SwitchRSControllerPoint(ZC_DrawerLevel drawerLevel)
 {
-    rsControllerPoint.SwitchToDrawLvl(ZC_FB_Default, drawLevel);
+    dsControllerPoint.SwitchToDrawLvl(ZC_RL_Default, drawerLevel);
 }
 
 void ZCR_Point::MakePointsActive(std::list<Points*>&& points)

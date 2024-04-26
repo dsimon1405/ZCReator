@@ -1,22 +1,22 @@
 #pragma once
 
 #include "ZCR_VBO.h"
-#include <ZC/Video/OpenGL/Renderer/ZC_RenderSet.h>
+#include <ZC/Video/OpenGL/Renderer/ZC_DrawerSet.h>
 
 struct ZCR_Surface : public virtual ZCR_VBO
 {
     ZCR_Surface();
 
-    ZC_sptr<ZC_RenderSet> spRendererSetsSucafe;
-    ZC_RSController rsControllerSurface;
+    ZC_sptr<ZC_DrawerSet> spDrawerSetsSucafe;
+    ZC_DSController dsControllerSurface;
 
-    ZC_sptr<ZC_RenderSet> MakeSurfaceRendererSet();
-    ZC_RSController MakeSurfaceRSController();
+    ZC_sptr<ZC_DrawerSet> CreateSurfaceDrawerSet();
+    ZC_DSController MakeSurfaceRSController();
     ZC_DA<uchar> GetTriangleElements(ulong& rElementsCount, GLenum& rElementsType);
     template<typename T>
     static void FillTriangleElements(T* pElementsHead, ulong elementsSize, ulong quadsElementsCount);
 
-    void SwitchRSControllerTriangle(ZC_DrawLevel drawLevel);
+    void SwitchRSControllerTriangle(ZC_DrawerLevel drawerLevel);
 };
 
 template<typename T>

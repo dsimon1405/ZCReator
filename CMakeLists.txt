@@ -64,7 +64,7 @@ set(ZCR_SRC_FILES ${ZCR_SRC_FILES}
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/Orientation3D/ZCR_Orientation3D.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/Orientation3D/ZCR_TextAxis.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/Orientation3D/ZCR_TextAxises.cpp
-    ${PROJECT_SOURCE_DIR}/src/Renderer/ZCR_RendererLevelDrawer.cpp
+    ${PROJECT_SOURCE_DIR}/src/Renderer/ZCR_DrawerCreator.cpp
     )
 
 add_executable(${PROJECT_NAME} ${ZCR_SRC_FILES})

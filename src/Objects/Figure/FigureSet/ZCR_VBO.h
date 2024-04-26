@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ZCR_FigureData.h"
+#include <ZC/Video/OpenGL/Buffer/ZC_Buffer.h>
 
 struct ZCR_VBO : public ZCR_FigureData
 {

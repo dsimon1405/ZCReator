@@ -220,7 +220,6 @@
 //     }
 // };
 
-//  IGWindow for axis
 
 #include <ZC/Objects/Text/ZC_Fonts.h>
 #include <ZC/Objects/Text/ZC_TextWindow.h>
@@ -237,64 +236,80 @@
 #include <ZC/Tools/ZC_OrthoSquare.h>
 #include <ZC/Collision/ZC_MouseCollisionWindow.h>
 
-struct Q
-{
-    float blX = 100.f,
-        blY = 100.f;
-};
+// struct Q
+// {
+//     float blX = 100.f,
+//         blY = 100.f;
+// };
 
-struct Z
-{
-    float blX = 500.f,
-        blY = 500.f,
-        width = 100.f,
-        height = 100.f;
-};
+// struct Z
+// {
+//     float blX = 500.f,
+//         blY = 500.f,
+//         width = 100.f,
+//         height = 100.f;
+// };
 
-struct R
-{
-    float blX = 500.f,
-        blY = 500.f,
-        width = 100.f,
-        height = 100.f;
-};
+// struct R
+// {
+//     float blX = 500.f,
+//         blY = 500.f,
+//         width = 100.f,
+//         height = 100.f;
+// };
 
 
-template<typename T>
-auto Returner()
-{
-    if constexpr (std::same_as<T,R>) return R();
-    else if constexpr (std::same_as<T,Q>) return Q();
-    else if constexpr (std::same_as<T,Z>) return Z();
-    else return 16;
-}
+// template<typename T>
+// auto Returner()
+// {
+//     if constexpr (std::same_as<T,R>) return R();
+//     else if constexpr (std::same_as<T,Q>) return Q();
+//     else if constexpr (std::same_as<T,Z>) return Z();
+//     else return 16;
+// }
 
-template<typename T1, typename T2, typename T3>
-struct W
-{
-    T1 q;
-    T2 z;
-    T3 r;
-    W(T1 _q, T2 _z, T3 _r)
-        : q(_q),
-        z(_z),
-        r(_r)
-    {}
-};
+// template<typename T1, typename T2, typename T3>
+// struct W
+// {
+//     T1 q;
+//     T2 z;
+//     T3 r;
+//     W(T1 _q, T2 _z, T3 _r)
+//         : q(_q),
+//         z(_z),
+//         r(_r)
+//     {}
+// };
 
-template<typename... T>
-auto Func()
-{
-    return W<T...>(Returner<T>()...);
-}
+// template<typename... T>
+// auto Func()
+// {
+//     return W<T...>(Returner<T>()...);
+// }
 
-#include <ZC/Video/OpenGL/Renderer/ZC_RDComplex.h>
+
+// template<typename TEnd>
+// void Foo(TEnd end)
+// {
+//     bool val = end;
+// }
+
+// template<typename THead, typename... TTail>
+// void Foo(THead head, TTail... tail)
+// {
+//     static_assert(std::same_as<bool, THead>);
+//     bool val = head;
+//     Foo(tail...);
+// }
+
+#include <ZC/Video/OpenGL/ZC_GLBlend.h>
 
 void SetColor(float);
 
 int ZC_main()
 {
-    auto q = Func<Q,Z,R>();
+    // auto q = Func<Q,Z,R>();
+    // Foo(true, false, false, true);
 
     using namespace ZC_Window;
     ZC_Window::MakeWindow(
@@ -302,6 +317,18 @@ int ZC_main()
         ZC_Window_Border, 800, 600, "ZeroCreator");
     ZC_Window::SetFPS(0);
     // ZC_Window::NeedDrawFPS(true);
+
+    ZC_GLBlend blend,
+        blend1(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA),
+        blend2(GL_ZERO, GL_ZERO, 1,1,1,1),
+        blend3(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA, 0,1,1,1);
+
+    // blend1.Use();
+    // blend3.Use();
+    // blend2.Use();
+    // blend.Use();
+    // blend1.Use();
+    
 
     ZCR_LoadFonts();
 
@@ -314,8 +341,8 @@ int ZC_main()
     // fbo.Finish();
 
     // // auto tex = ZC_Texture::LoadTexture2D("/home/dmitry/Загрузки/awesomeface.png");
-    // // ZC_OrthoSquare os(&tex, 100, 100, 100, 100, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, ZC_FB_Default);
-    // ZC_OrthoSquare os(ZC_Texture::LoadTexture2D("/home/dmitry/Загрузки/awesomeface.png"), 100, 100, 100, 100, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, ZC_FB_Default);
+    // // ZC_OrthoSquare os(&tex, 100, 100, 100, 100, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, ZC_RL_Default);
+    // ZC_OrthoSquare os(ZC_Texture::LoadTexture2D("/home/dmitry/Загрузки/awesomeface.png"), 100, 100, 100, 100, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, ZC_RL_Default);
     // os.NeedDraw(true);
     // os1 = &os;
     
@@ -328,29 +355,27 @@ int ZC_main()
     ZC_Window::GlEnablePointSize();
     
     ZCR_Scene scene;
-    // scene.SetMeshSpecificCoordSystem(ZCR_Mesh::CS_YZ);
 
 
     std::string str = "Dimp\nL";
 
-    // ZC_TextWindow text({ZC_F_Arial, textHeight}, str, ZC_TA_Left, 0.f, 0.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel);
-    // text.SetColorFloat(1,0,0);
-    // text.SetAlpha(0.5f);
-    // text.NeedDraw(true);
-    // ZC_TextScene text1({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right);
-    // text1.SetPosition({ 0,-4,0 });
-    // text1.SetColorFloat(0,1,0);
-    // text1.NeedDraw(true);
-    // // text1.SetRendererLevel(ZC_DrawLevels::TextScene);
-    // // text2.SetRendererLevel(ZC_DrawLevels::TextScene);
-    // ZC_TextSceneTurnedToCamera textSceneTurn({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, {10.f, 3.f, 0.f});
-    // textSceneTurn.SetColorFloat(1,1,1);
-    // textSceneTurn.NeedDraw(true);
+    ZC_TextWindow text({ZC_F_Arial, textHeight}, str, ZC_TA_Left, 0.f, 0.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel, true);
+    text.SetColorFloat(1,0,0);
+    text.SetAlpha(0.5f);
 
-    // ZC_TextWindowIntoScene textWIS({ZC_F_Arial, textHeight}, ZC_FO_bottomCenter, str, ZC_TextAlignment::ZC_TA_Center, {0.f, 0.f, 0.f});
-    // textWIS.NeedDraw(true);
-    // // ZC_TextWindowIntoScene text2({ZC_F_Arial, textHeight1}, ZC_FO_center, str, ZC_TextAlignment::ZC_TA_Right, { 5, 3, 3 });
-    // // text2.SetColorFloat(0,0,1);
+    ZC_TextScene text1({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, true);
+    text1.SetPosition({ 0,-4,0 });
+    text1.SetColorFloat(0,1,0);
+    // text1.SetRendererLevel(ZC_DrawerLevels::TextScene);
+    // text2.SetRendererLevel(ZC_DrawerLevels::TextScene);
+    ZC_TextSceneTurnedToCamera textSceneTurn({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, {10.f, 3.f, 0.f}, true);
+    textSceneTurn.SetColorFloat(1,1,1);
+
+    ZC_TextWindowIntoScene textWIS({ZC_F_Arial, textHeight}, ZC_FO_bottomCenter, str, ZC_TextAlignment::ZC_TA_Center, {0.f, 0.f, 0.f}, true);
+    ZC_TextWindowIntoScene textWIS2({ZC_F_Arial, textHeight}, ZC_FO_bottomCenter, str, ZC_TextAlignment::ZC_TA_Center, {0.f, -5.f, 0.f}, true);
+    textWIS2.SetColorFloat(0,0,1.f);
+    // ZC_TextWindowIntoScene text2({ZC_F_Arial, textHeight1}, ZC_FO_center, str, ZC_TextAlignment::ZC_TA_Right, { 5, 3, 3 });
+    // text2.SetColorFloat(0,0,1);
     
     
 
@@ -381,7 +406,7 @@ void SetColor(float)
         // pText->SetAlignment(ZC_TA_Left);
         // pText->SetColor({1.f, 0.f, 0.f});
         // pText->NeedDraw(true);
-        // pText->SetRendererLevel(ZC_DrawLevels::TextScene);
+        // pText->SetRendererLevel(ZC_DrawerLevels::TextScene);
         // os1->NeedDraw(false);
         // os1->SetAlpha(0.5f);
         // os1->SetSize(400,100);
@@ -398,7 +423,7 @@ void SetColor(float)
         // pText->SetAlignment(ZC_TA_Right);
         // pText->SetColor({0.f, 1.f, 0.f});
         // pText->NeedDraw(false);
-        // pText->SetRendererLevel(ZC_DrawLevels::OrthoBlend);
+        // pText->SetRendererLevel(ZC_DrawerLevels::OrthoBlend);
         // os1->NeedDraw(true);
         // os1->SetAlpha(1.f);
         // os1->SetSize(100,100);
