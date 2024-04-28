@@ -357,25 +357,25 @@ int ZC_main()
     ZCR_Scene scene;
 
 
-    std::string str = "Dimp\nL";
+    // std::string str = "Dimp\nL";
 
-    ZC_TextWindow text({ZC_F_Arial, textHeight}, str, ZC_TA_Left, 0.f, 0.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel, true);
-    text.SetColorFloat(1,0,0);
-    text.SetAlpha(0.5f);
+    // ZC_TextWindow text({ZC_F_Arial, textHeight}, str, ZC_TA_Left, 0.f, 0.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel, true);
+    // text.SetColorFloat(1,0,0);
+    // text.SetAlpha(0.5f);
 
-    ZC_TextScene text1({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, true);
-    text1.SetPosition({ 0,-4,0 });
-    text1.SetColorFloat(0,1,0);
-    // text1.SetRendererLevel(ZC_DrawerLevels::TextScene);
-    // text2.SetRendererLevel(ZC_DrawerLevels::TextScene);
-    ZC_TextSceneTurnedToCamera textSceneTurn({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, {10.f, 3.f, 0.f}, true);
-    textSceneTurn.SetColorFloat(1,1,1);
+    // ZC_TextScene text1({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, true);
+    // text1.SetPosition({ 0,-4,0 });
+    // text1.SetColorFloat(0,1,0);
+    // // text1.SetRendererLevel(ZC_DrawerLevels::TextScene);
+    // // text2.SetRendererLevel(ZC_DrawerLevels::TextScene);
+    // ZC_TextSceneTurnedToCamera textSceneTurn({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, {10.f, 3.f, 0.f}, true);
+    // textSceneTurn.SetColorFloat(1,1,1);
 
-    ZC_TextWindowIntoScene textWIS({ZC_F_Arial, textHeight}, ZC_FO_bottomCenter, str, ZC_TextAlignment::ZC_TA_Center, {0.f, 0.f, 0.f}, true);
-    ZC_TextWindowIntoScene textWIS2({ZC_F_Arial, textHeight}, ZC_FO_bottomCenter, str, ZC_TextAlignment::ZC_TA_Center, {0.f, -5.f, 0.f}, true);
-    textWIS2.SetColorFloat(0,0,1.f);
-    // ZC_TextWindowIntoScene text2({ZC_F_Arial, textHeight1}, ZC_FO_center, str, ZC_TextAlignment::ZC_TA_Right, { 5, 3, 3 });
-    // text2.SetColorFloat(0,0,1);
+    // ZC_TextWindowIntoScene textWIS({ZC_F_Arial, textHeight}, ZC_FO_bottomCenter, str, ZC_TextAlignment::ZC_TA_Center, {0.f, 0.f, 0.f}, true);
+    // ZC_TextWindowIntoScene textWIS2({ZC_F_Arial, textHeight}, ZC_FO_bottomCenter, str, ZC_TextAlignment::ZC_TA_Center, {0.f, -5.f, 0.f}, true);
+    // textWIS2.SetColorFloat(0,0,1.f);
+    // // ZC_TextWindowIntoScene text2({ZC_F_Arial, textHeight1}, ZC_FO_center, str, ZC_TextAlignment::ZC_TA_Right, { 5, 3, 3 });
+    // // text2.SetColorFloat(0,0,1);
     
     
 

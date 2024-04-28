@@ -4,6 +4,15 @@
 
 void ZCR_TextAxises::SetPosition(const ZC_Vec3<float>& newPosition)
 {
+    if (pActiveAxisText)
+    {
+        if (!fistCamMoveAfterMakeAxisActive)
+        {
+            pActiveAxisText->SetState(ZCR_TextAxis::S_Default);
+            pActiveAxisText = nullptr;
+        }
+        fistCamMoveAfterMakeAxisActive = false;
+    }
     for (auto& text : texts) text.SetPosition(newPosition);
 }
 
@@ -27,9 +36,9 @@ bool ZCR_TextAxises::MakeCursorMoveCollision()
     
     if (pNewActiveText == pActiveMoveText) return false;
 
-    if (pActiveMoveText) pActiveMoveText->SetColor(ZCR_TextAxis::S_Defualt);
+    if (pActiveMoveText) pActiveMoveText->SetState(ZCR_TextAxis::S_Default);
     pActiveMoveText = pNewActiveText;
-    if (pActiveMoveText) pActiveMoveText->SetColor(ZCR_TextAxis::S_UnderCursor);
+    if (pActiveMoveText) pActiveMoveText->SetState(ZCR_TextAxis::S_UnderCursor);
     return true;
 }
 
@@ -37,7 +46,7 @@ bool ZCR_TextAxises::LeaveActiveArea()
 {
     if (!pActiveMoveText) return false;
     
-    pActiveMoveText->SetColor(ZCR_TextAxis::S_Defualt);
+    pActiveMoveText->SetState(ZCR_TextAxis::S_Default);
     return true;
 }
 
@@ -45,9 +54,10 @@ void ZCR_TextAxises::MouseLeftButtonDown()
 {
     if (pActiveMoveText)
     {
-        if (pActiveAxisText) pActiveAxisText->SetColor(ZCR_TextAxis::S_Defualt);
+        if (pActiveAxisText) pActiveAxisText->SetState(ZCR_TextAxis::S_Default);
         pActiveAxisText = pActiveMoveText;
         pActiveMoveText = nullptr;
+        fistCamMoveAfterMakeAxisActive = true;
         pActiveAxisText->MouseLeftButtonDown();
     }
 }

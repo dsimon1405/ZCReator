@@ -15,6 +15,7 @@ struct ZCR_TextAxises
         ZCR_TextAxis(ZCR_A_PositiveZ, { 0.f, 0.f, 1.f }, "+Z", ZC_PackColorUCharToUInt(0, 180, 225)),
         ZCR_TextAxis(ZCR_A_NegativeZ, { 0.f, 0.f, -1.f }, "-Z", ZC_PackColorUCharToUInt(0, 155, 225)),
     };
+    bool fistCamMoveAfterMakeAxisActive = false;
 
     void SetPosition(const ZC_Vec3<float>& newPosition);
     void CalculateQuads(const ZC_Mat4<float>& perspView, const ZC_Vec2<float>& indents, float textureWidth, float textureHeight);

@@ -9,11 +9,12 @@ struct ZCR_TextAxis
 {
     enum State
     {
-        S_Defualt,
+        S_Default,
         S_UnderCursor,
         S_ActiveAxis,
     };
-                                                //  state !!!!!
+    
+    State state = S_Default;
     ZCR_Axis axis;
     ZC_Vec3<float> startPosition;
     ZC_TextWindowIntoScene textWindowIntoScene;
@@ -29,6 +30,6 @@ struct ZCR_TextAxis
     void CalculateQuad(const ZC_Mat4<float>& perspView, const ZC_Vec2<float>& windowIndents, float textureWidth, float textureHeight);
     //  if depth less then activeDepth (closer to camera) and cursor in text area returns pointer on itself.
     bool MakeCursorCollision(float cursorX, float cursorY, float activeDepth);
-    void SetColor(State color);
+    void SetState(State _state);
     void MouseLeftButtonDown();
 };

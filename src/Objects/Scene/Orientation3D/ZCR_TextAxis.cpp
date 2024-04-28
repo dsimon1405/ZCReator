@@ -45,19 +45,32 @@ bool ZCR_TextAxis::MakeCursorCollision(float cursorX, float cursorY, float activ
     return blX < cursorX && blY < cursorY && trX > cursorX && trY > cursorY && depth < activeDepth;
 }
 
-void ZCR_TextAxis::SetColor(State color)
+void ZCR_TextAxis::SetState(State _state)
 {
+    if (state == _state) return;
+
     static uint colorActiveAxis = ZC_PackColorUCharToUInt(255, 255, 255);   //  white color
-    switch (color)
+
+    //  in current state need change only drawer level if current state is S_ActiveAxis
+    if (state == S_UnderCursor) 
+        textWindowIntoScene.SetDrawerLevel(ZC_DrawerLevels::TextWindowIntoScene);
+    
+    switch (_state) //  set new state
     {
-    case S_Defualt: textWindowIntoScene.SetColorUInt(defaultColor); break;
-    case S_UnderCursor: textWindowIntoScene.SetColorUInt(0); break;      //  black color
+    case S_Default: textWindowIntoScene.SetColorUInt(defaultColor); break;
+    case S_UnderCursor:
+    {
+        textWindowIntoScene.SetDrawerLevel(ZC_DrawerLevels::OrthoBlend);
+        textWindowIntoScene.SetColorUInt(0);      //  black color
+    } break;
     case S_ActiveAxis: textWindowIntoScene.SetColorUInt(colorActiveAxis); break;
     }
+
+    state = _state;
 }
 
 void ZCR_TextAxis::MouseLeftButtonDown()
 {
     ZCR_Scene::GetScene()->SetAxise(axis);
-    SetColor(S_ActiveAxis);
+    SetState(S_ActiveAxis);
 }
