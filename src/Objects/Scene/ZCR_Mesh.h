@@ -12,12 +12,13 @@ public:
         CS_XY,
         CS_XZ,
         CS_YZ,
-        CS_Nothing  //  added for specificCoordSystem
+        CS_Auto  //  added for specificCoordSystem
     };
 
     virtual ~ZCR_Mesh() = default;
 
     void SetMeshSpecificCoordSystem(CoordSystem _coordSystem);
+    CoordSystem GetMeshSpecificCoordSystem();
 
 protected:
     ZCR_Mesh(float meshLength);
@@ -26,7 +27,7 @@ protected:
 
 private:
     CoordSystem coordSystem { CoordSystem::CS_None };
-    CoordSystem specificCoordSystem { CoordSystem::CS_Nothing };
+    CoordSystem specificCoordSystem { CoordSystem::CS_Auto };
     ZC_DrawerSet drawerSet;
     ZC_DSController dsController_axisXY;
     ZC_DSController dsController_axisXZ;

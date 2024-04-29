@@ -25,19 +25,53 @@ ZCR_Orientation3D::ZCR_Orientation3D()
     SetPosition(ZC_Camera::GetActiveCamera()->GetPosition());
 }
 
+ZCR_Orientation3D::~ZCR_Orientation3D()
+{
+    sconCamPosChange.Disconnect();
+}
+
+void ZCR_Orientation3D::Activate()
+{
+    if (isActive) return;
+    isActive = true;
+    if (!sconCamPosChange.IsConnected()) sconCamPosChange = std::move(ZC_Camera::GetActiveCamera()->ConnectChangeCameraPosition({ &ZCR_Orientation3D::SetPosition, this }));
+    scbMouseLeft.Connect();
+    orthoSquare.NeedDraw(true);
+    textAxices.PrepareReconnect();
+    SetPosition(ZC_Camera::GetActiveCamera()->GetPosition());
+    this->ConnectMouseCollision();
+}
+
+void ZCR_Orientation3D::Deactivate()
+{
+    if (!isActive) return;
+    isActive = false;
+    scbMouseLeft.Disconnect();
+    orthoSquare.NeedDraw(false);
+    this->DisconnectMouseConllision();
+}
+
 void ZCR_Orientation3D::SetPosition(const ZC_Vec3<float>& camPos)
 {
-    auto lookOn = ZC_Camera::GetActiveCamera()->GetLookOn();
-    
-    camera.SetPosition(camPos);
-    camera.SetLookOn(lookOn);
-    camera.SetUp(ZC_Camera::GetActiveCamera()->GetUp());
+    if (isActive)
+    {
+        auto lookOn = ZC_Camera::GetActiveCamera()->GetLookOn();
+        
+        camera.SetPosition(camPos);
+        camera.SetLookOn(lookOn);
+        camera.SetUp(ZC_Camera::GetActiveCamera()->GetUp());
 
-    textAxices.SetPosition(ZC_Vec::MoveByLength(camPos, lookOn - camPos, 3.3f));        //  3.3 -> distance from camera to loockOn (orientation3D)
+        textAxices.SetPosition(ZC_Vec::MoveByLength(camPos, lookOn - camPos, 3.3f));        //  3.3 -> distance from camera to loockOn (orientation3D)
 
-    pRender->SetDrawState(ZC_Render::DS_OneFrame);
+        pRender->SetDrawState(ZC_Render::DS_OneFrame);
 
-    needCalculateTextQuads = true;
+        needCalculateTextQuads = true;
+    }
+    else
+    {
+        textAxices.CamMoveWhileDeactivated();
+        sconCamPosChange.Disconnect();
+    }
 }
 
 void ZCR_Orientation3D::VMouseMoveCollision(float time)

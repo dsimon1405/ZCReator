@@ -236,150 +236,36 @@
 #include <ZC/Tools/ZC_OrthoSquare.h>
 #include <ZC/Collision/ZC_MouseCollisionWindow.h>
 
-// struct Q
-// {
-//     float blX = 100.f,
-//         blY = 100.f;
-// };
-
-// struct Z
-// {
-//     float blX = 500.f,
-//         blY = 500.f,
-//         width = 100.f,
-//         height = 100.f;
-// };
-
-// struct R
-// {
-//     float blX = 500.f,
-//         blY = 500.f,
-//         width = 100.f,
-//         height = 100.f;
-// };
-
-
-// template<typename T>
-// auto Returner()
-// {
-//     if constexpr (std::same_as<T,R>) return R();
-//     else if constexpr (std::same_as<T,Q>) return Q();
-//     else if constexpr (std::same_as<T,Z>) return Z();
-//     else return 16;
-// }
-
-// template<typename T1, typename T2, typename T3>
-// struct W
-// {
-//     T1 q;
-//     T2 z;
-//     T3 r;
-//     W(T1 _q, T2 _z, T3 _r)
-//         : q(_q),
-//         z(_z),
-//         r(_r)
-//     {}
-// };
-
-// template<typename... T>
-// auto Func()
-// {
-//     return W<T...>(Returner<T>()...);
-// }
-
-
-// template<typename TEnd>
-// void Foo(TEnd end)
-// {
-//     bool val = end;
-// }
-
-// template<typename THead, typename... TTail>
-// void Foo(THead head, TTail... tail)
-// {
-//     static_assert(std::same_as<bool, THead>);
-//     bool val = head;
-//     Foo(tail...);
-// }
-
-#include <ZC/Video/OpenGL/ZC_GLBlend.h>
 
 void SetColor(float);
 
+void Fo(ZC_ButtonID id, float time)
+{
+    ZC_cout(std::to_string(id));
+    auto q = id;
+}
+
 int ZC_main()
 {
-    // auto q = Func<Q,Z,R>();
-    // Foo(true, false, false, true);
-
     using namespace ZC_Window;
     ZC_Window::MakeWindow(
-        // ZC_Window_Multisampling_2 | 
+        ZC_Window_Multisampling_4 | 
         ZC_Window_Border, 800, 600, "ZeroCreator");
     ZC_Window::SetFPS(0);
-    // ZC_Window::NeedDrawFPS(true);
-
-    ZC_GLBlend blend,
-        blend1(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA),
-        blend2(GL_ZERO, GL_ZERO, 1,1,1,1),
-        blend3(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA, 0,1,1,1);
-
-    // blend1.Use();
-    // blend3.Use();
-    // blend2.Use();
-    // blend.Use();
-    // blend1.Use();
-    
+    ZC_Window::NeedDrawFPS(true);
 
     ZCR_LoadFonts();
 
-    // Q q;
-    // Z z;
-
-    // ZC_FBO fbo(ZC_Viewport::CreateStandardWindowViewport(), 4, ZC_FBO::CIF_None, ZC_FBO::DSIF_GL_DEPTH24_STENCIL8, ZC_FBO::RT_Depth_Stencil);
-
-    // fbo.Use();
-    // fbo.Finish();
-
-    // // auto tex = ZC_Texture::LoadTexture2D("/home/dmitry/Загрузки/awesomeface.png");
-    // // ZC_OrthoSquare os(&tex, 100, 100, 100, 100, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, ZC_RL_Default);
-    // ZC_OrthoSquare os(ZC_Texture::LoadTexture2D("/home/dmitry/Загрузки/awesomeface.png"), 100, 100, 100, 100, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, ZC_RL_Default);
-    // os.NeedDraw(true);
-    // os1 = &os;
-    
     ulong textHeight = 150;
     ulong textHeight1 = 151;
     ZC_FontData fonts[]{ { ZC_FontName::ZC_F_Arial, textHeight },{ ZC_FontName::ZC_F_Arial, textHeight1 } };
     ZC_Fonts::Load(fonts, 2);
-
-    ZC_Window::GlClearColor(0.3f, 0.3f, 0.3f, 1.f);
-    ZC_Window::GlEnablePointSize();
     
     ZCR_Scene scene;
-
-
-    // std::string str = "Dimp\nL";
-
-    // ZC_TextWindow text({ZC_F_Arial, textHeight}, str, ZC_TA_Left, 0.f, 0.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel, true);
-    // text.SetColorFloat(1,0,0);
-    // text.SetAlpha(0.5f);
-
-    // ZC_TextScene text1({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, true);
-    // text1.SetPosition({ 0,-4,0 });
-    // text1.SetColorFloat(0,1,0);
-    // // text1.SetRendererLevel(ZC_DrawerLevels::TextScene);
-    // // text2.SetRendererLevel(ZC_DrawerLevels::TextScene);
-    // ZC_TextSceneTurnedToCamera textSceneTurn({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, {10.f, 3.f, 0.f}, true);
-    // textSceneTurn.SetColorFloat(1,1,1);
-
-    // ZC_TextWindowIntoScene textWIS({ZC_F_Arial, textHeight}, ZC_FO_bottomCenter, str, ZC_TextAlignment::ZC_TA_Center, {0.f, 0.f, 0.f}, true);
-    // ZC_TextWindowIntoScene textWIS2({ZC_F_Arial, textHeight}, ZC_FO_bottomCenter, str, ZC_TextAlignment::ZC_TA_Center, {0.f, -5.f, 0.f}, true);
-    // textWIS2.SetColorFloat(0,0,1.f);
-    // // ZC_TextWindowIntoScene text2({ZC_F_Arial, textHeight1}, ZC_FO_center, str, ZC_TextAlignment::ZC_TA_Right, { 5, 3, 3 });
-    // // text2.SetColorFloat(0,0,1);
     
-    
-
-    ZC_Events::ConnectButtonDown(ZC_ButtonID::K_Q, {&SetColor}, false);
+    ZC_SConnection q1, q2;
+    q1 = ZC_Events::ConnectFirstDownButton({ &Fo });
+    q2 = std::move(ZC_Events::ConnectButtonDown(ZC_ButtonID::K_Q, {&SetColor}, false));
 
     ZC_Window::RuntMainCycle();
     
@@ -429,6 +315,33 @@ void SetColor(float)
         // os1->SetSize(100,100);
         current = first;
     }
+
+
+
+
+
+
+    /// TEXT
+
+    // std::string str = "Dimp\nL";
+
+    // ZC_TextWindow text({ZC_F_Arial, textHeight}, str, ZC_TA_Left, 0.f, 0.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel, true);
+    // text.SetColorFloat(1,0,0);
+    // text.SetAlpha(0.5f);
+
+    // ZC_TextScene text1({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, true);
+    // text1.SetPosition({ 0,-4,0 });
+    // text1.SetColorFloat(0,1,0);
+    // // text1.SetRendererLevel(ZC_DrawerLevels::TextScene);
+    // // text2.SetRendererLevel(ZC_DrawerLevels::TextScene);
+    // ZC_TextSceneTurnedToCamera textSceneTurn({ZC_F_Arial, textHeight}, str, ZC_TextAlignment::ZC_TA_Right, {10.f, 3.f, 0.f}, true);
+    // textSceneTurn.SetColorFloat(1,1,1);
+
+    // ZC_TextWindowIntoScene textWIS({ZC_F_Arial, textHeight}, ZC_FO_bottomCenter, str, ZC_TextAlignment::ZC_TA_Center, {0.f, 0.f, 0.f}, true);
+    // ZC_TextWindowIntoScene textWIS2({ZC_F_Arial, textHeight}, ZC_FO_bottomCenter, str, ZC_TextAlignment::ZC_TA_Center, {0.f, -5.f, 0.f}, true);
+    // textWIS2.SetColorFloat(0,0,1.f);
+    // // ZC_TextWindowIntoScene text2({ZC_F_Arial, textHeight1}, ZC_FO_center, str, ZC_TextAlignment::ZC_TA_Right, { 5, 3, 3 });
+    // // text2.SetColorFloat(0,0,1);
 }
 
 

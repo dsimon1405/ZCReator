@@ -6,12 +6,12 @@ void ZCR_TextAxises::SetPosition(const ZC_Vec3<float>& newPosition)
 {
     if (pActiveAxisText)
     {
-        if (!fistCamMoveAfterMakeAxisActive)
+        if (!isNeedMakeActiveAxisDefault)
         {
             pActiveAxisText->SetState(ZCR_TextAxis::S_Default);
             pActiveAxisText = nullptr;
         }
-        fistCamMoveAfterMakeAxisActive = false;
+        isNeedMakeActiveAxisDefault = false;
     }
     for (auto& text : texts) text.SetPosition(newPosition);
 }
@@ -57,7 +57,20 @@ void ZCR_TextAxises::MouseLeftButtonDown()
         if (pActiveAxisText) pActiveAxisText->SetState(ZCR_TextAxis::S_Default);
         pActiveAxisText = pActiveMoveText;
         pActiveMoveText = nullptr;
-        fistCamMoveAfterMakeAxisActive = true;
+        isNeedMakeActiveAxisDefault = true;
         pActiveAxisText->MouseLeftButtonDown();
     }
+}
+
+void ZCR_TextAxises::PrepareReconnect()
+{
+    if (pActiveAxisText) isNeedMakeActiveAxisDefault = true;
+}
+
+void ZCR_TextAxises::CamMoveWhileDeactivated()
+{
+    if (!pActiveAxisText) return;
+    
+    pActiveAxisText->SetState(ZCR_TextAxis::S_Default);
+    pActiveAxisText = nullptr;
 }
