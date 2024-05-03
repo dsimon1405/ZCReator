@@ -5,11 +5,11 @@
 #include <imgui.h>
 
 ZCR_IGWScene::ZCR_IGWScene()
-    : ZC_IGWindow("Scene", false, 300.f, 160.f, 0.f, 0.f, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, true,
+    : ZC_IGWBM(K_I, true, false, "Scene", false, 300.f, 160.f, 0.f, 0.f, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, true,
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)
 {}
 
-void ZCR_IGWScene::DrawWindow()
+void ZCR_IGWScene::VDrawWindowIGW()
 {
     ImGui::Text("                   Mesh");
     if (ImGui::BeginTable("Mesh", 5, 0))
@@ -29,6 +29,19 @@ void ZCR_IGWScene::DrawWindow()
         ImGui::EndTable();
     }
 
-    static bool isOrienttion3D = true;
-    if (ImGui::Checkbox("Orientation3D", &isOrienttion3D)) isOrienttion3D ? orientatin3D.Activate() : orientatin3D.Deactivate();
+    if (ImGui::Checkbox("Orientation3D", &checkBoxIsOrienttion3D)) checkBoxIsOrienttion3D ? orientatin3D.Activate() : orientatin3D.Deactivate();
+}
+
+void ZCR_IGWScene::VCallButtonDownBM(ZC_ButtonID buttonId, float time)
+{
+    switch (buttonId)
+    {
+    case K_O:
+    {
+        checkBoxIsOrienttion3D = !checkBoxIsOrienttion3D;
+        checkBoxIsOrienttion3D ? orientatin3D.Activate() : orientatin3D.Deactivate();
+    } break;
+    
+    default: break;
+    }
 }

@@ -2,9 +2,9 @@
 
 #include <ZC/Tools/ZC_OrthoSquare.h>
 #include <ZC/Collision/ZC_MouseCollisionWindow.h>
-#include <ZC/Events/ZC_SingleClickButton.h>
 #include "ZCR_TextAxises.h"
 #include <ZC/Objects/Camera/ZC_Camera.h>
+#include <ZC/Events/ZC_ButtonID.h>
 
 class ZCR_Orientation3D : public ZC_MouseCollisionWindow
 {
@@ -14,6 +14,7 @@ public:
 
     void Activate();
     void Deactivate();
+    bool IsActive() const noexcept;
 
 private:
     static inline const float textureSize = 100.f;
@@ -22,9 +23,10 @@ private:
     ZC_Camera camera;   //  camera only for that pRender
     ZCR_TextAxises textAxices;
     ZC_OrthoSquare orthoSquare;
-    ZC_SConnection sconCamPosChange;
+    ZC_EC ecCamPosChange,
+        ecMouseLeftButtonClick,
+        ecWindowResize;
     bool needCalculateTextQuads = true;   //  calculating textAxices collision quads, only once, on first call VMouseMoveCollision() after camera rotetion
-    ZC_SingleClickButton scbMouseLeft;
     bool isActive = true;
 
     ZC_Render* CreateRender();
@@ -33,5 +35,6 @@ private:
     void VMouseMoveCollision(float time) override;
     void VMouseMoveCollisionEnd(float time) override;
     void CalculateTextPositions();
-    void MouseLeftButtonDown(float time);
+    void MouseLeftButtonDown(ZC_ButtonID buttonId, float time);
+    void WindowResize(float widht, float height);
 };

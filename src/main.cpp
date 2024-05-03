@@ -236,14 +236,128 @@
 #include <ZC/Tools/ZC_OrthoSquare.h>
 #include <ZC/Collision/ZC_MouseCollisionWindow.h>
 
+#include <ZC/Events/ZC_ESignal.h>
 
-void SetColor(float);
 
-void Fo(ZC_ButtonID id, float time)
-{
-    ZC_cout(std::to_string(id));
-    auto q = id;
-}
+#include <ZC/Tools/ZC_ButtonManipulator.h>
+
+// struct A : public ZC_ButtonManipulator
+// {
+//     A() : ZC_ButtonManipulator(K_Q, true) {}
+
+//     void VCallButtonDown(ZC_ButtonID buttonId, float time) override
+//     {
+//         switch (buttonId)
+//         {
+//         case K_W: W(); break;
+//         case K_E: E(); break;
+//         case K_R: R(); break;
+//         default: break;
+//         }
+//     }
+    
+//     void VActivate() override
+//     {
+//         ZC_cout("A enable");
+//     }
+    
+//     void VDeactivate() override
+//     {
+//         ZC_cout("A disable");
+//     }
+
+//     void W()
+//     {
+//         ZC_cout("W");
+//     }
+//     void E()
+//     {
+//         ZC_cout("E");
+//     }
+//     void R()
+//     {
+//         ZC_cout("R");
+//     }
+// };
+
+// struct B : public ZC_ButtonManipulator
+// {
+//     B() : ZC_ButtonManipulator(K_A, false) {}
+
+//     void VCallButtonDown(ZC_ButtonID buttonId, float time) override
+//     {
+//         switch (buttonId)
+//         {
+//         case K_W: W(); break;
+//         case K_S: S(); break;
+//         case K_D: D(); break;
+//         default: break;
+//         }
+//     }
+    
+//     void VActivate() override
+//     {
+//         ZC_cout("B enable");
+//     }
+    
+//     void VDeactivate() override
+//     {
+//         ZC_cout("B disable");
+//     }
+
+//     void W()
+//     {
+//         ZC_cout("W");
+//     }
+//     void S()
+//     {
+//         ZC_cout("S");
+//     }
+//     void D()
+//     {
+//         ZC_cout("D");
+//     }
+// };
+
+// struct C : public ZC_ButtonManipulator
+// {
+//     C() : ZC_ButtonManipulator(K_I, true) {}
+
+//     void VCallButtonDown(ZC_ButtonID buttonId, float time) override
+//     {
+//         switch (buttonId)
+//         {
+//         case K_T: T(); break;
+//         case K_Y: Y(); break;
+//         case K_U: U(); break;
+//         default: break;
+//         }
+//     }
+    
+//     void VActivate() override
+//     {
+//         ZC_cout("C enable");
+//     }
+    
+//     void VDeactivate() override
+//     {
+//         ZC_cout("C disable");
+//     }
+
+//     void T()
+//     {
+//         ZC_cout("T");
+//     }
+//     void Y()
+//     {
+//         ZC_cout("Y");
+//     }
+//     void U()
+//     {
+//         ZC_cout("U");
+//     }
+// };
+
 
 int ZC_main()
 {
@@ -254,74 +368,31 @@ int ZC_main()
     ZC_Window::SetFPS(0);
     ZC_Window::NeedDrawFPS(true);
 
-    ZCR_LoadFonts();
 
-    ulong textHeight = 150;
-    ulong textHeight1 = 151;
-    ZC_FontData fonts[]{ { ZC_FontName::ZC_F_Arial, textHeight },{ ZC_FontName::ZC_F_Arial, textHeight1 } };
-    ZC_Fonts::Load(fonts, 2);
+    // A a;
+    // B b;
+    // C c;
+
+
+    ZCR_LoadFonts();
     
     ZCR_Scene scene;
     
-    ZC_SConnection q1, q2;
-    q1 = ZC_Events::ConnectFirstDownButton({ &Fo });
-    q2 = std::move(ZC_Events::ConnectButtonDown(ZC_ButtonID::K_Q, {&SetColor}, false));
 
     ZC_Window::RuntMainCycle();
     
     return 0;
 }
 
-std::string first = "first\nLol\nsdaasdffffffafsdf\nsdaf",
-    second = "{seconD}}\nasdf'_",
-    current = first;
-
-bool needDraw = true;
-void SetColor(float)
-{
-    needDraw = !needDraw;
-    // ZC_IGWindow::NeedImGuiDraw(needDraw);
-    if (current == first)
-    {
-        // pText->NeedDraw(false);
-        // pText->SetTextAndAlignment(second, ZC_TextAlignment::Left);
-        // pText->SetColor({1.f, 1.f, 0.f});
-        // pText->SetIndentData(0.2f, 90.f, ZC_WOIF__X_Left_Percent | ZC_WOIF__Y_Center);
-        // pText->SetPosition({5.f, 0.f, 2.f});
-        // pText->SetScale(0.001);
-        // pText->SetAlignment(ZC_TA_Left);
-        // pText->SetColor({1.f, 0.f, 0.f});
-        // pText->NeedDraw(true);
-        // pText->SetRendererLevel(ZC_DrawerLevels::TextScene);
-        // os1->NeedDraw(false);
-        // os1->SetAlpha(0.5f);
-        // os1->SetSize(400,100);
-        current = second;
-    }
-    else
-    {
-        // pText->NeedDraw(true);
-        // pText->SetTextAndAlignment(first, ZC_TextAlignment::Right);
-        // pText->SetColor({0.f, 1.f, 1.f});
-        // pText->SetIndentData(20.f, 40.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel);
-        // pText->SetPosition({0.f, 0.f, 0.f});
-        // pText->SetScale(0.01);
-        // pText->SetAlignment(ZC_TA_Right);
-        // pText->SetColor({0.f, 1.f, 0.f});
-        // pText->NeedDraw(false);
-        // pText->SetRendererLevel(ZC_DrawerLevels::OrthoBlend);
-        // os1->NeedDraw(true);
-        // os1->SetAlpha(1.f);
-        // os1->SetSize(100,100);
-        current = first;
-    }
-
-
-
 
 
 
     /// TEXT
+
+    // ulong textHeight = 150;
+    // ulong textHeight1 = 151;
+    // ZC_FontData fonts[]{ { ZC_FontName::ZC_F_Arial, textHeight },{ ZC_FontName::ZC_F_Arial, textHeight1 } };
+    // ZC_Fonts::Load(fonts, 2);
 
     // std::string str = "Dimp\nL";
 
@@ -342,7 +413,7 @@ void SetColor(float)
     // textWIS2.SetColorFloat(0,0,1.f);
     // // ZC_TextWindowIntoScene text2({ZC_F_Arial, textHeight1}, ZC_FO_center, str, ZC_TextAlignment::ZC_TA_Right, { 5, 3, 3 });
     // // text2.SetColorFloat(0,0,1);
-}
+
 
 
 //  pos = perspView * pos       -> with w divisor component

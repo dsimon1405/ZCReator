@@ -14,5 +14,5 @@ private:
     ZCR_IGWFigures igwFigures;
     ZCR_IGWScene igwScene;
 
-    void DrawWindow() override;
+    void VDrawWindowIGW() override;
 };

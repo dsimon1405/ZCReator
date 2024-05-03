@@ -8,11 +8,11 @@ ZCR_IGWCreateAndMode::ZCR_IGWCreateAndMode()
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse)
 {}
 
-void ZCR_IGWCreateAndMode::DrawWindow()
+void ZCR_IGWCreateAndMode::VDrawWindowIGW()
 {
     // ImGui::ShowDemoWindow();
-    if (ImGui::Button("Scene", { 100.f, 20.f })) igwScene.NeedDraw(true);
-    if (ImGui::Button("Create Figure", { 100.f, 20.f })) igwFigures.NeedDraw(true);
+    if (ImGui::Button("Scene", { 100.f, 20.f })) igwScene.NeedDrawIGW(true);
+    if (ImGui::Button("Create Figure", { 100.f, 20.f })) igwFigures.NeedDrawIGW(true);
     
     ZCR_Scene* pScene = ZCR_Scene::GetScene();
     if (ImGui::RadioButton("Model", pScene->GetActiveSceneMode() == ZCR_SM_Model)) pScene->SetActiveSceneMode(ZCR_SM_Model, true);

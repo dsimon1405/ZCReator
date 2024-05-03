@@ -6,7 +6,7 @@
 
 ZCR_Camera::ZCR_Camera()
     : camera(CreateCamera()),
-    sconButton_M_MIDLE(ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::MouseWheelDown, this }, false)),
+    sconButton_M_MIDLE(ZC_Events::ConnectButtonClick(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::MouseWheelDown, this }, { &ZCR_Camera::MouseWheelUp, this })),
     sconMouse(ZC_Events::ConnectMouseScrollOnceInFrame({ &ZCR_Camera::MouseWheelScroll, this }))
 {
     camera.MakeActive();
@@ -25,21 +25,17 @@ ZCR_Camera::ZCR_Camera()
     SetCameraLookOn({3.f, 0.f, 2.f});
 }
 
-bool ZCR_Camera::SetCameraUseEvents(bool needUse)
+void ZCR_Camera::SetCameraLookOn(const ZC_Vec3<float>& lookOn)
 {
-    if (needUseEvents == needUse) return isRotation;
-    needUseEvents = needUse;
-    if (!needUseEvents && !isRotation)
-    {
-        sconButton_M_MIDLE.Disconnect();
-        sconMouse.Disconnect();
-    }
-    else if (needUseEvents && !sconButton_M_MIDLE.IsConnected())
-    {
-        sconButton_M_MIDLE = ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::MouseWheelDown, this }, false);
-        sconMouse = ZC_Events::ConnectMouseScrollOnceInFrame({ &ZCR_Camera::MouseWheelScroll, this });
-    }
-    return isRotation;
+    auto curLookOn = camera.GetLookOn();
+    if (curLookOn == lookOn) return;
+    camera.SetPosition(lookOn + (camera.GetPosition() - curLookOn));
+    camera.SetLookOn(lookOn);
+}
+
+bool ZCR_Camera::IsRotating()
+{
+    return isRotating;
 }
 
 void ZCR_Camera::SetCameraAxis(ZCR_Axis axis)
@@ -68,14 +64,6 @@ void ZCR_Camera::SetCameraAxis(ZCR_Axis axis)
     }
     
     RotateAroundObject();
-}
-
-void ZCR_Camera::SetCameraLookOn(const ZC_Vec3<float>& lookOn)
-{
-    auto curLookOn = camera.GetLookOn();
-    if (curLookOn == lookOn) return;
-    camera.SetPosition(lookOn + (camera.GetPosition() - curLookOn));
-    camera.SetLookOn(lookOn);
 }
 
 ZC_Camera ZCR_Camera::CreateCamera()
@@ -175,27 +163,16 @@ void ZCR_Camera::CalculateDirections()
     isDirsActual = true;
 }
 
-void ZCR_Camera::MouseWheelDown(float time)
+void ZCR_Camera::MouseWheelDown(ZC_ButtonID buttonId, float time)
 {
-    isRotation = true;
-    sconButton_M_MIDLE.Disconnect();
-    sconMouse.Disconnect(); //  disconnect scroll
-    sconButton_M_MIDLE = ZC_Events::ConnectButtonUp(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::MouseWheelUp, this });
-    sconMouse = ZC_Events::ConnectMouseMoveOnceInFrame({ &ZCR_Camera::MouseMoveCallback, this });
-    // ZC_Window::HideCursor();
+    isRotating = true;
+    sconMouse.NewConnection(ZC_Events::ConnectMouseMoveOnceInFrame({ &ZCR_Camera::MouseMoveCallback, this }));      //  disconnect scroll, connect mouse move callback
 }
 
-void ZCR_Camera::MouseWheelUp(float time)
+void ZCR_Camera::MouseWheelUp(ZC_ButtonID buttonId, float time)
 {
-    isRotation = false;
-    sconButton_M_MIDLE.Disconnect();
-    sconMouse.Disconnect(); //  disconnect mouse MouseMoveAroundObject
-    if (needUseEvents)
-    {
-        sconButton_M_MIDLE = ZC_Events::ConnectButtonDown(ZC_ButtonID::M_MIDLE, { &ZCR_Camera::MouseWheelDown, this }, false);
-        sconMouse = ZC_Events::ConnectMouseScrollOnceInFrame({ &ZCR_Camera::MouseWheelScroll, this });   //  return scroll connection
-    }
-    // ZC_Window::ShowCursor();
+    isRotating = false;
+    sconMouse.NewConnection(ZC_Events::ConnectMouseScrollOnceInFrame({ &ZCR_Camera::MouseWheelScroll, this }));      //  disconnect mouse move callback, connect scroll
 }
 
 void ZCR_Camera::MouseWheelScroll(float rotationHorizontal, float rotationVertical, float time)

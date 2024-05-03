@@ -10,7 +10,7 @@ ZCR_IGWFigures::ZCR_IGWFigures()
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)
 {}
 
-void ZCR_IGWFigures::DrawWindow()
+void ZCR_IGWFigures::VDrawWindowIGW()
 {
     static float createIconSize = 100.f;
     static int columns = 4;
@@ -51,13 +51,12 @@ void ZCR_IGWFigures::DrawWindow()
 
 void ZCR_IGWFigures::FigureCreation(int _creatingFigureName)
 {
-    NeedDraw(false);
+    NeedDrawIGW(false);
     creatingFigureName = _creatingFigureName;
-    sconHandleEventsEnd = ZC_Events::ConnectHandleEventsEnd({ &ZCR_IGWFigures::CreateFigure, this });
+    this->AddAfterDrawEvent({ &ZCR_IGWFigures::CreateFigure, this });
 }
 
-void ZCR_IGWFigures::CreateFigure(float time)
+void ZCR_IGWFigures::CreateFigure()
 {
     ZCR_Figures::CreateFigure(static_cast<typename ZCR_Figure::Name>(creatingFigureName));
-    sconHandleEventsEnd.Disconnect();
 }

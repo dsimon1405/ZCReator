@@ -1,8 +1,9 @@
 #pragma once
 
 #include <ZC/Objects/Camera/ZC_Camera.h>
-#include <ZC/Tools/Signal/ZC_SConnection.h>
+#include <ZC/Events/ZC_EventConnection.h>
 #include "ZCR_Axis.h"
+#include <ZC/Events/ZC_ButtonID.h>
 
 class ZCR_Camera
 {
@@ -11,17 +12,8 @@ public:
 
     //  Change camera's look on. New position of camera save previous position's (camPos - lookOn) vector.
     void SetCameraLookOn(const ZC_Vec3<float>& lookOn);
-    
-    /*
-    Trys to connect/disconnect camera's events, like start rotation or change position on mouse scroll. Can't do disconnection if camera allready rotate.
-
-    Params:
-    - needUse - true - to connect events, false - to try disconnect events.
-
-    Return:
-    true if camera already rotate, otherwise false. 
-    */
-    bool SetCameraUseEvents(bool needUse);
+    //  true if camera rotates now
+    bool IsRotating();
 
 protected:
     ZCR_Camera();
@@ -46,11 +38,11 @@ private:
     const float sensitivityRotation = 1.f;
     float horizontalAngle = 0.f,
         verticalAngle = 0.f;
-    bool isRotation = false,
+    bool isRotating = false,
         needUseEvents = true;
 
-    ZC_SConnection sconButton_M_MIDLE;
-    ZC_SConnection sconMouse;
+    ZC_EC sconButton_M_MIDLE;
+    ZC_EC sconMouse;
 
     ZC_Camera CreateCamera();
     void Move(const ZC_Vec3<float>& step) noexcept;
@@ -64,7 +56,7 @@ private:
     void SetVerticalAngleMoreOrLessThan90(bool isMoreThan90);
     void RotateAroundObject();
     void CalculateDirections();
-    void MouseWheelDown(float time);
-    void MouseWheelUp(float time);
+    void MouseWheelDown(ZC_ButtonID buttonId, float time);
+    void MouseWheelUp(ZC_ButtonID buttonId, float time);
     void MouseWheelScroll(float rotationHorizontal, float rotationVertical, float time);
 };
