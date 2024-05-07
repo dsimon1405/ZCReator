@@ -3,14 +3,15 @@
 #include "ZCR_Point.h"
 #include "ZCR_Line.h"
 #include "ZCR_Surface.h"
-#include <Objects/Scene/ZCR_Scene.h>
+#include <Objects/Scene/ZCR_SceneMode.h>
+#include <ZC/Tools/Math/ZC_Mat4.h>
 
 class ZCR_FigureSet : public ZCR_Point, public ZCR_Line, public ZCR_Surface
 {
 public:
     ZCR_FigureSet(ZC_sptr<ZC_DA<ZC_Quad>>&& _quads, ZC_sptr<ZC_DA<ZC_Triangle>>&& _triangles, ZC_sptr<ZC_DA<int>>&& _normals);
 
-    void SwitchToSceneMode(ZCR_SceneModes sceneMode, bool isActiveOnScene);
+    void SwitchToSceneMode(ZCR_SceneMode sceneMode, bool isActiveOnScene);
     void TranslateModelMatrix(const ZC_Vec3<float>& trans);
     void SetAlpha(float alpha);
     void SetUseLight(bool _useLight);

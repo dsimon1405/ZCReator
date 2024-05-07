@@ -1,6 +1,8 @@
 #include "ZCR_Figure.h"
 
-ZCR_Figure::ZCR_Figure(Name standartFigure)
+#include <Objects/Scene/ImGui/ZCR_IGWBM_Mode.h>
+
+ZCR_Figure::ZCR_Figure(FigureName standartFigure)
     : name(GetName(standartFigure)),
     figureSet(GetQuads(standartFigure), GetTriangles(standartFigure), GetNormals(standartFigure))
 {}
@@ -14,7 +16,7 @@ bool ZCR_Figure::operator == (ZCR_Figure* fig) const noexcept
     return this == fig;
 }
 
-void ZCR_Figure::ChangeSceneMode(ZCR_SceneModes sceneMode)
+void ZCR_Figure::ChangeSceneMode(ZCR_SceneMode sceneMode)
 {
     figureSet.SwitchToSceneMode(sceneMode, figureSet.IsActiveOnScene());
 }
@@ -22,10 +24,10 @@ void ZCR_Figure::ChangeSceneMode(ZCR_SceneModes sceneMode)
 void ZCR_Figure::ChangeSceneActivity(bool isActiveOnScene)
 {
     if (figureSet.IsActiveOnScene() == isActiveOnScene) return;
-    figureSet.SwitchToSceneMode(ZCR_Scene::GetScene()->GetActiveSceneMode(), isActiveOnScene);
+    figureSet.SwitchToSceneMode(ZCR_IGWBM_Mode::GetActiveSceneMode(), isActiveOnScene);
 }
 
-void ZCR_Figure::ChangeSceneModeAndActivity(ZCR_SceneModes sceneMode, bool isActiveOnScene)
+void ZCR_Figure::ChangeSceneModeAndActivity(ZCR_SceneMode sceneMode, bool isActiveOnScene)
 {
     figureSet.SwitchToSceneMode(sceneMode, isActiveOnScene);
 }
@@ -35,20 +37,20 @@ void ZCR_Figure::Translate(const ZC_Vec3<float>& trans)
     figureSet.TranslateModelMatrix(trans);
 }
 
-std::string ZCR_Figure::GetName(Name standartFigure)
+std::string ZCR_Figure::GetName(FigureName standartFigure)
 {
     switch (standartFigure)
     {
-    case Name::Cube: return "Cube";
+    case FigureName::FN_Cube: return "Cube";
     default: return "";
     }
 }
 
-ZC_sptr<ZC_DA<ZC_Quad>> ZCR_Figure::GetQuads(Name standartFigure)
+ZC_sptr<ZC_DA<ZC_Quad>> ZCR_Figure::GetQuads(FigureName standartFigure)
 {
     switch (standartFigure)
     {
-    case Name::Cube: return ZC_sptrMake<ZC_DA<ZC_Quad>>
+    case FigureName::FN_Cube: return ZC_sptrMake<ZC_DA<ZC_Quad>>
         (
             new ZC_Quad[]
             {
@@ -95,11 +97,11 @@ ZC_sptr<ZC_DA<ZC_Quad>> ZCR_Figure::GetQuads(Name standartFigure)
     }
 }
 
-ZC_sptr<ZC_DA<ZC_Triangle>> ZCR_Figure::GetTriangles(Name standartFigure)
+ZC_sptr<ZC_DA<ZC_Triangle>> ZCR_Figure::GetTriangles(FigureName standartFigure)
 {
     switch (standartFigure)
     {
-    case Name::Cube: return {};
+    case FigureName::FN_Cube: return {};
     default: return {};
     }
     // return ZC_DA<ZC_Triangle>
@@ -143,11 +145,11 @@ ZC_sptr<ZC_DA<ZC_Triangle>> ZCR_Figure::GetTriangles(Name standartFigure)
     // );
 }
 
-ZC_sptr<ZC_DA<int>> ZCR_Figure::GetNormals(Name standartFigure)
+ZC_sptr<ZC_DA<int>> ZCR_Figure::GetNormals(FigureName standartFigure)
 {
     switch (standartFigure)
     {
-    case Name::Cube: return ZC_sptrMake<ZC_DA<int>>
+    case FigureName::FN_Cube: return ZC_sptrMake<ZC_DA<int>>
         (
             new int[]
             {

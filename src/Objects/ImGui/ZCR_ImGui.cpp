@@ -31,7 +31,7 @@ void ZCR_ImGui::MainWindow()
         TableNextColumn();
         if (ImageButton("Cube", reinterpret_cast<void*>(image.id), ImVec2(pictureSize, pictureSize), ImVec2(0.5f, 0.5f)))
         {
-            ZCR_Figures::CreateFigure(ZCR_Figure::Name::Cube);
+            ZCR_Figures::CreateFigure(ZCR_Figure::FigureName::FN_Cube);
         }
         
         TableNextColumn();
@@ -63,7 +63,7 @@ void ZCR_ImGui::MainWindow()
             TableNextColumn();
             if (ImageButton("Cube", reinterpret_cast<void*>(image.id), ImVec2(pictureSize, pictureSize)))
             {
-                ZCR_Figures::CreateFigure(ZCR_Figure::Name::Cube);
+                ZCR_Figures::CreateFigure(ZCR_Figure::FigureName::FN_Cube);
                 isNeedCloseCreate = true;
                 isNeedOpenModel = true;
             }

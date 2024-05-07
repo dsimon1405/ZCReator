@@ -1,30 +1,50 @@
 #include <ZC/main/ZC_main.h>
 #include <ZC/Video/ZC_Window.h>
-
-#include <ZC/Video/OpenGL/Shader/ZC_ShProgs.h>
-#include <ZC/Video/OpenGL/VAO/ZC_VAOs.h>
-#include <ZC/Video/OpenGL/VAO/ZC_VAOConfig.h>
-#include <ZC/Video/OpenGL/Buffer/ZC_UBOs.h>
-#include <ZC/Video/OpenGL/Buffer/ZC_Buffers.h>
-#include <ZC/Objects/Camera/ZC_Camera.h>
-
-#include <ZC/Tools/Time/ZC_Clock.h>
-
-#include <ZC/Tools/Math/ZC_Mat.h>
-#include <ZC/Tools/Console/ZC_cout.h>
-
-#include <ZC/Events/ZC_Events.h>
-
-#include <ZC/Objects/ZC_Object.h>
-
-#include <ZC/Tools/Math/ZC_Figures.h>
-
-#include <ZC/Video/OpenGL/Texture/ZC_Texture.h>
-
-// #include <Objects/ImGui/ZCR_ImGui.h>
 #include <Objects/Scene/ZCR_Scene.h>
+#include <ZCR_Load.h>
 
-#include <ZC/Tools/Container/ZC_ContFunc.h>
+// #include <ZC/Video/OpenGL/Shader/ZC_ShProgs.h>
+// #include <ZC/Video/OpenGL/VAO/ZC_VAOs.h>
+// #include <ZC/Video/OpenGL/VAO/ZC_VAOConfig.h>
+// #include <ZC/Video/OpenGL/Buffer/ZC_UBOs.h>
+// #include <ZC/Video/OpenGL/Buffer/ZC_Buffers.h>
+// #include <ZC/Objects/Camera/ZC_Camera.h>
+
+// #include <ZC/Tools/Time/ZC_Clock.h>
+
+// #include <ZC/Tools/Math/ZC_Mat.h>
+// #include <ZC/Tools/Console/ZC_cout.h>
+
+// #include <ZC/Events/ZC_Events.h>
+
+// #include <ZC/Objects/ZC_Object.h>
+
+// #include <ZC/Tools/Math/ZC_Figures.h>
+
+// #include <ZC/Video/OpenGL/Texture/ZC_Texture.h>
+
+// // #include <Objects/ImGui/ZCR_ImGui.h>
+// #include <ZC/Tools/Container/ZC_ContFunc.h>
+
+
+// #include <ZC/Objects/Text/ZC_Fonts.h>
+// #include <ZC/Objects/Text/ZC_TextWindow.h>
+// #include <ZC/Objects/Text/ZC_TextScene.h>
+// #include <ZC/Objects/Text/ZC_TextSceneTurnedToCamera.h>
+// #include <ZC/Objects/Text/ZC_TextWindowIntoScene.h>
+
+// #include <Renderer/ZCR_RendererLevelDrawer.h>
+// #include <ZC/Video/OpenGL/ZC_Framebuffer.h>
+// #include <ZC/Video/OpenGL/ZC_Viewport.h>
+
+// #include <ZC/Video/OpenGL/ZC_FBO.h>
+// #include <ZC/Tools/ZC_OrthoSquare.h>
+// #include <ZC/Collision/ZC_MouseCollisionWindow.h>
+
+// #include <ZC/Events/ZC_ESignal.h>
+
+
+// #include <ZC/Tools/ZC_ButtonManipulator.h>
 
 
 // struct NewSquare
@@ -220,27 +240,6 @@
 //     }
 // };
 
-
-#include <ZC/Objects/Text/ZC_Fonts.h>
-#include <ZC/Objects/Text/ZC_TextWindow.h>
-#include <ZC/Objects/Text/ZC_TextScene.h>
-#include <ZC/Objects/Text/ZC_TextSceneTurnedToCamera.h>
-#include <ZC/Objects/Text/ZC_TextWindowIntoScene.h>
-
-#include <Renderer/ZCR_RendererLevelDrawer.h>
-#include <ZC/Video/OpenGL/ZC_Framebuffer.h>
-#include <ZC/Video/OpenGL/ZC_Viewport.h>
-
-#include <ZC/Video/OpenGL/ZC_FBO.h>
-#include <ZCR_Load.h>
-#include <ZC/Tools/ZC_OrthoSquare.h>
-#include <ZC/Collision/ZC_MouseCollisionWindow.h>
-
-#include <ZC/Events/ZC_ESignal.h>
-
-
-#include <ZC/Tools/ZC_ButtonManipulator.h>
-
 // struct A : public ZC_ButtonManipulator
 // {
 //     A() : ZC_ButtonManipulator(K_Q, true) {}
@@ -367,7 +366,6 @@ int ZC_main()
         ZC_Window_Border, 800, 600, "ZeroCreator");
     ZC_Window::SetFPS(0);
     ZC_Window::NeedDrawFPS(true);
-
 
     // A a;
     // B b;

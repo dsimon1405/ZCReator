@@ -1,6 +1,7 @@
 #include "ZCR_FigureSet.h"
 
 #include <Renderer/ZCR_RenderLevel.h>
+#include <Objects/Scene/ImGui/ZCR_IGWBM_Mode.h>
 
 ZCR_FigureSet::ZCR_FigureSet(ZC_sptr<ZC_DA<ZC_Quad>>&& _quads, ZC_sptr<ZC_DA<ZC_Triangle>>&& _triangles, ZC_sptr<ZC_DA<int>>&& _normals)
     : ZCR_VBO(std::move(_quads), std::move(_triangles), std::move(_normals))
@@ -30,11 +31,12 @@ ZCR_FigureSet::ZCR_FigureSet(ZC_sptr<ZC_DA<ZC_Quad>>&& _quads, ZC_sptr<ZC_DA<ZC_
     }
 }
 
-void ZCR_FigureSet::SwitchToSceneMode(ZCR_SceneModes sceneMode, bool _isActiveOnScene)
+void ZCR_FigureSet::SwitchToSceneMode(ZCR_SceneMode sceneMode, bool _isActiveOnScene)
 {
     isActiveOnScene = _isActiveOnScene;
     switch (sceneMode)
     {
+    case ZCR_SM_None: SwitchGLElementOnRendererLevel(ZC_DL_Drawing, ZC_DL_None, ZC_DL_None); break;
     case ZCR_SM_Model:
     {
         ZC_DrawerLevel surfaceLevel =
@@ -73,8 +75,9 @@ void ZCR_FigureSet::SetAlpha(float _alpha)
         :_alpha > 1.f ? 1.f
         : _alpha;
 
-    switch (ZCR_Scene::GetScene()->GetActiveSceneMode())
+    switch (ZCR_IGWBM_Mode::GetActiveSceneMode())
     {
+    case ZCR_SM_None: SwitchGLElementOnRendererLevel(ZC_DL_Drawing, ZC_DL_None, ZC_DL_None);
     case ZCR_SM_Model: SwitchRSControllerTriangle(isActiveOnScene ? alpha == 1.f ? ZC_DL_StencilBorder
         : alpha == 0.f ? (ZC_DrawerLevel)ZC_DL_None : ZCR_DL_AlphaBlending : ZC_DL_Drawing); break;
     case ZCR_SM_Edit: SwitchRSControllerTriangle(isActiveOnScene ? alpha == 0.f ? (ZC_DrawerLevel)ZC_DL_None : ZCR_DL_AlphaBlending : ZC_DL_Drawing); break;

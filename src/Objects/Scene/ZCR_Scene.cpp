@@ -1,6 +1,5 @@
 #include "ZCR_Scene.h"
 
-#include <Objects/Figure/ZCR_Figures.h>
 #include "ZC/Video/OpenGL/Texture/ZC_Texture.h"
 #include <File/ZCR_File.h>
 #include <Objects/Scene/ImGui/ZCR_IconTexture.h>
@@ -24,20 +23,6 @@ ZCR_Scene::~ZCR_Scene()
 ZCR_Scene* ZCR_Scene::GetScene() noexcept
 {
     return pScene;
-}
-
-ZCR_SceneModes ZCR_Scene::GetActiveSceneMode() const noexcept
-{
-    return activeSceneMode;
-}
-
-void ZCR_Scene::SetActiveSceneMode(ZCR_SceneModes _sceneMode, bool changeFiguresState) noexcept
-{
-    if (activeSceneMode != _sceneMode)
-    {
-        activeSceneMode = _sceneMode;
-        if (changeFiguresState) ZCR_Figures::SwitchFiguresAndActiveFiguresToNewSceneMode(activeSceneMode);
-    }
 }
 
 void ZCR_Scene::SetAxise(ZCR_Axis _axis)

@@ -59,15 +59,19 @@ set(ZCR_SRC_FILES ${ZCR_SRC_FILES}
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ZCR_Scene.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ZCR_Mesh.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ZCR_Camera.cpp
-    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWCreateAndMode.cpp
-    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWFigures.cpp
-    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWScene.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWBM_MainMenu.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWBM_Create.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWBM_Interface.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWBM_Mode.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWBM_M_Edit.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWBM_M_Model.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWBM_M_Sculpting.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/Orientation3D/ZCR_Orientation3D.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/Orientation3D/ZCR_TextAxis.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/Orientation3D/ZCR_TextAxises.cpp
     ${PROJECT_SOURCE_DIR}/src/Renderer/ZCR_DrawerCreator.cpp
     )
-
+    
 add_executable(${PROJECT_NAME} ${ZCR_SRC_FILES})
 
 #========================= include dirs
