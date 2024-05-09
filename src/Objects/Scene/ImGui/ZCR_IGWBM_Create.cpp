@@ -6,21 +6,22 @@
 #include <ZC/Events/ZC_Events.h>
 
 ZCR_IGWBM_Create::ZCR_IGWBM_Create()
-    : ZC_IGWBM(K_C, true, false, true, "                              Create", false, 465.f, 160.f, 0.f, 0.f, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, true,
-        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)
+    : ZC_IGWBM(K_C, true, false, true, "Create", false, 0.f, 0.f, 0.f, 0.f, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, true,
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse
+            | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings)
 {}
 
 void ZCR_IGWBM_Create::VDrawWindowIGW()
 {
     static float createIconSize = 100.f;
     static int columns = 4;
-    if (ImGui::BeginTable("ObjectCreation", columns, 0, ImVec2(450.f, 0)))
+    if (ImGui::BeginTable("ObjectCreation", columns))
     {
         static ImVec2 iconSize(createIconSize, createIconSize);
         static ImVec4 colorActive(1.f, 1.f, 1.f, 1.f),
             colorPassive(1.f, 1.f, 1.f, 0.5f);
         
-        bool isAciveBM = this->IsActiveBM();
+        bool isAciveBM = this->IsEventsTargetBM();
 
         ImGui::TableNextColumn();
         static int iconTextureId = ZCR_IconTexture::iconTexture.GetId();

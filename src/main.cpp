@@ -240,123 +240,11 @@
 //     }
 // };
 
-// struct A : public ZC_ButtonManipulator
-// {
-//     A() : ZC_ButtonManipulator(K_Q, true) {}
 
-//     void VCallButtonDown(ZC_ButtonID buttonId, float time) override
-//     {
-//         switch (buttonId)
-//         {
-//         case K_W: W(); break;
-//         case K_E: E(); break;
-//         case K_R: R(); break;
-//         default: break;
-//         }
-//     }
-    
-//     void VActivate() override
-//     {
-//         ZC_cout("A enable");
-//     }
-    
-//     void VDeactivate() override
-//     {
-//         ZC_cout("A disable");
-//     }
-
-//     void W()
-//     {
-//         ZC_cout("W");
-//     }
-//     void E()
-//     {
-//         ZC_cout("E");
-//     }
-//     void R()
-//     {
-//         ZC_cout("R");
-//     }
-// };
-
-// struct B : public ZC_ButtonManipulator
-// {
-//     B() : ZC_ButtonManipulator(K_A, false) {}
-
-//     void VCallButtonDown(ZC_ButtonID buttonId, float time) override
-//     {
-//         switch (buttonId)
-//         {
-//         case K_W: W(); break;
-//         case K_S: S(); break;
-//         case K_D: D(); break;
-//         default: break;
-//         }
-//     }
-    
-//     void VActivate() override
-//     {
-//         ZC_cout("B enable");
-//     }
-    
-//     void VDeactivate() override
-//     {
-//         ZC_cout("B disable");
-//     }
-
-//     void W()
-//     {
-//         ZC_cout("W");
-//     }
-//     void S()
-//     {
-//         ZC_cout("S");
-//     }
-//     void D()
-//     {
-//         ZC_cout("D");
-//     }
-// };
-
-// struct C : public ZC_ButtonManipulator
-// {
-//     C() : ZC_ButtonManipulator(K_I, true) {}
-
-//     void VCallButtonDown(ZC_ButtonID buttonId, float time) override
-//     {
-//         switch (buttonId)
-//         {
-//         case K_T: T(); break;
-//         case K_Y: Y(); break;
-//         case K_U: U(); break;
-//         default: break;
-//         }
-//     }
-    
-//     void VActivate() override
-//     {
-//         ZC_cout("C enable");
-//     }
-    
-//     void VDeactivate() override
-//     {
-//         ZC_cout("C disable");
-//     }
-
-//     void T()
-//     {
-//         ZC_cout("T");
-//     }
-//     void Y()
-//     {
-//         ZC_cout("Y");
-//     }
-//     void U()
-//     {
-//         ZC_cout("U");
-//     }
-// };
-
+//  ZC_ZoneSelector, algorithm -> Connect click left mouse button (now can't be connects one button twisem=, take care). If button down heppens, check ereas: ZC_MouseCollisionWindowController::IsCursorInArea(), and ImGui.
+//  If that ereas don't use cursor, connect mouse move event and disable ZC_MouseCollisionWindowController events (don't created yet), try to find how to disable ImGui events.
+//  - If heppens move create ortho quad textured or colored with alpha. On left mouse button up selected zone give those who need that info, and make next step. 
+//  - If heppens left mouse button up enable ZC_MouseCollisionWindowController and ImGui events if disconnected.
 
 int ZC_main()
 {
@@ -366,10 +254,6 @@ int ZC_main()
         ZC_Window_Border, 800, 600, "ZeroCreator");
     ZC_Window::SetFPS(0);
     ZC_Window::NeedDrawFPS(true);
-
-    // A a;
-    // B b;
-    // C c;
 
 
     ZCR_LoadFonts();

@@ -42,15 +42,7 @@ void ZCR_VBO::BufferSubDataIndex(StoredType storedType, bool isQuad, ulong verte
     switch (storedType)
     {
     case StoredType_Vertex: setOffsetAndSize(0, vertexByteSize, trianglesStartIndex); break;
-    // {
-    //     offset = isQuad ? (vertexIndex * vertexByteSize) : (trianglesStartIndex + (vertexIndex * vertexByteSize));
-    //     byteSize = vertexByteSize; break;
-    // }
     case StoredType_Color: setOffsetAndSize(colorsStartIndex, colorByteSize, trianglesStartIndex); break;
-    // {
-    //     offset = isQuad ? colorsStartIndex + (vertexIndex * colorByteSize) : (colorsStartIndex + trianglesStartIndex + (vertexIndex * colorByteSize));
-    //     byteSize = colorByteSize; break;
-    // }
     case StoredType_Normal: setOffsetAndSize(normatlsStartIndex, normalByteSize, trianglesStartIndex); break;
     case StoredType_TexCoord: setOffsetAndSize(texCoordsStartIndex, texCoordByteSize, trianglesStartIndex); break;
     }

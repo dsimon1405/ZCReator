@@ -5,7 +5,9 @@
 struct ZCR_TextAxises
 {
     ZCR_TextAxis* pActiveMoveText = nullptr;
+    ZCR_TextAxis* pActivePressedText = nullptr;
     ZCR_TextAxis* pActiveAxisText = nullptr;
+    bool isButtonPressed = false;
     ZCR_TextAxis texts[6]
     {
         ZCR_TextAxis(ZCR_A_PositiveX, { 1.f, 0.f, 0.f }, "+X", ZC_PackColorUCharToUInt(225, 0, 0)),
@@ -15,7 +17,7 @@ struct ZCR_TextAxises
         ZCR_TextAxis(ZCR_A_PositiveZ, { 0.f, 0.f, 1.f }, "+Z", ZC_PackColorUCharToUInt(0, 180, 225)),
         ZCR_TextAxis(ZCR_A_NegativeZ, { 0.f, 0.f, -1.f }, "-Z", ZC_PackColorUCharToUInt(0, 155, 225)),
     };
-    bool isNeedMakeActiveAxisDefault = false;
+    bool makeActiveAxisDefault = true;
 
     void SetPosition(const ZC_Vec3<float>& newPosition);
     void CalculateQuads(const ZC_Mat4<float>& perspView, const ZC_Vec2<float>& indents, float textureWidth, float textureHeight);
@@ -23,7 +25,8 @@ struct ZCR_TextAxises
     bool MakeCursorMoveCollision();
     //  returns true if need redraw texture (were changed pActiveText)
     bool LeaveActiveArea();
-    void MouseLeftButtonDown();
+    bool MouseLeftButtonDown();
+    void MouseLeftButtonUp();
     void PrepareReconnect();
     void CamMoveWhileDeactivated();
 };

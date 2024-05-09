@@ -9,7 +9,7 @@ struct ZCR_Point : public ZCR_Color
 {
     ZCR_Point();
 
-    ZC_sptr<std::list<Points>> spPoints;    //  fill in GetPoints
+    std::list<Points> points;    //  fill in GetPoints
     std::list<Points*> activePoints {};
 
     ZC_sptr<ZC_DrawerSet> spDrawerSetsPoint;
@@ -35,7 +35,7 @@ void ZCR_Point::FillPointElements(TElement* pElement)
     ulong pElementI = 0;
     auto pQuadsHead = spQuads ? &(spQuads->Begin()->bl) : nullptr;
     auto pTrianglesHead = spTriangles ? &(spTriangles->Begin()->bl) : nullptr;
-    for (auto& point : *spPoints)
+    for (auto& point : points)
     {
         auto& samePoint = point.GetSamePoint();
         pElement[pElementI++] = samePoint.isQuad ?

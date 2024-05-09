@@ -4,14 +4,15 @@
 #include <ZC/Objects/Text/ZC_TextWindowIntoScene.h>
 #include <ZC/Tools/Math/ZC_Mat4.h>
 #include <ZC/Tools/Math/ZC_Vec2.h>
-
+//  reasons not to use for each heir ZC_MouseCollisionWindow are: no support depth collision (with ortho it no sence)
 struct ZCR_TextAxis
 {
     enum State
     {
         S_Default,
         S_UnderCursor,
-        S_ActiveAxis,
+        S_Pressed,
+        S_Active
     };
     
     State state = S_Default;
@@ -30,6 +31,6 @@ struct ZCR_TextAxis
     void CalculateQuad(const ZC_Mat4<float>& perspView, const ZC_Vec2<float>& windowIndents, float textureWidth, float textureHeight);
     //  if depth less then activeDepth (closer to camera) and cursor in text area returns pointer on itself.
     bool MakeCursorCollision(float cursorX, float cursorY, float activeDepth);
-    void SetState(State _state);
-    void MouseLeftButtonDown();
+    void SetState(State newState);
+    void MouseLeftButtonUp();
 };

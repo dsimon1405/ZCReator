@@ -13,7 +13,7 @@ public:
 
 private:
     static inline float orthoIndentX = 10.f,
-        orthoIndentY = 30;
+        orthoIndentY = 10;
 
     ZCR_IGWBM_Create igwbmCreate;
     ZCR_IGWBM_Interface igwbmInterface;

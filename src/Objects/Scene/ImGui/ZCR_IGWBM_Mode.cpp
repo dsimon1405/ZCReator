@@ -4,8 +4,8 @@
 #include <Objects/Figure/ZCR_Figures.h>
 
 ZCR_IGWBM_Mode::ZCR_IGWBM_Mode(float startX, float startY)
-    : ZC_IGWBM(K_M, true, false, false, "Mode", false, 470.f, 30.f, startX, startY, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel, true,
-    ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse)
+    : ZC_IGWBM(K_M, true, false, false, "Mode", false, 470.f, 0.f, startX, startY, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel, true,
+    ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoSavedSettings)
 {
     pIGWBM_Mode = this;
 }
@@ -30,11 +30,12 @@ void ZCR_IGWBM_Mode::SetActiveSceneMode(ZCR_SceneMode _sceneMode, bool changeFig
         _sceneMode == ZCR_SM_None ? pIGWBM_Mode->ChangeDrawState(previousMode, false) : pIGWBM_Mode->ChangeDrawState(_sceneMode, true);
         if (changeFiguresState) ZCR_Figures::SwitchFiguresAndActiveFiguresToNewSceneMode(pIGWBM_Mode->activeSceneMode);
     }
+    else pIGWBM_Mode->NeedDrawIGW(false); //  stop drawing Mode's window
 }
 
 bool ZCR_IGWBM_Mode::IsOneOfModes_ActiveBM() noexcept
 {
-    return pIGWBM_Mode->igwbmModel.IsActiveIGWBM() || pIGWBM_Mode->igwbmEdit.IsActiveIGWBM() || pIGWBM_Mode->igwbmSculpting.IsActiveIGWBM();
+    return pIGWBM_Mode->igwbmModel.IsEventsTargetIGWBM() || pIGWBM_Mode->igwbmEdit.IsEventsTargetIGWBM() || pIGWBM_Mode->igwbmSculpting.IsEventsTargetIGWBM();
 }
 
 void ZCR_IGWBM_Mode::ActivateIGWBM()
@@ -44,7 +45,7 @@ void ZCR_IGWBM_Mode::ActivateIGWBM()
 
 void ZCR_IGWBM_Mode::VDrawWindowIGW()
 {
-    if (ImGui::BeginTable("Modes", 4, 0))
+    if (ImGui::BeginTable("Mode", 4))
     {
         auto drawMode = [this](ZCR_SceneMode drawingSceneMode, const char* name)
         {
@@ -52,7 +53,7 @@ void ZCR_IGWBM_Mode::VDrawWindowIGW()
             if (ImGui::RadioButton(name, activeSceneMode == drawingSceneMode)) SetActiveSceneMode(drawingSceneMode, true);
         };
 
-        bool isActiveBM = this->IsActiveBM();
+        bool isActiveBM = this->IsEventsTargetBM();
         drawMode(ZCR_SM_None, isActiveBM ? activeSceneMode == ZCR_SM_None ? "None(Esc)" : "None(N)" : "None");
         drawMode(ZCR_SM_Model, isActiveBM ? activeSceneMode == ZCR_SM_Model ? "Model(Esc)" : "Model(M)" : "Model");
         drawMode(ZCR_SM_Edit, isActiveBM ? activeSceneMode == ZCR_SM_Edit ? "Edit(Esc)" : "Edit(E)" : "Edit");

@@ -13,12 +13,12 @@ protected:
     ZCR_FigureData() = default;
     ZCR_FigureData(ZC_sptr<ZC_DA<ZC_Quad>>&& spQuads, ZC_sptr<ZC_DA<ZC_Triangle>>&& spTriangles, ZC_sptr<ZC_DA<int>>&& spNormals);
 
-    enum GLElement
-    {
-        Triangle = 0,
-        Point,
-        Line
-    };
+    // enum GLElement
+    // {
+    //     Triangle = 0,
+    //     Point,
+    //     Line
+    // };
 
     ZC_sptr<ZC_DA<ZC_Quad>> spQuads;
     ZC_sptr<ZC_DA<ZC_Triangle>> spTriangles;

@@ -10,10 +10,12 @@ public:
 
 private:
     ZCR_Orientation3D orientatin3D;
-    bool checkBoxIsOrienttion3D = true;
+    bool showInterface = true;
 
     void VCallButtonDownBM(ZC_ButtonID buttonId, float time) override;
     void VDrawWindowIGW() override;
+
+    void DrawInterface(bool isActiveBM);
     void DrawMeshOptions(bool isActiveBM);
     void DrawViewportOptions();
 };

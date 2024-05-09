@@ -26,15 +26,16 @@ private:
     ZC_EC ecCamPosChange,
         ecMouseLeftButtonClick,
         ecWindowResize;
-    bool needCalculateTextQuads = true;   //  calculating textAxices collision quads, only once, on first call VMouseMoveCollision() after camera rotetion
+    bool needCalculateTextQuads = true;   //  calculating textAxices collision quads, only once, on first call VCrusorMoveCollision() after camera rotetion
     bool isActive = true;
 
     ZC_Render* CreateRender();
     void SetPosition(const ZC_Vec3<float>& camPos);
 
-    void VMouseMoveCollision(float time) override;
-    void VMouseMoveCollisionEnd(float time) override;
+    void VCrusorMoveCollision(float time) override;
+    void VCursorMoveCollisionEnd(float time) override;
     void CalculateTextPositions();
     void MouseLeftButtonDown(ZC_ButtonID buttonId, float time);
+    void MouseLeftButtonUp(ZC_ButtonID buttonId, float time);
     void WindowResize(float widht, float height);
 };

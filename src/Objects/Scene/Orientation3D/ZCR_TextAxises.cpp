@@ -6,12 +6,12 @@ void ZCR_TextAxises::SetPosition(const ZC_Vec3<float>& newPosition)
 {
     if (pActiveAxisText)
     {
-        if (!isNeedMakeActiveAxisDefault)
+        if (makeActiveAxisDefault)
         {
             pActiveAxisText->SetState(ZCR_TextAxis::S_Default);
             pActiveAxisText = nullptr;
         }
-        isNeedMakeActiveAxisDefault = false;
+        makeActiveAxisDefault = true;
     }
     for (auto& text : texts) text.SetPosition(newPosition);
 }
@@ -33,13 +33,29 @@ bool ZCR_TextAxises::MakeCursorMoveCollision()
         if (text.MakeCursorCollision(cursorX, cursorY, pNewActiveText ? pNewActiveText->depth : 1.f)) pNewActiveText = &text;
         if (pActiveAxisText && pNewActiveText == pActiveAxisText) return false;  //  cursor on active axis text, that is closest (depth) text
     }
-    
-    if (pNewActiveText == pActiveMoveText) return false;
 
-    if (pActiveMoveText) pActiveMoveText->SetState(ZCR_TextAxis::S_Default);
+    bool needRedraw = false;
+    
+    if (isButtonPressed && pActivePressedText)
+    {
+        if (pActivePressedText == pNewActiveText) return false;     //  haven't left pActivePressedText area
+        pActivePressedText->SetState(ZCR_TextAxis::S_Default);      //  leave pActivePressedText area
+        pActivePressedText = nullptr;
+        needRedraw = true;
+    }
+    else if (pActiveMoveText)
+    {
+        if (pActiveMoveText == pNewActiveText) return false;    //  haven't left pActiveMoveText area
+        pActiveMoveText->SetState(ZCR_TextAxis::S_Default);     //  leave pActiveMoveText area
+        needRedraw = true;
+    }
     pActiveMoveText = pNewActiveText;
-    if (pActiveMoveText) pActiveMoveText->SetState(ZCR_TextAxis::S_UnderCursor);
-    return true;
+    if (pActiveMoveText)
+    {
+        pActiveMoveText->SetState(ZCR_TextAxis::S_UnderCursor);     //  entered pActiveMoveText area
+        needRedraw = true;
+    }
+    return needRedraw;      //  if false movement is in an empty area
 }
 
 bool ZCR_TextAxises::LeaveActiveArea()
@@ -50,21 +66,35 @@ bool ZCR_TextAxises::LeaveActiveArea()
     return true;
 }
 
-void ZCR_TextAxises::MouseLeftButtonDown()
+bool ZCR_TextAxises::MouseLeftButtonDown()
 {
+    isButtonPressed = true;
     if (pActiveMoveText)
     {
-        if (pActiveAxisText) pActiveAxisText->SetState(ZCR_TextAxis::S_Default);
-        pActiveAxisText = pActiveMoveText;
+        pActiveMoveText->SetState(ZCR_TextAxis::S_Pressed);
+        pActivePressedText = pActiveMoveText;
         pActiveMoveText = nullptr;
-        isNeedMakeActiveAxisDefault = true;
-        pActiveAxisText->MouseLeftButtonDown();
+        return true;
+    }
+    return false;
+}
+
+void ZCR_TextAxises::MouseLeftButtonUp()
+{
+    isButtonPressed = false;
+    if (pActivePressedText)
+    {
+        if (pActiveAxisText) pActiveAxisText->SetState(ZCR_TextAxis::S_Default);
+        pActiveAxisText = pActivePressedText;
+        pActivePressedText = nullptr;
+        makeActiveAxisDefault = false;      //  next line will call ZCR_TextAxises::SetPosition() from camera, we don't need changing pActiveAxisText in that call
+        pActiveAxisText->MouseLeftButtonUp();
     }
 }
 
 void ZCR_TextAxises::PrepareReconnect()
 {
-    if (pActiveAxisText) isNeedMakeActiveAxisDefault = true;
+    if (pActiveAxisText) makeActiveAxisDefault = true;      //  if pActiveAxisText still not nullptr, don't changing it in next ZCR_TextAxises::SetPosition() call 
 }
 
 void ZCR_TextAxises::CamMoveWhileDeactivated()

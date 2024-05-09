@@ -7,8 +7,7 @@
 #include <cassert>
 
 ZCR_Orientation3D::ZCR_Orientation3D()
-    : ZC_MouseCollisionWindow(ZC_MouseCollisionWindow::E_Move,
-        &textureSize, &textureSize, &textureSize, &textureSize, true),
+    : ZC_MouseCollisionWindow(ZC_MouseCollisionWindow::E_Move, &textureSize, &textureSize, &textureSize, &textureSize, true),
     pRender(ZC_Renders::CreateRender(ZCR_RL_Orientation3D, ZC_Render::DS_None,
         ZC_FBO(ZC_Viewport(0, 0, textureSize, textureSize), 0, ZC_FBO::CIF_GL_RGBA8, ZC_FBO::DSIF_GL_DEPTH_COMPONENT24, ZC_FBO::RT_Color, false))),
     camera(ZC_Camera::GetActiveCamera()->GetPosition(), ZC_Camera::GetActiveCamera()->GetLookOn(), ZC_Camera::GetActiveCamera()->GetUp(),
@@ -36,11 +35,12 @@ void ZCR_Orientation3D::Activate()
 {
     if (isActive) return;
     isActive = true;
-    ecMouseLeftButtonClick.NewConnection(ZC_Events::ConnectButtonClick(ZC_ButtonID::M_LEFT, { &ZCR_Orientation3D::MouseLeftButtonDown, this }, {}));
+    ecMouseLeftButtonClick.NewConnection(ZC_Events::ConnectButtonClick(ZC_ButtonID::M_LEFT, { &ZCR_Orientation3D::MouseLeftButtonDown, this },
+        { &ZCR_Orientation3D::MouseLeftButtonUp, this }));
     orthoSquare.NeedDraw(true);
     textAxices.PrepareReconnect();
     SetPosition(ZC_Camera::GetActiveCamera()->GetPosition());
-    this->ConnectMouseCollision();
+    this->ConnectMCW();
 }
 
 void ZCR_Orientation3D::Deactivate()
@@ -49,7 +49,7 @@ void ZCR_Orientation3D::Deactivate()
     isActive = false;
     ecMouseLeftButtonClick.Disconnect();
     orthoSquare.NeedDraw(false);
-    this->DisconnectMouseConllision();
+    this->DisconnectMCW();
 }
 
 bool ZCR_Orientation3D::IsActive() const noexcept
@@ -76,7 +76,7 @@ void ZCR_Orientation3D::SetPosition(const ZC_Vec3<float>& camPos)
     else textAxices.CamMoveWhileDeactivated();
 }
 
-void ZCR_Orientation3D::VMouseMoveCollision(float time)
+void ZCR_Orientation3D::VCrusorMoveCollision(float time)
 {
     if (ZCR_Scene::GetScene()->IsRotating()) return;  // camera rotates, can't start cursor collision event before stop rotation
 
@@ -89,10 +89,11 @@ void ZCR_Orientation3D::VMouseMoveCollision(float time)
     if (textAxices.MakeCursorMoveCollision()) pRender->SetDrawState(ZC_Render::DS_OneFrame);
 
     if (!ecMouseLeftButtonClick.IsConnected())
-        ecMouseLeftButtonClick.NewConnection(ZC_Events::ConnectButtonClick(ZC_ButtonID::M_LEFT, { &ZCR_Orientation3D::MouseLeftButtonDown, this }, {}));
+        ecMouseLeftButtonClick.NewConnection(ZC_Events::ConnectButtonClick(ZC_ButtonID::M_LEFT, { &ZCR_Orientation3D::MouseLeftButtonDown, this },
+            { &ZCR_Orientation3D::MouseLeftButtonUp, this }));
 }
 
-void ZCR_Orientation3D::VMouseMoveCollisionEnd(float time)
+void ZCR_Orientation3D::VCursorMoveCollisionEnd(float time)
 {
     if (textAxices.LeaveActiveArea()) pRender->SetDrawState(ZC_Render::DS_OneFrame);
     ecMouseLeftButtonClick.Disconnect();
@@ -100,7 +101,12 @@ void ZCR_Orientation3D::VMouseMoveCollisionEnd(float time)
 
 void ZCR_Orientation3D::MouseLeftButtonDown(ZC_ButtonID buttonId, float time)
 {
-    textAxices.MouseLeftButtonDown();
+    if (textAxices.MouseLeftButtonDown()) pRender->SetDrawState(ZC_Render::DS_OneFrame);
+}
+
+void ZCR_Orientation3D::MouseLeftButtonUp(ZC_ButtonID buttonId, float time)
+{
+    textAxices.MouseLeftButtonUp();
 }
 
 void ZCR_Orientation3D::WindowResize(float widht, float height)

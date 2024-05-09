@@ -4,8 +4,9 @@
 #include <imgui.h>
 
 ZCR_IGWBM_M_Sculpting::ZCR_IGWBM_M_Sculpting()
-    : ZC_IGWBM(K_M, false, false, false, "Sculpting", false, 50.f, 100.f, 0.f, 0.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Center, true,
-    ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)
+    : ZC_IGWBM(K_M, false, false, false, "Sculpting", false, 0.f, 0.f, 0.f, 0.f, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Center, true,
+    ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse
+        | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings)
 {}
 
 void ZCR_IGWBM_M_Sculpting::VDrawWindowIGW()

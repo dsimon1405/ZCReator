@@ -46,7 +46,7 @@ ZC_DA<uchar> ZCR_Point::GetPointElements(ulong& rElementsCount, GLenum& rElement
 
 void ZCR_Point::GetPoints(ulong& rElementsCount)
 {
-    spPoints = std::move(ZC_sptr<std::list<Points>>(new std::list<Points>()));
+    // std::list<Points> points;
 
     auto pVertexHeadOfTriangles = spTriangles ? &(spTriangles->Begin()->bl) : nullptr;
     for (ulong i = 0; i < (spTriangles ? spTriangles->size : 0); ++i)
@@ -67,7 +67,7 @@ void ZCR_Point::GetPoints(ulong& rElementsCount)
 
 ulong ZCR_Point::FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>* pVertexContainerHead)
 {
-    auto pPoints = ZC_Find(*spPoints, pVertex);
+    auto pPoints = ZC_Find(points, pVertex);
     if(pPoints)
     {
         pPoints->samePoints.emplace_front(Points::SamePoint{ pVertex, isQuad, static_cast<ulong>(pVertex - pVertexContainerHead) });
@@ -75,7 +75,7 @@ ulong ZCR_Point::FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>
     }
     else
     {
-        spPoints->emplace_back(Points{ { Points::SamePoint{ pVertex, isQuad, static_cast<ulong>(pVertex - pVertexContainerHead) } } });
+        points.emplace_back(Points{ { Points::SamePoint{ pVertex, isQuad, static_cast<ulong>(pVertex - pVertexContainerHead) } } });
         return 1;   //  in ebo point is one value, if not found same return 1 (new point)
     }
 }
@@ -87,8 +87,8 @@ void ZCR_Point::SwitchRSControllerPoint(ZC_DrawerLevel drawerLevel)
 
 void ZCR_Point::MakePointsActive(std::list<Points*>&& points)
 {
-    if (points.size() == spPoints->size() && points.size() == activePoints.size()) return;
-    if (points.size() == spPoints->size())
+    if (points.size() == points.size() && points.size() == activePoints.size()) return;
+    if (points.size() == points.size())
     {
         FillColorsAllAsActive(true);
         activePoints = std::move(points);

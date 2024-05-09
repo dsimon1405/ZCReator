@@ -10,7 +10,7 @@ ZCR_FigureSet::ZCR_FigureSet(ZC_sptr<ZC_DA<ZC_Quad>>&& _quads, ZC_sptr<ZC_DA<ZC_
 
     //  active points
     std::list<Points*> allActivePoints;
-    for (auto& point : *spPoints) allActivePoints.emplace_back(&point);
+    for (auto& point : points) allActivePoints.emplace_back(&point);
     MakePointsActive(std::move(allActivePoints));
 
     dsControllerPoint.SetUniformsData(ZC_UN_unModel, spMatModel->Begin());
