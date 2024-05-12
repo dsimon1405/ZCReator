@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Objects/Figure/ZCR_Figures.h>
 #include <Objects/Scene/ImGui/ZCR_IGWBM_MainMenu.h>
 #include "ZCR_Mesh.h"
 #include "ZCR_Camera.h"
@@ -18,6 +19,7 @@ public:
 private:
     static inline ZCR_Scene* pScene;
 
+    ZCR_Figures figures;    //  create here to destroy created fugures before ZCR_Scene
     ZCR_IGWBM_MainMenu igwbmMenu;
     ZCR_Axis axis = ZCR_A_Free;
 };

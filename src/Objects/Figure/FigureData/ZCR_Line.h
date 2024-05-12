@@ -6,9 +6,10 @@
 struct ZCR_Line : public virtual ZCR_VBO
 {
     ZCR_Line();
+    ZCR_Line(ZCR_Line&& l);
 
-    ZC_sptr<ZC_DrawerSet> spDrawerSetsLine;
-    ZC_DSController dsControllerLine;
+    ZC_DrawerSet dsLine;
+    ZC_DSController dsConLine;
 
     struct Lines
     {
@@ -26,7 +27,7 @@ struct ZCR_Line : public virtual ZCR_VBO
         Corners& GetCorners();
     };
 
-    ZC_sptr<ZC_DrawerSet> CreateLineDrawerSet();
+    ZC_DrawerSet CreateLineDrawerSet();
     ZC_DA<uchar> GetLineElements(ulong& rElementsCount, GLenum& rElementsType);
     std::forward_list<Lines> GetLines(ulong& rElementsCount);
     template<typename TElement>
@@ -38,10 +39,10 @@ struct ZCR_Line : public virtual ZCR_VBO
 template<typename TElement>
 void ZCR_Line::FillLineElements(typename std::forward_list<Lines>& lines, TElement* pElement)
 {
-    ulong trianglesStartOffsetInEBO = spQuads ? (spQuads->size * 4) : 0;    //  triangles start index in ebo
+    ulong trianglesStartOffsetInEBO = quads.size * 4;    //  triangles start index in ebo
     ulong pElementI = 0;
-    auto pQuadsHead = spQuads ? &(spQuads->Begin()->bl) : nullptr;
-    auto pTrianglesHead = spTriangles ? &(spTriangles->Begin()->bl) : nullptr;
+    auto pQuadsHead = &(quads.Begin()->bl);
+    auto pTrianglesHead = &(triangles.Begin()->bl);
     for (auto& line : lines)
     {
         auto& corners = line.GetCorners();

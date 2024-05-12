@@ -48,14 +48,13 @@ set(ZCR_SRC_FILES ${ZCR_SRC_FILES}
     ${PROJECT_SOURCE_DIR}/src/ZCR_Load.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Figure/ZCR_Figure.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Figure/ZCR_Figures.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/ZCR_FigureCreator.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Figure/ZCR_ActiveFigures.cpp
-    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureSet/ZCR_Color.cpp
-    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureSet/ZCR_FigureData.cpp
-    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureSet/ZCR_FigureSet.cpp
-    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureSet/ZCR_Point.cpp
-    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureSet/ZCR_Line.cpp
-    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureSet/ZCR_Surface.cpp
-    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureSet/ZCR_VBO.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureData/ZCR_Color.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureData/ZCR_Point.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureData/ZCR_Line.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureData/ZCR_Surface.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureData/ZCR_VBO.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ZCR_Scene.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ZCR_Mesh.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ZCR_Camera.cpp

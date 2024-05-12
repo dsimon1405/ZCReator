@@ -13,7 +13,7 @@ void ZCR_ActiveFigures::Erase(ZCR_Figure* pFigure)
 {
     pFigure->ChangeSceneActivity(false);
     if (!ZC_ForwardListErase(activeFigures, pFigure))
-        ZC_ErrorLogger::Err("Can't find ZCR_Figure to erase from activeFigures!", __FILE__,__LINE__);
+        ZC_ErrorLogger::Err("Can't find ZCR_FigureCreator to erase from activeFigures!", __FILE__,__LINE__);
 }
 
 void ZCR_ActiveFigures::Clear(bool changeActivityOnScene)

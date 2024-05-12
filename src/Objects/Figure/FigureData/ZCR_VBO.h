@@ -1,22 +1,30 @@
 #pragma once
 
-#include "ZCR_FigureData.h"
 #include <ZC/Video/OpenGL/Buffer/ZC_Buffer.h>
+#include <ZC/Tools/Container/ZC_DA.h>
+#include <ZC/Tools/Math/ZC_Figures.h>
+#include <ZC/Tools/Math/ZC_Vec2.h>
 
-struct ZCR_VBO : public ZCR_FigureData
+struct ZCR_VBO
 {
 protected:
-    ZC_sptr<ZC_Buffer> vbo = nullptr;
-    
+    ZC_Buffer vbo { GL_ARRAY_BUFFER };
+
+    ZC_DA<ZC_Quad> quads;
+    ZC_DA<ZC_Triangle> triangles;
+    ZC_DA<ZC_Vec3<uchar>> colors;
+    ZC_DA<int> normals;
+    ZC_DA<ZC_Vec2<float>> texCoords;
+
     ZCR_VBO() = default;
-    ZCR_VBO(ZC_sptr<ZC_DA<ZC_Quad>>&& spQuads, ZC_sptr<ZC_DA<ZC_Triangle>>&& spTriangles, ZC_sptr<ZC_DA<int>>&& spNormals);
+    ZCR_VBO(ZC_DA<ZC_Quad>&& quads, ZC_DA<ZC_Triangle>&& triangles, ZC_DA<int>&& normals);
 
     enum StoredType
     {
-        StoredType_Vertex,
-        StoredType_Color,
-        StoredType_Normal,
-        StoredType_TexCoord,
+        ST_Vertex,
+        ST_Color,
+        ST_Normal,
+        ST_TexCoord,
     };
     
     void FillVBO();
@@ -38,10 +46,9 @@ protected:
     
     Params:
     storedType - stored type.
-    pData - pointer on data.
     isVertexQuad - must be true if storing vertices of quads, and falls if triangle. In other cases no metter.
     */
-    void BufferSubDataAllStoredType(StoredType storedType, const void* pData, bool isVertexQuad);
+    void BufferSubDataAllStoredType(StoredType storedType, bool isVertexQuad = true);
 
 private:
     ulong trianglesStartIndex = 0;

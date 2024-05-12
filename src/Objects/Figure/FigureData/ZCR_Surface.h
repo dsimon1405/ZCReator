@@ -6,11 +6,12 @@
 struct ZCR_Surface : public virtual ZCR_VBO
 {
     ZCR_Surface();
+    ZCR_Surface(ZCR_Surface&& s);
 
-    ZC_sptr<ZC_DrawerSet> spDrawerSetsSucafe;
-    ZC_DSController dsControllerSurface;
+    ZC_DrawerSet dsSurface;
+    ZC_DSController dsConSurface;
 
-    ZC_sptr<ZC_DrawerSet> CreateSurfaceDrawerSet();
+    ZC_DrawerSet CreateSurfaceDrawerSet();
     ZC_DSController MakeSurfaceRSController();
     ZC_DA<uchar> GetTriangleElements(ulong& rElementsCount, GLenum& rElementsType);
     template<typename T>

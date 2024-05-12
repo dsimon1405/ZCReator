@@ -246,8 +246,11 @@
 //  - If heppens move create ortho quad textured or colored with alpha. On left mouse button up selected zone give those who need that info, and make next step. 
 //  - If heppens left mouse button up enable ZC_MouseCollisionWindowController and ImGui events if disconnected.
 
+#include <Objects/Figure/FigureData/ZCR_MatModel.h>
+
 int ZC_main()
 {
+    // ZCR_MatModel m;
     using namespace ZC_Window;
     ZC_Window::MakeWindow(
         ZC_Window_Multisampling_4 | 

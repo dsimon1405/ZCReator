@@ -3,11 +3,18 @@
 #include <ZC/Tools/Math/ZC_Math.h>
 
 ZCR_Surface::ZCR_Surface()
-    : spDrawerSetsSucafe(CreateSurfaceDrawerSet()),
-    dsControllerSurface(MakeSurfaceRSController())
+    : dsSurface(CreateSurfaceDrawerSet()),
+    dsConSurface(MakeSurfaceRSController())
 {}
 
-ZC_sptr<ZC_DrawerSet> ZCR_Surface::CreateSurfaceDrawerSet()
+ZCR_Surface::ZCR_Surface(ZCR_Surface&& s)
+    : dsSurface(std::move(s.dsSurface)),
+    dsConSurface(MakeSurfaceRSController())
+{
+    dsConSurface.SwitchToDrawLvl(ZC_RL_Default, s.dsConSurface.GetDrawingLevel(ZC_RL_Default));   //  switch new controller to acoding level of previous controller
+}
+
+ZC_DrawerSet ZCR_Surface::CreateSurfaceDrawerSet()
 {
     ulong elementsCount = 0;
     GLenum elementsType = 0;
@@ -21,12 +28,12 @@ ZC_sptr<ZC_DrawerSet> ZCR_Surface::CreateSurfaceDrawerSet()
     typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ShPN_ZCR_ColorFigure);
 
     ZC_VAO vao;
-    vao.Config(pShPIS->vaoConfigData, *vbo, &ebo, 0, (spQuads ? (spQuads->size * 4) : 0) + (spTriangles ? (spTriangles->size * 3) : 0));   //  vertices count in vbo (in one quad 4, in one triangle 3)
+    vao.Config(pShPIS->vaoConfigData, vbo, &ebo, 0, (quads.size * 4) + (triangles.size * 3));   //  vertices count in vbo (in one quad 4, in one triangle 3)
 
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(ebo));
 
-    return ZC_DrawerSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
+    return { pShPIS, std::move(vao), std::move(upDraw), std::move(buffers) };
     // switch (element)
     // {
     // case GLElement::Triangle: return { new ZC_RSNonTex(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers)) };
@@ -42,15 +49,15 @@ ZC_DSController ZCR_Surface::MakeSurfaceRSController()
 
     std::forward_list<ZC_uptr<ZC_RSPersonalData>> persDatas;
     persDatas.emplace_front(ZC_RSPDStencilBorder::Make({ 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) }));    //  stencil border color {r = 255, g = 90, b = 0}
-    return spDrawerSetsSucafe->MakeZC_DSController(-1, std::move(persDatas));
+    return dsSurface.MakeZC_DSController(-1, std::move(persDatas));
 }
 
 ZC_DA<uchar> ZCR_Surface::GetTriangleElements(ulong& rElementsCount, GLenum& rElementsType)
 {
-    ulong quadsElementsCount = spQuads ? (spQuads->size * 6) : 0,     //  6 elements in ebo on one quad
-        trianglesElementsCount = spTriangles ? (spTriangles->size * 3) : 0;     //  3 elements in ebo on one triangle
+    ulong quadsElementsCount = quads.size * 6,     //  6 elements in ebo on one quad
+        trianglesElementsCount = triangles.size * 3;     //  3 elements in ebo on one triangle
     rElementsCount = quadsElementsCount + trianglesElementsCount;  
-    ulong verticesInVBO = (spQuads ? (spQuads->size * 4) : 0) + trianglesElementsCount,     //  4 vertices in vbo on one quad
+    ulong verticesInVBO = (quads.size * 4) + trianglesElementsCount,     //  4 vertices in vbo on one quad
         storingTypeSize = 0;
     ZC_Buffer::GetElementsData(verticesInVBO - 1, storingTypeSize, rElementsType);
     ZC_DA<uchar> elements(storingTypeSize * rElementsCount);
@@ -65,5 +72,5 @@ ZC_DA<uchar> ZCR_Surface::GetTriangleElements(ulong& rElementsCount, GLenum& rEl
 
 void ZCR_Surface::SwitchRSControllerTriangle(ZC_DrawerLevel drawerLevel)
 {
-    dsControllerSurface.SwitchToDrawLvl(ZC_RL_Default, drawerLevel);
+    dsConSurface.SwitchToDrawLvl(ZC_RL_Default, drawerLevel);
 }

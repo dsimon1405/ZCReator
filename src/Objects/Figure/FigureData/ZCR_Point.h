@@ -7,34 +7,37 @@
 
 struct ZCR_Point : public ZCR_Color
 {
-    ZCR_Point();
-
     std::list<Points> points;    //  fill in GetPoints
-    std::list<Points*> activePoints {};
+    std::list<Points*> activePoints;
 
-    ZC_sptr<ZC_DrawerSet> spDrawerSetsPoint;
-    ZC_DSController dsControllerPoint;
+    ZC_DrawerSet dsPoint;
+    ZC_DSController dsConPoint;
 
-    ZC_sptr<ZC_DrawerSet> CreatePointDrawerSet();
+    ZCR_Point();
+    ZCR_Point(ZCR_Point&& p);
+
+    void MakePointsActive(std::list<Points*>& points);
+    void MakeAllPointsActive();
+    void MakeAllPointsPassive();
+    void SwitchRSControllerPoint(ZC_DrawerLevel drawerLevel);
+
+private:
+    ZC_DrawerSet CreatePointDrawerSet();
     ZC_DA<uchar> GetPointElements(ulong& rElementsCount, GLenum& rElementsType);
     void GetPoints(ulong& rElementsCount);
     ulong FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>* pVertexContainerHead);
     template<typename TElement>
     void FillPointElements(TElement* pIndex);
-
-    void SwitchRSControllerPoint(ZC_DrawerLevel drawerLevel);
-
-    void MakePointsActive(std::list<Points*>&& points);
 };
 
 
 template<typename TElement>
 void ZCR_Point::FillPointElements(TElement* pElement)
 {
-    ulong trianglesStartOffsetInEBO = spQuads ? (spQuads->size * 4) : 0;    //  triangles start index in ebo
+    ulong trianglesStartOffsetInEBO = quads.size * 4;    //  triangles start index in ebo
     ulong pElementI = 0;
-    auto pQuadsHead = spQuads ? &(spQuads->Begin()->bl) : nullptr;
-    auto pTrianglesHead = spTriangles ? &(spTriangles->Begin()->bl) : nullptr;
+    auto pQuadsHead = &(quads.Begin()->bl);
+    auto pTrianglesHead = &(triangles.Begin()->bl);
     for (auto& point : points)
     {
         auto& samePoint = point.GetSamePoint();

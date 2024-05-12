@@ -3,11 +3,18 @@
 #include <ZC/Tools/Container/ZC_ContFunc.h>
 
 ZCR_Line::ZCR_Line()
-    : spDrawerSetsLine(CreateLineDrawerSet()),
-    dsControllerLine(spDrawerSetsLine->MakeZC_DSController())
+    : dsLine(CreateLineDrawerSet()),
+    dsConLine(dsLine.MakeZC_DSController())
 {}
 
-ZC_sptr<ZC_DrawerSet> ZCR_Line::CreateLineDrawerSet()
+ZCR_Line::ZCR_Line(ZCR_Line&& l)
+    : dsLine(std::move(l.dsLine)),
+    dsConLine(dsLine.MakeZC_DSController())
+{
+    dsConLine.SwitchToDrawLvl(ZC_RL_Default, l.dsConLine.GetDrawingLevel(ZC_RL_Default));   //  switch new controller to acoding level of previous controller
+}
+
+ZC_DrawerSet ZCR_Line::CreateLineDrawerSet()
 {
     ulong elementsCount = 0;
     GLenum elementsType = 0;
@@ -20,13 +27,13 @@ ZC_sptr<ZC_DrawerSet> ZCR_Line::CreateLineDrawerSet()
 
     typename ZC_ShProgs::ShPInitSet* pShPIS = ZC_ShProgs::Get(ShPN_ZCR_LineFigure);
 
-    ZC_VAO vao;                                        //  vertices count in vbo (in one quad 4, in one triangle 3)
-    vao.Config(pShPIS->vaoConfigData, *vbo, &ebo, 0, (spQuads ? (spQuads->size * 4) : 0) + (spTriangles ? (spTriangles->size * 3) : 0));
+    ZC_VAO vao;
+    vao.Config(pShPIS->vaoConfigData, vbo, &ebo, 0, (quads.size * 4) + (triangles.size * 3));   //  vertices count in vbo (in one quad 4, in one triangle 3)
 
     std::forward_list<ZC_Buffer> buffers;
     buffers.emplace_front(std::move(ebo));
 
-    return ZC_DrawerSet::CreateShptr(pShPIS, std::move(vao), std::move(upDraw), std::move(buffers));
+    return { pShPIS, std::move(vao), std::move(upDraw), std::move(buffers) };
 }
 
 ZC_DA<uchar> ZCR_Line::GetLineElements(ulong& rElementsCount, GLenum& rElementsType)
@@ -65,25 +72,25 @@ std::forward_list<typename ZCR_Line::Lines> ZCR_Line::GetLines(ulong& rElementsC
             return 2;   //  in ebo line is two values, if not found same return 2 (new line)
         }
     };
-    for (ulong i = 0; i < (spTriangles ? spTriangles->size : 0); ++i)
+    for (ulong i = 0; i < triangles.size; ++i)
     {
-        rElementsCount += linesAdd((*spTriangles)[i].bl, (*spTriangles)[i].tc, false);
-        rElementsCount += linesAdd((*spTriangles)[i].tc, (*spTriangles)[i].br, false);
-        rElementsCount += linesAdd((*spTriangles)[i].br, (*spTriangles)[i].bl, false);
+        rElementsCount += linesAdd(triangles[i].bl, triangles[i].tc, false);
+        rElementsCount += linesAdd(triangles[i].tc, triangles[i].br, false);
+        rElementsCount += linesAdd(triangles[i].br, triangles[i].bl, false);
     }
-    for (ulong i = 0; i < (spQuads ? spQuads->size : 0); ++i)
+    for (ulong i = 0; i < quads.size; ++i)
     {
-        rElementsCount += linesAdd((*spQuads)[i].bl, (*spQuads)[i].tl, true);
-        rElementsCount += linesAdd((*spQuads)[i].tl, (*spQuads)[i].tr, true);
-        rElementsCount += linesAdd((*spQuads)[i].tr, (*spQuads)[i].br, true);
-        rElementsCount += linesAdd((*spQuads)[i].br, (*spQuads)[i].bl, true);
+        rElementsCount += linesAdd(quads[i].bl, quads[i].tl, true);
+        rElementsCount += linesAdd(quads[i].tl, quads[i].tr, true);
+        rElementsCount += linesAdd(quads[i].tr, quads[i].br, true);
+        rElementsCount += linesAdd(quads[i].br, quads[i].bl, true);
     }
     return lines;
 }
 
 void ZCR_Line::SwitchRSControllerLine(ZC_DrawerLevel drawerLevel)
 {
-    dsControllerLine.SwitchToDrawLvl(ZC_RL_Default, drawerLevel);
+    dsConLine.SwitchToDrawLvl(ZC_RL_Default, drawerLevel);
 }
 
 

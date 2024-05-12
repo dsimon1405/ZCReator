@@ -3,6 +3,7 @@
 #include "ZCR_VBO.h"
 
 #include <forward_list>
+#include <list>
 
 struct ZCR_Color : public virtual ZCR_VBO
 {
@@ -24,13 +25,21 @@ protected:
         SamePoint& GetSamePoint();
     };
 
-    void FillColorsAllAsPassive(bool needBufferData);
-    void FillColorsAllAsActive(bool needBufferData);
+    void FillColorsAllAsPassive(bool bufferData);
+    void FillColorsAllAsActive(bool bufferData);
     void FillColorActivePoint(Points* pPoints);
+
+    /*
+    Params:
+    _activePoints - point to make active.
+    passiveClear - need to clear points color buffer in passive color, before make active points?
+    bufferData - need buffer data on gpu?
+    */
+    void FillColorsActivePoints(const std::list<Points*>& _activePoints, bool passiveClear, bool bufferData);
 
 private:
     static inline const ZC_Vec3<uchar> colorPassivePoint { 0, 0, 0 };        //  black
     static inline const ZC_Vec3<uchar> colorActivePoint { 253, 127, 57 };    //  orange
 
-    ulong trianglesStartVertexIndex = spQuads->size * 4;
+    ulong trianglesStartVertexIndex = quads.size * 4;
 };

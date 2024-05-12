@@ -26,22 +26,22 @@ void ZCR_IGWBM_Create::VDrawWindowIGW()
         ImGui::TableNextColumn();
         static int iconTextureId = ZCR_IconTexture::iconTexture.GetId();
         if (ImGui::ImageButton("Cube", reinterpret_cast<ImTextureID>((long long)iconTextureId), iconSize, ZCR_IconTexture::tcCreateCube.tl, ZCR_IconTexture::tcCreateCube.br))
-            FigureCreation(FN_Cube, false);
+            FigureCreation(ZCR_FN_Cube, false);
         ImGui::TextColored(ImGui::IsItemHovered() ? colorActive : colorPassive, isAciveBM ? "     Cube(U)" : "     Cube");
         
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("Cylinder", reinterpret_cast<ImTextureID>((long long)iconTextureId), iconSize, ZCR_IconTexture::tcCreateCylinder.tl, ZCR_IconTexture::tcCreateCylinder.br))
-            FigureCreation(FN_Cube, false);
+            FigureCreation(ZCR_FN_Cube, false);
         ImGui::TextColored(ImGui::IsItemHovered() ? colorActive : colorPassive, isAciveBM ? "   Cylinder(Y)" : "   Cylinder");
 
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("Cone", reinterpret_cast<ImTextureID>((long long)iconTextureId), iconSize, ZCR_IconTexture::tcCreateCone.tl, ZCR_IconTexture::tcCreateCone.br))
-            FigureCreation(FN_Cube, false);
+            FigureCreation(ZCR_FN_Cube, false);
         ImGui::TextColored(ImGui::IsItemHovered() ? colorActive : colorPassive, isAciveBM ? "     Cone(O)" : "     Cone");
 
         ImGui::TableNextColumn();
         if (ImGui::ImageButton("Sphere", reinterpret_cast<ImTextureID>((long long)iconTextureId), iconSize, ZCR_IconTexture::tcCreateSphere.tl, ZCR_IconTexture::tcCreateSphere.br))
-            FigureCreation(FN_Cube, false);
+            FigureCreation(ZCR_FN_Cube, false);
         ImGui::TextColored(ImGui::IsItemHovered() ? colorActive : colorPassive, isAciveBM ? "    Sphere(S)" : "    Sphere");
 
         ImGui::EndTable();
@@ -52,7 +52,7 @@ void ZCR_IGWBM_Create::VCallButtonDownBM(ZC_ButtonID buttonId, float time)
 {
     switch (buttonId)
     {
-    case K_U: FigureCreation(FN_Cube, true); break;
+    case K_U: FigureCreation(ZCR_FN_Cube, true); break;
     default: break;
     }
 }
@@ -60,7 +60,7 @@ void ZCR_IGWBM_Create::VCallButtonDownBM(ZC_ButtonID buttonId, float time)
 void ZCR_IGWBM_Create::FigureCreation(int _creatingFigureName, bool createNow)
 {
     NeedDrawIGW(false);
-    if (createNow) ZCR_Figures::CreateFigure(static_cast<FigureName>(_creatingFigureName));
+    if (createNow) ZCR_Figures::CreateFigure(static_cast<ZCR_FigureName>(_creatingFigureName));
     else
     {
         creatingFigureName = _creatingFigureName;
@@ -70,5 +70,5 @@ void ZCR_IGWBM_Create::FigureCreation(int _creatingFigureName, bool createNow)
 
 void ZCR_IGWBM_Create::CreateFigure()
 {
-    ZCR_Figures::CreateFigure(static_cast<FigureName>(creatingFigureName));
+    ZCR_Figures::CreateFigure(static_cast<ZCR_FigureName>(creatingFigureName));
 }
