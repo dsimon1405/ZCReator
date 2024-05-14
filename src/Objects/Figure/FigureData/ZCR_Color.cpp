@@ -1,15 +1,27 @@
 #include "ZCR_Color.h"
 
+// ZCR_Color::ZCR_Color(ZC_DA<ZC_Quad>&& _quads, ZC_DA<ZC_Triangle>&& _triangles, ZC_DA<int>&& _normals)
+//     : ZCR_VBO(std::move(_quads), std::move(_triangles), { (quads.size * 4) + (triangles.size * 3) }, std::move(_normals))
+// {}
+
 void ZCR_Color::FillColorsAllAsPassive(bool bufferData)
 {
     std::fill(&((*(colors.pHead))[0]), &((*(colors.pHead + (colors.size - 1)))[2]), 0); //  dangerous place
-    if (bufferData) BufferSubDataAllStoredType(ST_Color);
+    if (bufferData)
+    {
+        this->BufferSubDataAllStoredType(ST_Color);
+        colorStateGPU = CS_GPU_AllPassive;
+    }
 }
 
 void ZCR_Color::FillColorsAllAsActive(bool bufferData)
 {
     for (ulong i = 0; i < colors.size; ++i) colors[i] = colorActivePoint;
-    if (bufferData) BufferSubDataAllStoredType(ST_Color);
+    if (bufferData)
+    {
+        this->BufferSubDataAllStoredType(ST_Color);
+        colorStateGPU = CS_GPU_AllActive;
+    }
 }
 
 void ZCR_Color::FillColorActivePoint(Points* pPoints)
@@ -17,19 +29,26 @@ void ZCR_Color::FillColorActivePoint(Points* pPoints)
     for (auto& samePoint : pPoints->samePoints)
     {
         colors[samePoint.isQuad ? samePoint.indexInQuadsOrTriangles : trianglesStartVertexIndex + samePoint.indexInQuadsOrTriangles] = colorActivePoint;
-        BufferSubDataIndex(ST_Color, samePoint.isQuad, samePoint.indexInQuadsOrTriangles, &colorActivePoint);
+        this->BufferSubDataIndex(ST_Color, samePoint.isQuad, samePoint.indexInQuadsOrTriangles, &colorActivePoint);
+        colorStateGPU = CS_GPU_ActivePoint;
     }
 }
 
-void ZCR_Color::FillColorsActivePoints(const std::list<Points*>& _activePoints, bool passiveClear, bool bufferData)
+void ZCR_Color::FillColorActivePoints(const std::list<Points*>& _activePoints, bool passiveClear, bool bufferData)
 {
+    if (_activePoints.empty()) return;
+    
     if (passiveClear) FillColorsAllAsPassive(false);
     
     for (Points* pActivePoint : _activePoints)
         for (auto& samePoint : pActivePoint->samePoints)
             colors[samePoint.isQuad ? samePoint.indexInQuadsOrTriangles : trianglesStartVertexIndex + samePoint.indexInQuadsOrTriangles] = colorActivePoint;
 
-    if (bufferData) this->BufferSubDataAllStoredType(ST_Color);
+    if (bufferData)
+    {
+        this->BufferSubDataAllStoredType(ST_Color);
+        colorStateGPU = CS_GPU_ActivePoint;
+    }
 }
 
 

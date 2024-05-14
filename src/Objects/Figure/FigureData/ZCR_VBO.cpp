@@ -7,7 +7,9 @@ ZCR_VBO::ZCR_VBO(ZC_DA<ZC_Quad>&& _quads, ZC_DA<ZC_Triangle>&& _triangles, ZC_DA
     triangles(std::move(_triangles)),
     colors((quads.size * 4) + (triangles.size * 3)),
     normals(std::move(_normals))
-{}
+{
+    FillVBO();
+}
 
 void ZCR_VBO::FillVBO()
 {
@@ -20,7 +22,8 @@ void ZCR_VBO::FillVBO()
     normatlsStartIndex = colorsStartIndex + colorsBSize;
     ulong texCoordsStartIndex = normatlsStartIndex + normalsBSize,
         vboSize = texCoordsStartIndex + texCoordsBSize;
-    if (trianglesStartIndex != 0) vbo.BufferData(vboSize, &(quads.Begin()->bl), GL_DYNAMIC_DRAW);
+    //  trianglesStartIndex is quads byte size
+    vbo.BufferData(vboSize, trianglesStartIndex != 0 ? quads.Begin() : nullptr, GL_DYNAMIC_DRAW);
     if (trianglesBSize != 0) vbo.BufferSubData(trianglesStartIndex, trianglesBSize, triangles.Begin());
     // vbo.BufferSubData(colorsStartIndex, colorsBSize, colors.Begin());
     vbo.BufferSubData(normatlsStartIndex, normalsBSize, normals.Begin());
@@ -35,7 +38,7 @@ void ZCR_VBO::BufferSubDataIndex(StoredType storedType, bool isQuad, ulong verte
     static const ulong texCoordByteSize = sizeof(ZC_DA<ZC_Vec2<float>>);
     ulong offset = 0;
     ulong byteSize = 0;
-    auto setOffsetAndSize = [&offset, &byteSize, isQuad, vertexIndex](ulong startIndex, ulong typesByteSize, ulong trianglesStartIndex)
+    auto lambSetOffsetAndSize = [&offset, &byteSize, isQuad, vertexIndex](ulong startIndex, ulong typesByteSize, ulong trianglesStartIndex)
     {
         offset = isQuad ? startIndex + (vertexIndex * typesByteSize) : (startIndex + trianglesStartIndex + (vertexIndex * typesByteSize));
         byteSize = vertexByteSize;
@@ -43,10 +46,10 @@ void ZCR_VBO::BufferSubDataIndex(StoredType storedType, bool isQuad, ulong verte
 
     switch (storedType)
     {
-    case ST_Vertex: setOffsetAndSize(0, vertexByteSize, trianglesStartIndex); break;
-    case ST_Color: setOffsetAndSize(colorsStartIndex, colorByteSize, trianglesStartIndex); break;
-    case ST_Normal: setOffsetAndSize(normatlsStartIndex, normalByteSize, trianglesStartIndex); break;
-    case ST_TexCoord: setOffsetAndSize(texCoordsStartIndex, texCoordByteSize, trianglesStartIndex); break;
+    case ST_Vertex: lambSetOffsetAndSize(0, vertexByteSize, trianglesStartIndex); break;
+    case ST_Color: lambSetOffsetAndSize(colorsStartIndex, colorByteSize, trianglesStartIndex); break;
+    case ST_Normal: lambSetOffsetAndSize(normatlsStartIndex, normalByteSize, trianglesStartIndex); break;
+    case ST_TexCoord: lambSetOffsetAndSize(texCoordsStartIndex, texCoordByteSize, trianglesStartIndex); break;
     }
     vbo.BufferSubData(offset, byteSize, pData);
 }

@@ -55,6 +55,7 @@ set(ZCR_SRC_FILES ${ZCR_SRC_FILES}
     ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureData/ZCR_Line.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureData/ZCR_Surface.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Figure/FigureData/ZCR_VBO.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Figure/ImGui/ZCR_IGW_Figures.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ZCR_Scene.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ZCR_Mesh.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ZCR_Camera.cpp

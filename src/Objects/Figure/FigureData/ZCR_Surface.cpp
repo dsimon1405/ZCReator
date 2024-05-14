@@ -1,17 +1,89 @@
 #include "ZCR_Surface.h"
 
 #include <ZC/Tools/Math/ZC_Math.h>
+#include <ZC/Tools/Container/ZC_ContFunc.h>
+#include <Objects/Scene/ImGui/ZCR_IGWBM_Mode.h>
+#include <Renderer/ZCR_RenderLevel.h>
 
 ZCR_Surface::ZCR_Surface()
     : dsSurface(CreateSurfaceDrawerSet()),
-    dsConSurface(MakeSurfaceRSController())
-{}
-
-ZCR_Surface::ZCR_Surface(ZCR_Surface&& s)
-    : dsSurface(std::move(s.dsSurface)),
-    dsConSurface(MakeSurfaceRSController())
+    dscSurface(MakeSurfaceRSController())
 {
-    dsConSurface.SwitchToDrawLvl(ZC_RL_Default, s.dsConSurface.GetDrawingLevel(ZC_RL_Default));   //  switch new controller to acoding level of previous controller
+    dscSurface.SetUniformsData(ZC_UN_unAlpha, &alpha);
+    dscSurface.SetUniformsData(ZCR_UN_unUseLight, &useLight);
+}
+
+// ZCR_Surface::ZCR_Surface(ZCR_Surface&& s)
+//     : dsSurface(std::move(s.dsSurface)),
+//     dsConSurface(MakeSurfaceRSController())
+// {
+//     dsConSurface.SwitchToDrawLvl(ZC_RL_Default, s.dsConSurface.GetDrawingLevel(ZC_RL_Default));   //  switch new controller to acoding level of previous controller
+// }
+
+void ZCR_Surface::ChangeSceneModeTriangle(ZCR_SceneMode sceneMode)
+{
+    if (alpha == 0.f) dscSurface.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None);
+    else if (alpha < 1.f)
+    {
+        if (sceneMode == ZCR_SM_Sculpting)
+        {
+            if (this->isActiveOnScene)
+            {
+                dscSurface.SetUniformsData(ZC_UN_unAlpha, &alphaOne);
+                dscSurface.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_Drawing);
+            }
+            else dscSurface.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None);
+        }
+        else
+        {
+            if (this->isActiveOnScene)
+            {
+                dscSurface.SetUniformsData(ZC_UN_unAlpha, &alpha);
+                dscSurface.SwitchToDrawLvl(ZC_RL_Default, ZCR_DL_AlphaBlending);
+            }
+            else
+            {
+                dscSurface.SetUniformsData(ZC_UN_unAlpha, &alphaOne);
+                dscSurface.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_Drawing);
+            };
+        }
+    }
+    else    //  alpha = 1.f
+    {
+        dscSurface.SetUniformsData(ZC_UN_unAlpha, &alphaOne);
+        switch (sceneMode)
+        {
+        case ZCR_SM_None: dscSurface.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_Drawing); break;
+        case ZCR_SM_Model: dscSurface.SwitchToDrawLvl(ZC_RL_Default, this->isActiveOnScene ? ZC_DL_StencilBorder : ZC_DL_Drawing); break;
+        case ZCR_SM_Edit: dscSurface.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_Drawing); break;
+        case ZCR_SM_Sculpting: dscSurface.SwitchToDrawLvl(ZC_RL_Default, this->isActiveOnScene ? ZC_DL_Drawing : ZC_DL_None); break;
+        }
+    }
+}
+
+void ZCR_Surface::SetAlpha(float _alpha)
+{
+    if (alpha == _alpha) return;
+    alpha = _alpha < 0.f ? 0.f
+        :_alpha > 1.f ? 1.f
+        : _alpha;
+
+    ChangeSceneModeTriangle(ZCR_IGWBM_Mode::GetActiveSceneMode());
+}
+
+float ZCR_Surface::GetAlpha()
+{
+    return alpha;
+}
+
+void ZCR_Surface::SetUseLight(bool _useLight)
+{
+    useLight = _useLight;
+}
+
+bool ZCR_Surface::IsUseLight()
+{
+    return useLight;
 }
 
 ZC_DrawerSet ZCR_Surface::CreateSurfaceDrawerSet()
@@ -48,7 +120,7 @@ ZC_DSController ZCR_Surface::MakeSurfaceRSController()
     // ZC_RSPDStencilBorder::Make({ 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) });
 
     std::forward_list<ZC_uptr<ZC_RSPersonalData>> persDatas;
-    persDatas.emplace_front(ZC_RSPDStencilBorder::Make({ 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) }));    //  stencil border color {r = 255, g = 90, b = 0}
+    persDatas.emplace_front(ZC_RSPDStencilBorder::Make({ 1.05f, 1.05f, 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) }));    //  stencil border color {r = 255, g = 90, b = 0}
     return dsSurface.MakeZC_DSController(-1, std::move(persDatas));
 }
 
@@ -68,9 +140,4 @@ ZC_DA<uchar> ZCR_Surface::GetTriangleElements(ulong& rElementsCount, GLenum& rEl
     case 4: FillTriangleElements<uint>(reinterpret_cast<uint*>(elements.pHead), elements.size / 4, quadsElementsCount); break;
     }
     return elements;
-}
-
-void ZCR_Surface::SwitchRSControllerTriangle(ZC_DrawerLevel drawerLevel)
-{
-    dsConSurface.SwitchToDrawLvl(ZC_RL_Default, drawerLevel);
 }

@@ -6,9 +6,10 @@
 #include <imgui.h>
 
 ZCR_IGWBM_Interface::ZCR_IGWBM_Interface()
-    : ZC_IGWBM(K_I, true, false, true, "Interface", false, 400.f, 300.f, 0.f, 0.f, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, true,
+    : ZC_IGWBM(K_I, true, false, true, "Interface", false, 366.f, 246.f, 0.f, 0.f, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, true,
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse
-        | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings)
+        // | ImGuiWindowFlags_AlwaysAutoResize
+         | ImGuiWindowFlags_NoSavedSettings)
 {}
 
 void ZCR_IGWBM_Interface::VCallButtonDownBM(ZC_ButtonID buttonId, float time)
@@ -38,9 +39,9 @@ void ZCR_IGWBM_Interface::DrawInterface(bool isActiveBM)
 {
     ImGui::SeparatorText("Interface");
     bool isActiveO3d = orientatin3D.IsActive();
-    if (ImGui::Checkbox(isActiveBM ? "Orientation3D(O)" : "Orientation3D", &isActiveO3d)) isActiveO3d ? orientatin3D.Activate() : orientatin3D.Deactivate();
+    if (ImGui::Checkbox(isActiveBM ? " Orientation3D(O)" : " Orientation3D", &isActiveO3d)) isActiveO3d ? orientatin3D.Activate() : orientatin3D.Deactivate();
     bool isDrawingIG = ZC_IGWindow::IsImGuiDrawing();
-    if (ImGui::Checkbox(isActiveBM ? "ImGui(G)" : "ImGui", &isDrawingIG)) ZC_IGWindow::NeedImGuiDraw(!isDrawingIG);
+    if (ImGui::Checkbox(isActiveBM ? " ImGui(G)" : " ImGui", &isDrawingIG)) ZC_IGWindow::NeedImGuiDraw(!isDrawingIG);
 }
 
 void ZCR_IGWBM_Interface::DrawMeshOptions(bool isActiveBM)
@@ -48,6 +49,7 @@ void ZCR_IGWBM_Interface::DrawMeshOptions(bool isActiveBM)
     ImGui::SeparatorText("Mesh");
     if (ImGui::BeginTable("Mesh", 5))
     {
+        for (char i = 0; i < 5; i++) ImGui::TableSetupColumn(&i, ImGuiTableColumnFlags_WidthFixed);
         ZCR_Scene* pScene = ZCR_Scene::GetScene();
         ImGui::TableNextColumn();
         if (ImGui::RadioButton(isActiveBM ? "Auto(1)" : "Auto", pScene->GetMeshSpecificCoordSystem() == ZCR_Mesh::CS_Auto)) pScene->SetMeshSpecificCoordSystem(ZCR_Mesh::CS_Auto);
@@ -59,7 +61,6 @@ void ZCR_IGWBM_Interface::DrawMeshOptions(bool isActiveBM)
         if (ImGui::RadioButton(isActiveBM ? "YZ(4)" : "YZ", pScene->GetMeshSpecificCoordSystem() == ZCR_Mesh::CS_YZ)) pScene->SetMeshSpecificCoordSystem(ZCR_Mesh::CS_YZ);
         ImGui::TableNextColumn();
         if (ImGui::RadioButton(isActiveBM ? "None(5)" : "None", pScene->GetMeshSpecificCoordSystem() == ZCR_Mesh::CS_None)) pScene->SetMeshSpecificCoordSystem(ZCR_Mesh::CS_None);
-        
         ImGui::EndTable();
     }
 }
@@ -79,10 +80,10 @@ void ZCR_IGWBM_Interface::DrawViewportOptions()
         
         static const float nearPlaneDefault = 0.01f;
         ImGui::TableNextColumn();
-        if (ImGui::InputFloat("NearPlane", &nearPlane, 0.1f, 2.f, "%.2f"))
+        if (ImGui::InputFloat(" Near Plane", &nearPlane, 0.1f, 2.f, "%.2f"))
         {
-            if (nearPlane >= farPlane) nearPlane = farPlane - 1.f;
-            if (nearPlane <= 0.f) nearPlane = nearPlaneDefault;
+            if (nearPlane > farPlane -1.f) nearPlane = farPlane - 1.f;
+            else if (nearPlane < nearPlaneDefault) nearPlane = nearPlaneDefault;
             pCamera->SetNearPlane(nearPlane);
         }
         ImGui::TableNextColumn();
@@ -91,10 +92,10 @@ void ZCR_IGWBM_Interface::DrawViewportOptions()
         static const float farPlaneDefault = 100.f;
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
-        if (ImGui::InputFloat("FarPlane", &farPlane, 1.f, 5.f, "%.2f"))
+        if (ImGui::InputFloat(" Far Plane", &farPlane, 1.f, 5.f, "%.2f"))
         {
-            static const float farPlaneMax = 2000.f;
-            if (nearPlane >= farPlane) farPlane = nearPlane + 1.f;
+            static const float farPlaneMax = 1000000.f;
+            if (nearPlane > farPlane - 1.f) farPlane = nearPlane + 1.f;
             else if (farPlane > farPlaneMax) farPlane = farPlaneMax;
             pCamera->SetFarPlane(farPlane);
         }
@@ -103,7 +104,7 @@ void ZCR_IGWBM_Interface::DrawViewportOptions()
 
         ImGui::TableNextRow();
         ImGui::TableNextColumn();
-        if (ImGui::SliderFloat("Fovy", &fovy, 1.f, 179.f, "%1.f")) pCamera->SetFovy(fovy);
+        if (ImGui::SliderFloat(" Fovy", &fovy, 1.f, 179.f, "%1.f")) pCamera->SetFovy(fovy);
         ImGui::TableNextColumn();
         static const float fovyDefault = 45.f;
         if (fovy != fovyDefault && ImGui::SmallButton("Default##3")) pCamera->SetFovy(fovyDefault);

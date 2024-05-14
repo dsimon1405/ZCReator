@@ -1,16 +1,29 @@
 #pragma once
 
-#include "ZCR_VBO.h"
+#include "ZCR_Color.h"
 #include <ZC/Video/OpenGL/Renderer/ZC_DrawerSet.h>
+#include <Objects/Scene/ZCR_SceneMode.h>
 
-struct ZCR_Line : public virtual ZCR_VBO
+class ZCR_Line : public virtual ZCR_Color
 {
-    ZCR_Line();
-    ZCR_Line(ZCR_Line&& l);
+public:
+    //  returns true if lines drawing in all scene modes
+    bool IsDrawLines();
+    //  sets to draw lines in all scene modes
+    void SetDrawLines(bool _drawLines);
 
+private:
     ZC_DrawerSet dsLine;
-    ZC_DSController dsConLine;
 
+protected:
+    ZC_DSController dscLine;
+
+    ZCR_Line();
+    // ZCR_Line(ZCR_Line&& l);
+
+    void ChangeSceneModeLine(ZCR_SceneMode sceneMode);
+
+private:
     struct Lines
     {
         struct Corners
@@ -27,13 +40,14 @@ struct ZCR_Line : public virtual ZCR_VBO
         Corners& GetCorners();
     };
 
+    bool drawLines = false;
+
     ZC_DrawerSet CreateLineDrawerSet();
     ZC_DA<uchar> GetLineElements(ulong& rElementsCount, GLenum& rElementsType);
     std::forward_list<Lines> GetLines(ulong& rElementsCount);
     template<typename TElement>
     void FillLineElements(std::forward_list<Lines>& lines, TElement* pElement);
-
-    void SwitchRSControllerLine(ZC_DrawerLevel drawerLevel);
+    // ZC_DSController ZCR_Line::MakeSurfaceRSController();
 };
 
 template<typename TElement>

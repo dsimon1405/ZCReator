@@ -2,14 +2,31 @@
 
 #include "ZCR_VBO.h"
 #include <ZC/Video/OpenGL/Renderer/ZC_DrawerSet.h>
+#include <Objects/Scene/ZCR_SceneMode.h>
 
-struct ZCR_Surface : public virtual ZCR_VBO
+class ZCR_Surface : public virtual ZCR_VBO
 {
-    ZCR_Surface();
-    ZCR_Surface(ZCR_Surface&& s);
+public:
+    void SetAlpha(float alpha);
+    float GetAlpha();
+    bool IsUseLight();
+    void SetUseLight(bool _useLight);
 
+private:
     ZC_DrawerSet dsSurface;
-    ZC_DSController dsConSurface;
+
+protected:
+    ZC_DSController dscSurface;
+
+    ZCR_Surface();
+    // ZCR_Surface(ZCR_Surface&& s);
+
+    void ChangeSceneModeTriangle(ZCR_SceneMode sceneMode);
+
+private:
+    static inline float alphaOne = 1.f;
+    float alpha = 1.f;
+    int useLight = true;    //  uses as int in uniform
 
     ZC_DrawerSet CreateSurfaceDrawerSet();
     ZC_DSController MakeSurfaceRSController();
@@ -17,7 +34,6 @@ struct ZCR_Surface : public virtual ZCR_VBO
     template<typename T>
     static void FillTriangleElements(T* pElementsHead, ulong elementsSize, ulong quadsElementsCount);
 
-    void SwitchRSControllerTriangle(ZC_DrawerLevel drawerLevel);
 };
 
 template<typename T>

@@ -25,17 +25,29 @@ protected:
         SamePoint& GetSamePoint();
     };
 
+    enum ColorStateGPU
+    {
+        CS_GPU_AllPassive,
+        CS_GPU_AllActive,
+        CS_GPU_ActivePoint
+    };
+
+    std::list<Points*> activePoints;
+    ColorStateGPU colorStateGPU;
+
+    // ZCR_Color(ZC_DA<ZC_Quad>&& _quads, ZC_DA<ZC_Triangle>&& _triangles, ZC_DA<int>&& _normals);
+
     void FillColorsAllAsPassive(bool bufferData);
     void FillColorsAllAsActive(bool bufferData);
     void FillColorActivePoint(Points* pPoints);
 
     /*
     Params:
-    _activePoints - point to make active.
-    passiveClear - need to clear points color buffer in passive color, before make active points?
-    bufferData - need buffer data on gpu?
+    - _activePoints - point to make active.
+    - passiveClear - is it necessary to clear the point color buffer with a passive color before coloring the active points?
+    - bufferData - need buffer data on gpu?
     */
-    void FillColorsActivePoints(const std::list<Points*>& _activePoints, bool passiveClear, bool bufferData);
+    void FillColorActivePoints(const std::list<Points*>& _activePoints, bool passiveClear, bool bufferData);
 
 private:
     static inline const ZC_Vec3<uchar> colorPassivePoint { 0, 0, 0 };        //  black

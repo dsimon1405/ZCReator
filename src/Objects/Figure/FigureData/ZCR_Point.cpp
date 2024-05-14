@@ -2,55 +2,62 @@
 
 #include <ZC/Tools/Container/ZC_ContFunc.h>
 
-ZCR_Point::ZCR_Point()
-    : points{},
-    activePoints{},
-    dsPoint(CreatePointDrawerSet()),
-    dsConPoint(dsPoint.MakeZC_DSController())
-{}
-
-ZCR_Point::ZCR_Point(ZCR_Point&& p)
-    : points(std::move(p.points)),
-    activePoints(std::move(p.activePoints)),
-    dsPoint(std::move(p.dsPoint)),
-    dsConPoint(dsPoint.MakeZC_DSController())
+void ZCR_Point::MakePointActive(Points* _point)
 {
-    dsConPoint.SwitchToDrawLvl(ZC_RL_Default, p.dsConPoint.GetDrawingLevel(ZC_RL_Default));   //  switch new controller to acoding level of previous controller
+    if (ZC_Find(this->activePoints, _point)) return;  //  point allready active
+    this->activePoints.emplace_back(_point);
+    this->FillColorActivePoint(_point);
 }
 
 void ZCR_Point::MakePointsActive(std::list<Points*>& _points)
 {
-    if (points.size() == _points.size() && _points.size() == activePoints.size()) return;
-    if (points.size() == _points.size())
-    {
-        FillColorsAllAsActive(true);
-        activePoints = std::move(_points);
-    }
+    if (points.size() == _points.size() && _points.size() == this->activePoints.size()) return;
+    if (points.size() == _points.size()) MakeAllPointsActive();
     else
     {
-        for (auto pPoint : _points)
+        for (auto _pointsIter = _points.begin(); _pointsIter != _points.end(); )
         {
-            FillColorActivePoint(pPoint);
-            activePoints.emplace_back(pPoint);
+            if (ZC_Find(this->activePoints, *_pointsIter)) _pointsIter = _points.erase(_pointsIter);  //  point allready active
+            else
+            {
+                this->activePoints.emplace_back(*_pointsIter);
+                ++_pointsIter;
+            }
         }
+        if (!(_points.empty())) this->FillColorActivePoints(_points, false, true);
     }
 }
+
 void ZCR_Point::MakeAllPointsActive()
 {
-    activePoints.clear();
-    for (auto& point : points) activePoints.emplace_back(&point);
+    this->activePoints.clear();
+    for (auto& point : points) this->activePoints.emplace_back(&point);
     this->FillColorsAllAsActive(true);
 }
 
 void ZCR_Point::MakeAllPointsPassive()
 {
-    activePoints.clear();
+    this->activePoints.clear();
     this->FillColorsAllAsPassive(true);
 }
 
-void ZCR_Point::SwitchRSControllerPoint(ZC_DrawerLevel drawerLevel)
+ZCR_Point::ZCR_Point()
+    : points{},
+    dsPoint(CreatePointDrawerSet()),
+    dscPoint(dsPoint.MakeZC_DSController())
+{}
+
+// ZCR_Point::ZCR_Point(ZCR_Point&& p)
+//     : points(std::move(p.points)),
+//     dsPoint(std::move(p.dsPoint)),
+//     dsConPoint(dsPoint.MakeZC_DSController())
+// {
+//     dsConPoint.SwitchToDrawLvl(ZC_RL_Default, p.dsConPoint.GetDrawingLevel(ZC_RL_Default));   //  switch new controller to acoding level of previous controller
+// }
+
+void ZCR_Point::ChangeSceneModePoint(ZCR_SceneMode sceneMode)
 {
-    dsConPoint.SwitchToDrawLvl(ZC_RL_Default, drawerLevel);
+    sceneMode == ZCR_SM_Edit && isActiveOnScene ? dscPoint.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_Drawing) : dscPoint.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None);
 }
 
 ZC_DrawerSet ZCR_Point::CreatePointDrawerSet()
@@ -92,34 +99,34 @@ ZC_DA<uchar> ZCR_Point::GetPointElements(ulong& rElementsCount, GLenum& rElement
 
 void ZCR_Point::GetPoints(ulong& rElementsCount)
 {
+    auto lambFillPoints = [this](ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>* pVertexContainerHead) -> ulong
+    {
+        auto pPoints = ZC_Find(points, pVertex);
+        if(pPoints)
+        {
+            pPoints->samePoints.emplace_front(Points::SamePoint{ pVertex, isQuad, static_cast<ulong>(pVertex - pVertexContainerHead) });
+            return 0;   //  in ebo point is one value, if found same return 0
+        }
+        else
+        {
+            points.emplace_back(Points{ { Points::SamePoint{ pVertex, isQuad, static_cast<ulong>(pVertex - pVertexContainerHead) } } });
+            return 1;   //  in ebo point is one value, if not found same return 1 (new point)
+        }
+    };
+
     auto pVertexHeadOfTriangles = &(triangles.Begin()->bl);
     for (ulong i = 0; i < triangles.size; ++i)
     {
-        rElementsCount += FillPoints(&(triangles[i].bl), false, pVertexHeadOfTriangles);
-        rElementsCount += FillPoints(&(triangles[i].tc), false, pVertexHeadOfTriangles);
-        rElementsCount += FillPoints(&(triangles[i].br), false, pVertexHeadOfTriangles);  
+        rElementsCount += lambFillPoints(&(triangles[i].bl), false, pVertexHeadOfTriangles);
+        rElementsCount += lambFillPoints(&(triangles[i].tc), false, pVertexHeadOfTriangles);
+        rElementsCount += lambFillPoints(&(triangles[i].br), false, pVertexHeadOfTriangles);  
     }
     auto pVertexHeadOfQuads = &(quads.Begin()->bl);
     for (ulong i = 0; i < quads.size; ++i)
     {
-        rElementsCount += FillPoints(&(quads[i].bl), true, pVertexHeadOfQuads);
-        rElementsCount += FillPoints(&(quads[i].tl), true, pVertexHeadOfQuads);
-        rElementsCount += FillPoints(&(quads[i].tr), true, pVertexHeadOfQuads);
-        rElementsCount += FillPoints(&(quads[i].br), true, pVertexHeadOfQuads);
-    }
-}
-
-ulong ZCR_Point::FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>* pVertexContainerHead)
-{
-    auto pPoints = ZC_Find(points, pVertex);
-    if(pPoints)
-    {
-        pPoints->samePoints.emplace_front(Points::SamePoint{ pVertex, isQuad, static_cast<ulong>(pVertex - pVertexContainerHead) });
-        return 0;   //  in ebo point is one value, if found same return 0
-    }
-    else
-    {
-        points.emplace_back(Points{ { Points::SamePoint{ pVertex, isQuad, static_cast<ulong>(pVertex - pVertexContainerHead) } } });
-        return 1;   //  in ebo point is one value, if not found same return 1 (new point)
+        rElementsCount += lambFillPoints(&(quads[i].bl), true, pVertexHeadOfQuads);
+        rElementsCount += lambFillPoints(&(quads[i].tl), true, pVertexHeadOfQuads);
+        rElementsCount += lambFillPoints(&(quads[i].tr), true, pVertexHeadOfQuads);
+        rElementsCount += lambFillPoints(&(quads[i].br), true, pVertexHeadOfQuads);
     }
 }

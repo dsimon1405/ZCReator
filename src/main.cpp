@@ -250,7 +250,6 @@
 
 int ZC_main()
 {
-    // ZCR_MatModel m;
     using namespace ZC_Window;
     ZC_Window::MakeWindow(
         ZC_Window_Multisampling_4 | 

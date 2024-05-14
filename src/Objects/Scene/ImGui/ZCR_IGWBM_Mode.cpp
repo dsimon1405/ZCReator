@@ -28,7 +28,7 @@ void ZCR_IGWBM_Mode::SetActiveSceneMode(ZCR_SceneMode _sceneMode, bool changeFig
         pIGWBM_Mode->activeSceneMode = _sceneMode;  //  make it to actualize state before call from ZCR_IGWBM_M_Edit or ZCR_IGWBM_M_Model or ZCR_IGWBM_M_Sculpting::VDeactivateIGWBM()
         //  if new mode ZCR_SM_None, just stops draw current state, if new mode legal make it draw
         _sceneMode == ZCR_SM_None ? pIGWBM_Mode->ChangeDrawState(previousMode, false) : pIGWBM_Mode->ChangeDrawState(_sceneMode, true);
-        if (changeFiguresState) ZCR_Figures::SwitchFiguresAndActiveFiguresToNewSceneMode(pIGWBM_Mode->activeSceneMode);
+        if (changeFiguresState) ZCR_Figures::SwitchSceneMode(pIGWBM_Mode->activeSceneMode);
     }
     else pIGWBM_Mode->NeedDrawIGW(false); //  stop drawing Mode's window
 }

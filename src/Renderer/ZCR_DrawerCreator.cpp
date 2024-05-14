@@ -13,7 +13,7 @@ ZC_uptr<ZC_Drawer> ZCR_DrawerCreator::GetRendererLevelDrawer(ZC_DrawerLevel lvl)
 {
     switch (lvl)
     {
-    case ZCR_DL_AlphaBlending: return 
+    case ZCR_DL_AlphaBlending: return                               //  wrong way! (depth must be write in texture and then make depth test from texture for fragment)
         { new ZC_DrawerFL<const ZC_ShProg*, ZC_TexturesHolder, const ZC_VAO*, ZC_RLDData_Uniforms_GLDraw>(0, true, false, ZC_GLBlend(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)) };
     default: assert(false); return nullptr;
     }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ZCR_FigureCreator.h"
+#include "ImGui/ZCR_IGW_Figures.h"
 
 class ZCR_Figures
 {
@@ -10,10 +11,15 @@ public:
 
     static void CreateFigure(ZCR_FigureName figureName);
     static void EraseFigure(ZCR_Figure* pFigure);
-    static void SwitchFiguresAndActiveFiguresToNewSceneMode(ZCR_SceneMode mode);
+    static void SwitchSceneMode(ZCR_SceneMode mode);
+    static ZCR_Figure* GetActiveFigure();
+    static void MakeFigureActive(ZCR_Figure* pFigure);
 
 private:
     static inline ZCR_Figures* pFigures;
 
-    std::forward_list<ZC_uptr<ZCR_Figure>> figures;
+    ZCR_Figure* pActiveFigure = nullptr;
+
+    std::list<ZC_uptr<ZCR_Figure>> figures;
+    ZCR_IGW_Figures igwFigure { figures };
 };

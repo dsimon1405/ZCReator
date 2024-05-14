@@ -6,9 +6,10 @@
 #include <ZC/Events/ZC_Events.h>
 
 ZCR_IGWBM_Create::ZCR_IGWBM_Create()
-    : ZC_IGWBM(K_C, true, false, true, "Create", false, 0.f, 0.f, 0.f, 0.f, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, true,
+    : ZC_IGWBM(K_C, true, false, true, "Create", false, 472.f, 162.f, 0.f, 0.f, ZC_WOIF__X_Center | ZC_WOIF__Y_Center, true,
         ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse
-            | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings)
+            // | ImGuiWindowFlags_AlwaysAutoResize 
+            | ImGuiWindowFlags_NoSavedSettings)
 {}
 
 void ZCR_IGWBM_Create::VDrawWindowIGW()

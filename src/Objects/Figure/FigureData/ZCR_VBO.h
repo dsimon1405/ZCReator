@@ -15,9 +15,13 @@ protected:
     ZC_DA<ZC_Vec3<uchar>> colors;
     ZC_DA<int> normals;
     ZC_DA<ZC_Vec2<float>> texCoords;
+    
+    bool isActiveOnScene = false;
 
     ZCR_VBO() = default;
-    ZCR_VBO(ZC_DA<ZC_Quad>&& quads, ZC_DA<ZC_Triangle>&& triangles, ZC_DA<int>&& normals);
+    ZCR_VBO(ZC_DA<ZC_Quad>&& _quads, ZC_DA<ZC_Triangle>&& _triangles, ZC_DA<int>&& _normals);
+
+    virtual ~ZCR_VBO() = default;
 
     enum StoredType
     {
@@ -26,9 +30,7 @@ protected:
         ST_Normal,
         ST_TexCoord,
     };
-    
-    void FillVBO();
-    
+        
     /*
     Storing data in vbo for index of concrete type.
     
@@ -56,4 +58,6 @@ private:
     ulong normatlsStartIndex = 0;
     ulong texCoordsStartIndex = 0;
     ulong texCoordsBSize = 0;
+
+    void FillVBO();
 };

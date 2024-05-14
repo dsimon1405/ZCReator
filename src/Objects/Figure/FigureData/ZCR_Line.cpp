@@ -1,18 +1,171 @@
 #include "ZCR_Line.h"
 
 #include <ZC/Tools/Container/ZC_ContFunc.h>
+#include <Objects/Scene/ImGui/ZCR_IGWBM_Mode.h>
+
+bool ZCR_Line::IsDrawLines()
+{
+    return drawLines;
+}
+
+void ZCR_Line::SetDrawLines(bool _drawLines)
+{
+    if (drawLines == _drawLines) return;
+    drawLines = _drawLines;
+    ChangeSceneModeLine(ZCR_IGWBM_Mode::GetActiveSceneMode());
+}
 
 ZCR_Line::ZCR_Line()
     : dsLine(CreateLineDrawerSet()),
-    dsConLine(dsLine.MakeZC_DSController())
+    dscLine(dsLine.MakeZC_DSController())
 {}
 
-ZCR_Line::ZCR_Line(ZCR_Line&& l)
-    : dsLine(std::move(l.dsLine)),
-    dsConLine(dsLine.MakeZC_DSController())
+// ZCR_Line::ZCR_Line(ZCR_Line&& l)
+//     : dsLine(std::move(l.dsLine)),
+//     dsConLine(dsLine.MakeZC_DSController())
+// {
+//     dsConLine.SwitchToDrawLvl(ZC_RL_Default, l.dsConLine.GetDrawingLevel(ZC_RL_Default));   //  switch new controller to acoding level of previous controller
+// }
+
+void ZCR_Line::ChangeSceneModeLine(ZCR_SceneMode sceneMode)
 {
-    dsConLine.SwitchToDrawLvl(ZC_RL_Default, l.dsConLine.GetDrawingLevel(ZC_RL_Default));   //  switch new controller to acoding level of previous controller
+    if (sceneMode == ZCR_SM_Edit && isActiveOnScene)
+    {
+        if (colorStateGPU == CS_GPU_AllPassive) this->FillColorActivePoints(this->activePoints, false, true);
+        dscLine.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_Drawing);
+    }
+    else if (drawLines)
+    {
+        if (colorStateGPU != CS_GPU_AllPassive) this->FillColorsAllAsPassive(true);
+        dscLine.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_Drawing);      //  herer add stencilBorder level
+    }
+    else dscLine.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None);
+
+    // switch (sceneMode)
+    // {
+    // case ZCR_SM_None:
+    // {
+    //     if (isActiveOnScene)
+    //     {
+    //         dscLine.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None);
+    //     }
+    //     else
+    //     {
+    //         dscLine.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None);
+    //     };
+    // } break;
+    // case ZCR_SM_Model:
+    // {
+    //     if (isActiveOnScene)
+    //     {
+    //         dscLine.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None);
+    //     }
+    //     else
+    //     {
+    //         dscLine.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None);
+    //     };
+    // } break;
+    // case ZCR_SM_Edit:
+    // {
+    //     if (isActiveOnScene)
+    //     {
+    //         dscLine.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_Drawing);
+    //     }
+    //     else
+    //     {
+    //         dscLine.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None);
+    //     };
+    // } break;
+    // case ZCR_SM_Sculpting:
+    // {
+    //     if (isActiveOnScene)
+    //     {
+    //         dscLine.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None);
+    //     }
+    //     else
+    //     {
+    //         dscLine.SwitchToDrawLvl(ZC_RL_Default, ZC_DL_None);
+    //     };
+    // } break;
+    // }
 }
+
+
+
+
+// void ZCR_Figure::ChangeSceneMode(ZCR_SceneMode sceneMode)
+// {
+//     if (alpha == 0.f) sceneMode == ZCR_SM_Edit ?
+//         SwitchGLElementOnRendererLevel(ZC_DL_None, ZC_DL_Drawing, ZC_DL_Drawing) : SwitchGLElementOnRendererLevel(ZC_DL_None, ZC_DL_None, ZC_DL_None);
+//     else if (alpha < 1.f)
+//     {
+//         switch (sceneMode)
+//         {
+//         case ZCR_SM_None:
+//         {
+//             if (isActiveOnScene)
+//             {
+//                 dsConSurface.SetUniformsData(ZC_UN_unAlpha, &alpha);
+//                 SwitchGLElementOnRendererLevel(ZCR_DL_AlphaBlending, ZC_DL_None, ZC_DL_None);
+//             }
+//             else
+//             {
+//                 dsConSurface.SetUniformsData(ZC_UN_unAlpha, &alphaOne);
+//                 SwitchGLElementOnRendererLevel(ZC_DL_Drawing, ZC_DL_None, ZC_DL_None);
+//             };
+//         } break;
+//         case ZCR_SM_Model:
+//         {
+//             if (isActiveOnScene)
+//             {
+//                 dsConSurface.SetUniformsData(ZC_UN_unAlpha, &alpha);
+//                 SwitchGLElementOnRendererLevel(ZCR_DL_AlphaBlending, ZC_DL_None, ZC_DL_None);
+//             }
+//             else
+//             {
+//                 dsConSurface.SetUniformsData(ZC_UN_unAlpha, &alphaOne);
+//                 SwitchGLElementOnRendererLevel(ZC_DL_Drawing, ZC_DL_None, ZC_DL_None);
+//             };
+//         } break;
+//         case ZCR_SM_Edit:
+//         {
+//             if (isActiveOnScene)
+//             {
+//                 dsConSurface.SetUniformsData(ZC_UN_unAlpha, &alpha);
+//                 SwitchGLElementOnRendererLevel(ZCR_DL_AlphaBlending, ZC_DL_Drawing, ZC_DL_Drawing);
+//             }
+//             else
+//             {
+//                 dsConSurface.SetUniformsData(ZC_UN_unAlpha, &alphaOne);
+//                 SwitchGLElementOnRendererLevel(ZC_DL_Drawing, ZC_DL_None, ZC_DL_None);
+//             };
+//         } break;
+//         case ZCR_SM_Sculpting:
+//         {
+//             if (isActiveOnScene)
+//             {
+//                 dsConSurface.SetUniformsData(ZC_UN_unAlpha, &alphaOne);
+//                 SwitchGLElementOnRendererLevel(ZC_DL_Drawing, ZC_DL_None, ZC_DL_None);
+//             }
+//             else
+//             {
+//                 SwitchGLElementOnRendererLevel(ZC_DL_None, ZC_DL_None, ZC_DL_None);
+//             };
+//         } break;
+//         }
+//     }
+//     else
+//     {
+//         dsConSurface.SetUniformsData(ZC_UN_unAlpha, &alphaOne);
+//         switch (sceneMode)
+//         {
+//         case ZCR_SM_None: SwitchGLElementOnRendererLevel(ZC_DL_Drawing, ZC_DL_None, ZC_DL_None); break;
+//         case ZCR_SM_Model: SwitchGLElementOnRendererLevel(isActiveOnScene ? ZC_DL_StencilBorder : ZC_DL_Drawing, ZC_DL_None, ZC_DL_None); break;
+//         case ZCR_SM_Edit: SwitchGLElementOnRendererLevel(ZC_DL_Drawing, ZC_DL_Drawing, ZC_DL_Drawing); break;
+//         case ZCR_SM_Sculpting: SwitchGLElementOnRendererLevel(isActiveOnScene ? ZC_DL_Drawing : ZC_DL_None, ZC_DL_None, ZC_DL_None); break;
+//         }
+//     }
+// }
 
 ZC_DrawerSet ZCR_Line::CreateLineDrawerSet()
 {
@@ -88,10 +241,15 @@ std::forward_list<typename ZCR_Line::Lines> ZCR_Line::GetLines(ulong& rElementsC
     return lines;
 }
 
-void ZCR_Line::SwitchRSControllerLine(ZC_DrawerLevel drawerLevel)
-{
-    dsConLine.SwitchToDrawLvl(ZC_RL_Default, drawerLevel);
-}
+// ZC_DSController ZCR_Line::MakeSurfaceRSController()
+// {
+//     // std::forward_list<ZC_uptr<ZC_RSPersonalData>>{ZC_RSPDStencilBorder::Make({ 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) })};
+//     // ZC_RSPDStencilBorder::Make({ 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) });
+
+//     std::forward_list<ZC_uptr<ZC_RSPersonalData>> persDatas;
+//     persDatas.emplace_front(ZC_RSPDStencilBorder::Make({ 1.05f, 1.05f, 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) }));    //  stencil border color {r = 255, g = 90, b = 0}
+//     return dsSurface.MakeZC_DSController(-1, std::move(persDatas));
+// }
 
 
 //  Line start

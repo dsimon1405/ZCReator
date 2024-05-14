@@ -2,30 +2,35 @@
 
 #include "ZCR_Color.h"
 #include <ZC/Video/OpenGL/Renderer/ZC_DrawerSet.h>
+#include <Objects/Scene/ZCR_SceneMode.h>
 
 #include <list>
 
-struct ZCR_Point : public ZCR_Color
+class ZCR_Point : public virtual ZCR_Color
 {
-    std::list<Points> points;    //  fill in GetPoints
-    std::list<Points*> activePoints;
-
-    ZC_DrawerSet dsPoint;
-    ZC_DSController dsConPoint;
-
-    ZCR_Point();
-    ZCR_Point(ZCR_Point&& p);
-
+public:
+    void MakePointActive(Points* _point);
     void MakePointsActive(std::list<Points*>& points);
     void MakeAllPointsActive();
     void MakeAllPointsPassive();
-    void SwitchRSControllerPoint(ZC_DrawerLevel drawerLevel);
+
+private:
+    std::list<Points> points;    //  fills in GetPoints
+    ZC_DrawerSet dsPoint;
+
+protected:
+    ZC_DSController dscPoint;
+
+    ZCR_Point();
+    // ZCR_Point(ZCR_Point&& p);
+
+    void ChangeSceneModePoint(ZCR_SceneMode sceneMode);
 
 private:
     ZC_DrawerSet CreatePointDrawerSet();
     ZC_DA<uchar> GetPointElements(ulong& rElementsCount, GLenum& rElementsType);
     void GetPoints(ulong& rElementsCount);
-    ulong FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>* pVertexContainerHead);
+    // ulong FillPoints(ZC_Vec3<float>* pVertex, bool isQuad, ZC_Vec3<float>* pVertexContainerHead);
     template<typename TElement>
     void FillPointElements(TElement* pIndex);
 };
