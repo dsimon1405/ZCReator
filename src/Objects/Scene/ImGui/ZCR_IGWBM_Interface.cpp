@@ -41,7 +41,7 @@ void ZCR_IGWBM_Interface::DrawInterface(bool isActiveBM)
     bool isActiveO3d = orientatin3D.IsActive();
     if (ImGui::Checkbox(isActiveBM ? " Orientation3D(O)" : " Orientation3D", &isActiveO3d)) isActiveO3d ? orientatin3D.Activate() : orientatin3D.Deactivate();
     bool isDrawingIG = ZC_IGWindow::IsImGuiDrawing();
-    if (ImGui::Checkbox(isActiveBM ? " ImGui(G)" : " ImGui", &isDrawingIG)) ZC_IGWindow::NeedImGuiDraw(!isDrawingIG);
+    if (ImGui::Checkbox(isActiveBM ? " ImGui(G)" : " ImGui", &isDrawingIG)) ZC_IGWindow::NeedImGuiDraw(isDrawingIG);
 }
 
 void ZCR_IGWBM_Interface::DrawMeshOptions(bool isActiveBM)

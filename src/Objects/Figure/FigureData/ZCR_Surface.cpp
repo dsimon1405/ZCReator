@@ -93,7 +93,7 @@ ZC_DrawerSet ZCR_Surface::CreateSurfaceDrawerSet()
     ZC_DA<uchar> elements = GetTriangleElements(elementsCount, elementsType);
 
     ZC_Buffer ebo(GL_ELEMENT_ARRAY_BUFFER);
-    ebo.BufferData(elements.size, elements.Begin(), GL_STATIC_DRAW);
+    ebo.GLNamedBufferData(elements.size, elements.Begin(), GL_STATIC_DRAW);
 
     auto upDraw = ZC_uptrMakeFromChild<ZC_GLDraw, ZC_DrawElements>(GL_TRIANGLES, elementsCount, elementsType, 0);
 

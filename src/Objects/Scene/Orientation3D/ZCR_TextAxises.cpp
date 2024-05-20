@@ -1,6 +1,6 @@
 #include "ZCR_TextAxises.h"
 
-#include <ZC/Video/ZC_Window.h>
+#include <ZC/Video/ZC_SWindow.h>
 
 void ZCR_TextAxises::SetPosition(const ZC_Vec3<float>& newPosition)
 {
@@ -25,7 +25,7 @@ bool ZCR_TextAxises::MakeCursorMoveCollision()
 {
     float cursorX,
         cursorY;
-    ZC_Window::GetCursorPosition(cursorX, cursorY);
+    ZC_SWindow::GetCursorPosition(cursorX, cursorY);
 
     ZCR_TextAxis* pNewActiveText = nullptr;
     for (auto& text : texts)
@@ -94,7 +94,7 @@ void ZCR_TextAxises::MouseLeftButtonUp()
 
 void ZCR_TextAxises::PrepareReconnect()
 {
-    if (pActiveAxisText) makeActiveAxisDefault = true;      //  if pActiveAxisText still not nullptr, don't changing it in next ZCR_TextAxises::SetPosition() call 
+    if (pActiveAxisText) makeActiveAxisDefault = false;      //  if pActiveAxisText still not nullptr, don't changing it in next ZCR_TextAxises::SetPosition() call 
 }
 
 void ZCR_TextAxises::CamMoveWhileDeactivated()

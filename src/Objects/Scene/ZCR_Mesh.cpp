@@ -75,8 +75,8 @@ ZC_DrawerSet ZCR_Mesh::CreateDrawerSet(float totalLength)
     }    
 
     ZC_Buffer vbo(GL_ARRAY_BUFFER);
-    vbo.BufferData(vertices.BytesSize() + colors.BytesSize(), vertices.pHead, GL_STATIC_DRAW);
-    vbo.BufferSubData(vertices.BytesSize(), colors.BytesSize(), colors.pHead);
+    vbo.GLNamedBufferStorage(vertices.BytesSize() + colors.BytesSize(), vertices.pHead, GL_DYNAMIC_STORAGE_BIT);
+    vbo.GLNamedBufferSubData(vertices.BytesSize(), colors.BytesSize(), colors.pHead);
 
     auto upGLDraw = ZC_uptrMakeFromChild<ZC_GLDraw, ZC_DrawArrays>(GL_LINES, 0, vertices.size);
 

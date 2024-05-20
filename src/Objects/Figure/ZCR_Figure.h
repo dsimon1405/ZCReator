@@ -21,7 +21,7 @@ public:
     void SetSceneActivity(bool _isActiveOnScene);
     void ChangeSceneModeAndActivity(ZCR_SceneMode sceneMode, bool _isActiveOnScene);
 
-    const char* GetName() const noexcept;
+    const std::string& GetName() const noexcept;
     void SetName(std::string&& _name);
     bool IsActiveOnScene() const noexcept;
 

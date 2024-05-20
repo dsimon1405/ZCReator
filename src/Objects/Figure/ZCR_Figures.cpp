@@ -21,10 +21,8 @@ void ZCR_Figures::CreateFigure(ZCR_FigureName figureName)
         ZCR_IGWBM_Mode::SetActiveSceneMode(ZCR_SM_Model, false);
         for (auto& figure : pFigures->figures) figure->ChangeSceneModeAndActivity(ZCR_SM_Model, false);
     }
-    else if (pFigures->pActiveFigure) pFigures->pActiveFigure->SetSceneActivity(false);
     
-    pFigures->pActiveFigure = (pFigures->figures.emplace_back(ZCR_FigureCreator::CreateFigure(figureName))).Get();
-    pFigures->pActiveFigure->SetSceneActivity(true);
+    MakeFigureActive((pFigures->figures.emplace_back(ZCR_FigureCreator::CreateFigure(figureName))).Get());
 }
 
 void ZCR_Figures::EraseFigure(ZCR_Figure* pFigure)
@@ -44,7 +42,9 @@ ZCR_Figure* ZCR_Figures::GetActiveFigure()
 
 void ZCR_Figures::MakeFigureActive(ZCR_Figure* pFigure)
 {
+    if (pFigures->pActiveFigure == pFigure) return;
     if (pFigures->pActiveFigure) pFigures->pActiveFigure->SetSceneActivity(false);
     pFigure->SetSceneActivity(true);;
     pFigures->pActiveFigure = pFigure;
+    pFigures->igwFigures.SetNameBuffer(pFigure);
 }

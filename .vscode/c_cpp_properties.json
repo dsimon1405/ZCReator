@@ -6,7 +6,8 @@
                 "${workspaceFolder}/**",
                 "/home/dmitry/projects/external/SDL3/include",
                 "/home/dmitry/projects/external/glm/include",
-                "/usr/include/freetype2"
+                "/usr/include/freetype2",
+                "/home/dmitry/projects/external/sqlite3/include"
             ],
             "defines": [],
             "cStandard": "c17",

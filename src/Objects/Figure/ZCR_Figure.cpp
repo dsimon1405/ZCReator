@@ -65,9 +65,9 @@ void ZCR_Figure::ChangeSceneModeAndActivity(ZCR_SceneMode sceneMode, bool _isAct
     ChangeSceneMode(sceneMode);
 }
 
-const char* ZCR_Figure::GetName() const noexcept
+const std::string& ZCR_Figure::GetName() const noexcept
 {
-    return name.c_str();
+    return name;
 }
 
 void ZCR_Figure::SetName(std::string&& _name)

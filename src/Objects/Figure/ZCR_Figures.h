@@ -21,5 +21,5 @@ private:
     ZCR_Figure* pActiveFigure = nullptr;
 
     std::list<ZC_uptr<ZCR_Figure>> figures;
-    ZCR_IGW_Figures igwFigure { figures };
+    ZCR_IGW_Figures igwFigures { figures };
 };

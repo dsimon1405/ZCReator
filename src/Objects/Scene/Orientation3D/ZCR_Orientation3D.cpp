@@ -9,7 +9,7 @@
 ZCR_Orientation3D::ZCR_Orientation3D()
     : ZC_MouseCollisionWindow(ZC_MouseCollisionWindow::E_Move, &textureSize, &textureSize, &textureSize, &textureSize, true),
     pRender(ZC_Renders::CreateRender(ZCR_RL_Orientation3D, ZC_Render::DS_None,
-        ZC_FBO(ZC_Viewport(0, 0, textureSize, textureSize), 0, ZC_FBO::CIF_GL_RGBA8, ZC_FBO::DSIF_GL_DEPTH_COMPONENT24, ZC_FBO::RT_Color, false))),
+        ZC_FBO(ZC_Viewport(0, 0, textureSize, textureSize), 0, ZC_FBO::CIF_GL_RGBA8, ZC_FBO::DSIF_GL_DEPTH_COMPONENT24, GL_COLOR_BUFFER_BIT, false))),
     camera(ZC_Camera::GetActiveCamera()->GetPosition(), ZC_Camera::GetActiveCamera()->GetLookOn(), ZC_Camera::GetActiveCamera()->GetUp(),
         ZC_Perspective(45.f, textureSize / textureSize, 0.01f, 100.f), ZC_Ortho(0.f, textureSize, 0.f, textureSize), false, ZCR_RL_Orientation3D),
     orthoSquare(pRender->GetColorTexture(), textureSize, textureSize, 3.f, 3.f, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel, ZC_RL_Default, true, {}),

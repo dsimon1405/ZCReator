@@ -67,7 +67,7 @@ ZC_DrawerSet ZCR_Point::CreatePointDrawerSet()
     ZC_DA<uchar> elements = GetPointElements(elementsCount, elementsType);
 
     ZC_Buffer ebo(GL_ELEMENT_ARRAY_BUFFER);
-    ebo.BufferData(elements.size, elements.Begin(), GL_STATIC_DRAW);
+    ebo.GLNamedBufferData(elements.size, elements.Begin(), GL_STATIC_DRAW);
 
     auto upDraw = ZC_uptrMakeFromChild<ZC_GLDraw, ZC_DrawElements>(GL_POINTS, elementsCount, elementsType, 0);
 

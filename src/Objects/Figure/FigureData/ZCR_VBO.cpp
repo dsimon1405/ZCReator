@@ -23,11 +23,11 @@ void ZCR_VBO::FillVBO()
     ulong texCoordsStartIndex = normatlsStartIndex + normalsBSize,
         vboSize = texCoordsStartIndex + texCoordsBSize;
     //  trianglesStartIndex is quads byte size
-    vbo.BufferData(vboSize, trianglesStartIndex != 0 ? quads.Begin() : nullptr, GL_DYNAMIC_DRAW);
-    if (trianglesBSize != 0) vbo.BufferSubData(trianglesStartIndex, trianglesBSize, triangles.Begin());
-    // vbo.BufferSubData(colorsStartIndex, colorsBSize, colors.Begin());
-    vbo.BufferSubData(normatlsStartIndex, normalsBSize, normals.Begin());
-    if (texCoordsBSize != 0) vbo.BufferSubData(texCoordsStartIndex, texCoordsBSize, texCoords.Begin());
+    vbo.GLNamedBufferData(vboSize, trianglesStartIndex != 0 ? quads.Begin() : nullptr, GL_DYNAMIC_DRAW);
+    if (trianglesBSize != 0) vbo.GLNamedBufferSubData(trianglesStartIndex, trianglesBSize, triangles.Begin());
+    // vbo.GLNamedBufferSubData(colorsStartIndex, colorsBSize, colors.Begin());
+    vbo.GLNamedBufferSubData(normatlsStartIndex, normalsBSize, normals.Begin());
+    if (texCoordsBSize != 0) vbo.GLNamedBufferSubData(texCoordsStartIndex, texCoordsBSize, texCoords.Begin());
 }
 
 void ZCR_VBO::BufferSubDataIndex(StoredType storedType, bool isQuad, ulong vertexIndex, const void* pData)
@@ -51,17 +51,17 @@ void ZCR_VBO::BufferSubDataIndex(StoredType storedType, bool isQuad, ulong verte
     case ST_Normal: lambSetOffsetAndSize(normatlsStartIndex, normalByteSize, trianglesStartIndex); break;
     case ST_TexCoord: lambSetOffsetAndSize(texCoordsStartIndex, texCoordByteSize, trianglesStartIndex); break;
     }
-    vbo.BufferSubData(offset, byteSize, pData);
+    vbo.GLNamedBufferSubData(offset, byteSize, pData);
 }
 
 void ZCR_VBO::BufferSubDataAllStoredType(StoredType storedType, bool isVertexQuad)
 {
     switch (storedType)
     {
-    case ST_Vertex: isVertexQuad ? vbo.BufferSubData(0, trianglesStartIndex, quads.Begin()) :  //  quadsByteSize = trianglesStartIndex 
-        vbo.BufferSubData(trianglesStartIndex, colorsStartIndex - trianglesStartIndex, triangles.Begin()); break;   //  tianglesByteSize = colorsStartIndex - trianglesStartIndex
-    case ST_Color: vbo.BufferSubData(colorsStartIndex, normatlsStartIndex - colorsStartIndex, colors.Begin()); break;   //  colorsByteSize = texCoordsStartIndex - normatlsStartIndex
-    case ST_Normal: vbo.BufferSubData(normatlsStartIndex, texCoordsStartIndex - normatlsStartIndex, normals.Begin()); break; //  normalsByteSize = texCoordsStartIndex - normatlsStartIndex
-    case ST_TexCoord: vbo.BufferSubData(texCoordsStartIndex, texCoordsBSize, texCoords.Begin()); break;
+    case ST_Vertex: isVertexQuad ? vbo.GLNamedBufferSubData(0, trianglesStartIndex, quads.Begin()) :  //  quadsByteSize = trianglesStartIndex 
+        vbo.GLNamedBufferSubData(trianglesStartIndex, colorsStartIndex - trianglesStartIndex, triangles.Begin()); break;   //  tianglesByteSize = colorsStartIndex - trianglesStartIndex
+    case ST_Color: vbo.GLNamedBufferSubData(colorsStartIndex, normatlsStartIndex - colorsStartIndex, colors.Begin()); break;   //  colorsByteSize = texCoordsStartIndex - normatlsStartIndex
+    case ST_Normal: vbo.GLNamedBufferSubData(normatlsStartIndex, texCoordsStartIndex - normatlsStartIndex, normals.Begin()); break; //  normalsByteSize = texCoordsStartIndex - normatlsStartIndex
+    case ST_TexCoord: vbo.GLNamedBufferSubData(texCoordsStartIndex, texCoordsBSize, texCoords.Begin()); break;
     }
 }

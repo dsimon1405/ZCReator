@@ -2,10 +2,19 @@
 
 #include <ZC_IGWBM.h>
 
-struct ZCR_IGWBM_M_Model : public ZC_IGWBM
+#include <ZC_IGInputText.h>
+#include <iostream>
+
+struct ZCR_IGWBM_M_Model : public ZC_IGWBM, public ZC_IGInputText
 {
 public:
     ZCR_IGWBM_M_Model();
+
+    void VLostFocuseIGIT(ZC_DA<char>& buffer) override
+    {
+    std::cout<<"lost focus III"<<std::endl;
+        
+    }
 
 private:
     void VDrawWindowIGW() override;

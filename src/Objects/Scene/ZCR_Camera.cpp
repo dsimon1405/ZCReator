@@ -1,7 +1,7 @@
 #include "ZCR_Camera.h"
 
 #include <ZC/Events/ZC_Events.h>
-#include <ZC/Video/ZC_Window.h>
+#include <ZC/Video/ZC_SWindow.h>
 #include "ZCR_Scene.h"
 
 ZCR_Camera::ZCR_Camera()
@@ -69,7 +69,7 @@ void ZCR_Camera::SetCameraAxis(ZCR_Axis axis)
 ZC_Camera ZCR_Camera::CreateCamera()
 {
     int width, height;
-    ZC_Window::GetSize(width, height);
+    ZC_SWindow::GetSize(width, height);
     return ZC_Camera({0.f, -15, 0.f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 1.f}, ZC_Perspective(45.f, static_cast<float>(width) / static_cast<float>(height), 0.01f, 100.f),
         ZC_Ortho(0.f, static_cast<float>(width), 0.f, static_cast<float>(height)), true);
 }

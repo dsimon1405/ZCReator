@@ -174,7 +174,7 @@ ZC_DrawerSet ZCR_Line::CreateLineDrawerSet()
     ZC_DA<uchar> elements = GetLineElements(elementsCount, elementsType);
 
     ZC_Buffer ebo(GL_ELEMENT_ARRAY_BUFFER);
-    ebo.BufferData(elements.size, elements.Begin(), GL_STATIC_DRAW);
+    ebo.GLNamedBufferData(elements.size, elements.Begin(), GL_STATIC_DRAW);
 
     auto upDraw = ZC_uptrMakeFromChild<ZC_GLDraw, ZC_DrawElements>(GL_LINES, elementsCount, elementsType, 0);
 

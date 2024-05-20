@@ -1,7 +1,75 @@
 #include <ZC/main/ZC_main.h>
-#include <ZC/Video/ZC_Window.h>
+#include <ZC/Video/ZC_SWindow.h>
 #include <Objects/Scene/ZCR_Scene.h>
 #include <ZCR_Load.h>
+
+#include <ZC/Tools/SQLite3/ZC_SQLite3.h>
+#include <ZC/Tools/Time/ZC_Clock.h>
+
+//  ZC_ZoneSelector, algorithm -> Connect click left mouse button (now can't be connects one button twisem=, take care). If button down heppens, check ereas: ZC_MouseCollisionWindowController::IsCursorInArea(), and ImGui.
+//  If that ereas don't use cursor, connect mouse move event and disable ZC_MouseCollisionWindowController events (don't created yet), try to find how to disable ImGui events.
+//  - If heppens move create ortho quad textured or colored with alpha. On left mouse button up selected zone give those who need that info, and make next step. 
+//  - If heppens left mouse button up enable ZC_MouseCollisionWindowController and ImGui events if disconnected.
+
+#include <iostream>
+#include <glad/glad.h>
+
+void Create()
+{
+    // GLuint tex;
+    // glCreateTextures(GL_TEXTURE_2D, 1, &tex);
+    // glTextureStorage2D(tex, 1, GL_RG8, 2, 2);
+    // ZC_Vec2<GLubyte> colors[]
+    // {
+    //     {1,2}, {3,4},
+    //     {5,6}, {7,8}
+    // };
+    // GLubyte colors1[]
+    // {
+    //     1,2,3,4
+    // };
+
+    // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    // glTextureSubImage2D(tex, 0, 0, 0, 2, 2, GL_GREEN, GL_UNSIGNED_BYTE, colors1);
+    // glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+
+    // GLubyte get[sizeof(colors)];
+    // std::fill(get, get + sizeof(get), 0);
+    // glGetTextureImage(tex, 0, GL_RG, GL_UNSIGNED_BYTE, sizeof(colors), get);
+    
+    // int a = 3;
+}
+
+int ZC_main()
+{
+    // ZC_SQLite3::Open("/home/dmitry/projects/ZCreator/data.db", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
+
+    // std::list<std::tuple<int, std::string>> l;
+    // int q = 1;
+    // const int q1 = q;
+    // std::tuple<int, std::string> t;
+    // std::get<q1>(t);
+    // bool ok = ZC_SQLite3::Exec("SELECT * FROM lol", l);
+
+    using namespace ZC_SWindow;
+    ZC_SWindow::MakeWindow(
+        ZC_Window_Multisampling_4 | 
+        ZC_Window_Border, 800, 600, "ZeroCreator");
+    ZC_SWindow::SetFPS(0);
+    ZC_SWindow::NeedDrawFPS(true);
+
+
+    Create();
+
+    ZCR_LoadFonts();
+    
+    // ZCR_Scene scene;
+    
+
+    ZC_SWindow::RuntMainCycle();
+    
+    return 0;
+}
 
 // #include <ZC/Video/OpenGL/Shader/ZC_ShProgs.h>
 // #include <ZC/Video/OpenGL/VAO/ZC_VAOs.h>
@@ -240,33 +308,6 @@
 //     }
 // };
 
-
-//  ZC_ZoneSelector, algorithm -> Connect click left mouse button (now can't be connects one button twisem=, take care). If button down heppens, check ereas: ZC_MouseCollisionWindowController::IsCursorInArea(), and ImGui.
-//  If that ereas don't use cursor, connect mouse move event and disable ZC_MouseCollisionWindowController events (don't created yet), try to find how to disable ImGui events.
-//  - If heppens move create ortho quad textured or colored with alpha. On left mouse button up selected zone give those who need that info, and make next step. 
-//  - If heppens left mouse button up enable ZC_MouseCollisionWindowController and ImGui events if disconnected.
-
-#include <Objects/Figure/FigureData/ZCR_MatModel.h>
-
-int ZC_main()
-{
-    using namespace ZC_Window;
-    ZC_Window::MakeWindow(
-        ZC_Window_Multisampling_4 | 
-        ZC_Window_Border, 800, 600, "ZeroCreator");
-    ZC_Window::SetFPS(0);
-    ZC_Window::NeedDrawFPS(true);
-
-
-    ZCR_LoadFonts();
-    
-    ZCR_Scene scene;
-    
-
-    ZC_Window::RuntMainCycle();
-    
-    return 0;
-}
 
 
 

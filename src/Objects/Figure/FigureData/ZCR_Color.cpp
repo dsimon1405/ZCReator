@@ -6,7 +6,7 @@
 
 void ZCR_Color::FillColorsAllAsPassive(bool bufferData)
 {
-    std::fill(&((*(colors.pHead))[0]), &((*(colors.pHead + (colors.size - 1)))[2]), 0); //  dangerous place
+    std::fill(colors.pHead, colors.pHead + colors.size, colorPassivePoint);
     if (bufferData)
     {
         this->BufferSubDataAllStoredType(ST_Color);
@@ -16,7 +16,7 @@ void ZCR_Color::FillColorsAllAsPassive(bool bufferData)
 
 void ZCR_Color::FillColorsAllAsActive(bool bufferData)
 {
-    for (ulong i = 0; i < colors.size; ++i) colors[i] = colorActivePoint;
+    std::fill(colors.pHead, colors.pHead + colors.size, colorActivePoint);
     if (bufferData)
     {
         this->BufferSubDataAllStoredType(ST_Color);
