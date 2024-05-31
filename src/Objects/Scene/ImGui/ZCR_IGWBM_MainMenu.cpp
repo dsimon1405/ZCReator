@@ -14,7 +14,7 @@ ZCR_IGWBM_MainMenu::ZCR_IGWBM_MainMenu()
 
 void ZCR_IGWBM_MainMenu::VDrawWindowIGW()
 {
-    ImGui::ShowDemoWindow();
+    // ImGui::ShowDemoWindow();
     bool isActiveBM = this->IsEventsTargetBM();   //  active for button calls
 
     if (ImGui::Button(isActiveBM ? "Interface(I)" : igwbmInterface.IsEventsTargetIGWBM() ? "Interface(I/Esc)" : "Interface")) igwbmInterface.ActivateIGW();

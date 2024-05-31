@@ -2,20 +2,22 @@
 #include <ZC/Video/ZC_SWindow.h>
 #include <Objects/Scene/ZCR_Scene.h>
 #include <ZCR_Load.h>
-
-#include <ZC/Tools/SQLite3/ZC_SQLite3.h>
 #include <ZC/Tools/Time/ZC_Clock.h>
+
+#include <glad/glad.h>
+
+#include <iostream>
 
 //  ZC_ZoneSelector, algorithm -> Connect click left mouse button (now can't be connects one button twisem=, take care). If button down heppens, check ereas: ZC_MouseCollisionWindowController::IsCursorInArea(), and ImGui.
 //  If that ereas don't use cursor, connect mouse move event and disable ZC_MouseCollisionWindowController events (don't created yet), try to find how to disable ImGui events.
 //  - If heppens move create ortho quad textured or colored with alpha. On left mouse button up selected zone give those who need that info, and make next step. 
 //  - If heppens left mouse button up enable ZC_MouseCollisionWindowController and ImGui events if disconnected.
 
-#include <iostream>
-#include <glad/glad.h>
 
-void Create()
-{
+#include <Renderer/ZCR_ShaderKeeper.h>
+
+// void Create()
+// {
     // GLuint tex;
     // glCreateTextures(GL_TEXTURE_2D, 1, &tex);
     // glTextureStorage2D(tex, 1, GL_RG8, 2, 2);
@@ -38,18 +40,10 @@ void Create()
     // glGetTextureImage(tex, 0, GL_RG, GL_UNSIGNED_BYTE, sizeof(colors), get);
     
     // int a = 3;
-}
+// }
 
 int ZC_main()
 {
-    // ZC_SQLite3::Open("/home/dmitry/projects/ZCreator/data.db", SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
-
-    // std::list<std::tuple<int, std::string>> l;
-    // int q = 1;
-    // const int q1 = q;
-    // std::tuple<int, std::string> t;
-    // std::get<q1>(t);
-    // bool ok = ZC_SQLite3::Exec("SELECT * FROM lol", l);
 
     using namespace ZC_SWindow;
     ZC_SWindow::MakeWindow(
@@ -58,18 +52,35 @@ int ZC_main()
     ZC_SWindow::SetFPS(0);
     ZC_SWindow::NeedDrawFPS(true);
 
+    {
+        ZCR_ShaderKeeper sm;
+        auto p = ZC_ShaderManager::GetPipeLine(ZCR_SV_colorFigure, ZCR_STC_None, ZCR_STE_None, ZCR_SG_None, ZCR_SF_color);
+    }
 
-    Create();
+    // ZC_ShaderPrograms::CompilationTest(
+    //     "/home/dmitry/projects/ZCreator/build/assets/ZC/shaders/GUI/gui.vs",
+    //     nullptr,
+    //     nullptr,
+    //     "/home/dmitry/projects/ZCreator/build/assets/ZC/shaders/GUI/gui.gs",
+    //     "/home/dmitry/projects/ZCreator/build/assets/ZC/shaders/GUI/gui.fs");
 
     ZCR_LoadFonts();
     
-    // ZCR_Scene scene;
+    ZCR_Scene scene;
     
 
     ZC_SWindow::RuntMainCycle();
     
     return 0;
 }
+
+
+        // ZC_Clock cl;
+        // size_t count = 1000000;
+
+        // cl.Start();
+        // for (size_t i = 0; i < count; i++) 
+        // std::cout<<cl.Time<ZC_Nanoseconds>()<<std::endl;
 
 // #include <ZC/Video/OpenGL/Shader/ZC_ShProgs.h>
 // #include <ZC/Video/OpenGL/VAO/ZC_VAOs.h>

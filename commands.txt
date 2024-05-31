@@ -5,3 +5,21 @@ cd /home/dmitry/projects/ZCreator/ZeroCore && git add . && git commit -m "" && g
 -> ZCReator
 cd /home/dmitry/projects/ZCreator && git add . && git commit -m "" && cd /home/dmitry/projects/ZCreator/build
 cd /home/dmitry/projects/ZCreator && git add . && git commit -m "" && git push origin main && cd /home/dmitry/projects/ZCreator/build
+
+
+VAO -> https://hero.handmade.network/forums/code-discussion/t/8814-opengl__is_vao_creation_expensive
+std140 -> don't use vec3, https://ru.stackoverflow.com/questions/921705/%D0%92%D1%8B%D1%80%D0%B0%D0%B2%D0%BD%D0%B8%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5-std140-%D0%B4%D0%BB%D1%8F-unform-%D0%B1%D0%BB%D0%BE%D0%BA%D0%BE%D0%B2-%D0%B2-%D1%88%D0%B5%D0%B9%D0%B4%D0%B5%D1%80%D0%B0%D1%85-opengl-glsl
+std430 Buffer -> don't use vec3! Last element can be anlimited array, with C style struct alignment: https://stackoverflow.com/questions/29531237/memory-allocation-with-std430-qualifier
+
+glSampling (texture filtering) and shader's links -> https://habr.com/ru/articles/457380/
+original -> https://github.com/fendevel/Guide-to-Modern-OpenGL-Functions?tab=readme-ov-file#setting-up-mix--match-shaders-with-program-pipelines
+
+smooth shading (smoothstep in GLSL) -> https://iquilezles.org/articles/smin/
+
+sdl 2 contexts -> https://stackoverflow.com/questions/70900488/i-cant-create-two-contexts-in-opengl-using-sdl2
+
+teselation -> https://steps3d.narod.ru/tutorials/tesselation-tutorial.html, https://edu.mmcs.sfedu.ru/pluginfile.php/121052/mod_resource/content/2/%D0%9B%D0%B5%D0%BA%D1%86%D0%B8%D1%8F%2022.pdf
+    https://www.youtube.com/watch?v=21gfE-zUym8
+
+openGL 4.6 -> https://ktstephano.github.io/
+compute shader -> https://web.engr.oregonstate.edu/~mjb/cs557/Handouts/compute.shader.1pp.pdf

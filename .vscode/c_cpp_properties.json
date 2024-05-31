@@ -7,7 +7,8 @@
                 "/home/dmitry/projects/external/SDL3/include",
                 "/home/dmitry/projects/external/glm/include",
                 "/usr/include/freetype2",
-                "/home/dmitry/projects/external/sqlite3/include"
+                "/home/dmitry/projects/external/sqlite3/include",
+                "${workspaceFolder}/ZeroCore/includeVariable/imgui/include"
             ],
             "defines": [],
             "cStandard": "c17",
