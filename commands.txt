@@ -23,3 +23,7 @@ teselation -> https://steps3d.narod.ru/tutorials/tesselation-tutorial.html, http
 
 openGL 4.6 -> https://ktstephano.github.io/
 compute shader -> https://web.engr.oregonstate.edu/~mjb/cs557/Handouts/compute.shader.1pp.pdf
+
+
+sudo:
+sudo snap revert code -> (code is vs code) back to previous version

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <ZC/Video/OpenGL/Shader/ZC_ShaderManager.h>
 #include <File/ZCR_File.h>
 
 enum ZCR_ShVertex
@@ -54,17 +53,17 @@ enum ZCR_ShFragment
 };
 
 
-class ZCR_ShaderKeeper  //  class for loading all shaders
+class ZCR_ShaderLoader  //  class for loading all shaders
 {
 public:
-    ZCR_ShaderKeeper();
+    ZCR_ShaderLoader() = delete;
+    
+    static bool LoadAllShaders();
 
 private:
-    ZC_ShaderManager shaderManager;
-
-    std::string GetPath_Vertex(int shV, const ZC_FSPath& shadersPath);
-    std::string GetPath_TessControl(int shTC, const ZC_FSPath& shadersPath);
-    std::string GetPath_TessEvaluation(int shTE, const ZC_FSPath& shadersPath);
-    std::string GetPath_Geometry(int shG, const ZC_FSPath& shadersPath);
-    std::string GetPath_Fragment(int shF, const ZC_FSPath& shadersPath);
+    static std::string GetPath_Vertex(int shV, const ZC_FSPath& shadersPath);
+    static std::string GetPath_TessControl(int shTC, const ZC_FSPath& shadersPath);
+    static std::string GetPath_TessEvaluation(int shTE, const ZC_FSPath& shadersPath);
+    static std::string GetPath_Geometry(int shG, const ZC_FSPath& shadersPath);
+    static std::string GetPath_Fragment(int shF, const ZC_FSPath& shadersPath);
 };

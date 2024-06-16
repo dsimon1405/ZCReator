@@ -1,6 +1,8 @@
 #include "ZCR_ShaderKeeper.h"
 
-ZCR_ShaderKeeper::ZCR_ShaderKeeper()
+#include <ZC/Video/OpenGL/Shader/ZC_ShaderManager.h>
+
+bool ZCR_ShaderLoader::LoadAllShaders()
 {
     std::vector<ZC_ShaderInput> v;
     if (ZCR_SV_All != 0) v.reserve(ZCR_SV_All);
@@ -20,12 +22,11 @@ ZCR_ShaderKeeper::ZCR_ShaderKeeper()
     for (int i = ZCR_SG_None + 1; i < ZCR_SG_All; ++i) g.emplace_back(ZC_ShaderInput{ GetPath_Geometry(i, shadersPath), i });
     for (int i = ZCR_SF_None + 1; i < ZCR_SF_All; ++i) f.emplace_back(ZC_ShaderInput{ GetPath_Fragment(i, shadersPath), i });
     
-    shaderManager.LoadShaderPrograms(v, tc, te, g, f);
+    return ZC_ShaderManager::LoadShaderPrograms(v, tc, te, g, f);
 }
 
-std::string ZCR_ShaderKeeper::GetPath_Vertex(int shV, const ZC_FSPath& shadersPath)
+std::string ZCR_ShaderLoader::GetPath_Vertex(int shV, const ZC_FSPath& shadersPath)
 {
-    std::string path;
     switch (shV)
     {
     case ZCR_SV_colorFigure: return ZC_FSPath(shadersPath).append("colorFigure.vs").string();
@@ -37,27 +38,26 @@ std::string ZCR_ShaderKeeper::GetPath_Vertex(int shV, const ZC_FSPath& shadersPa
     case ZCR_SV_textWindow: return ZC_FSPath(shadersPath).append("textWindow.vs").string();
     case ZCR_SV_textScene: return ZC_FSPath(shadersPath).append("textScene.vs").string();
     case ZCR_SV_textWindowIntoScene: return ZC_FSPath(shadersPath).append("textWindowIntoScene.vs").string();
-    default: assert(false);
+    default: assert(false); return {};
     }
-    return path;
 }
 
-std::string ZCR_ShaderKeeper::GetPath_TessControl(int shTC, const ZC_FSPath& shadersPath)
+std::string ZCR_ShaderLoader::GetPath_TessControl(int shTC, const ZC_FSPath& shadersPath)
 {
     return {};
 }
 
-std::string ZCR_ShaderKeeper::GetPath_TessEvaluation(int shTE, const ZC_FSPath& shadersPath)
+std::string ZCR_ShaderLoader::GetPath_TessEvaluation(int shTE, const ZC_FSPath& shadersPath)
 {
     return {};
 }
 
-std::string ZCR_ShaderKeeper::GetPath_Geometry(int shG, const ZC_FSPath& shadersPath)
+std::string ZCR_ShaderLoader::GetPath_Geometry(int shG, const ZC_FSPath& shadersPath)
 {
     return {};
 }
 
-std::string ZCR_ShaderKeeper::GetPath_Fragment(int shF, const ZC_FSPath& shadersPath)
+std::string ZCR_ShaderLoader::GetPath_Fragment(int shF, const ZC_FSPath& shadersPath)
 {
     switch (shF)
     {

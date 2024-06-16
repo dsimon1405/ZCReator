@@ -88,6 +88,7 @@
         "xstring": "cpp",
         "xutility": "cpp",
         "zcr_igwfigures.h": "c",
-        "zcr_igw_figure": "cpp"
+        "zcr_igw_figure": "cpp",
+        "*.h copy": "c"
     }
 }

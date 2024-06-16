@@ -8,6 +8,7 @@
 
 #include <iostream>
 
+
 //  ZC_ZoneSelector, algorithm -> Connect click left mouse button (now can't be connects one button twisem=, take care). If button down heppens, check ereas: ZC_MouseCollisionWindowController::IsCursorInArea(), and ImGui.
 //  If that ereas don't use cursor, connect mouse move event and disable ZC_MouseCollisionWindowController events (don't created yet), try to find how to disable ImGui events.
 //  - If heppens move create ortho quad textured or colored with alpha. On left mouse button up selected zone give those who need that info, and make next step. 
@@ -41,10 +42,40 @@
     
     // int a = 3;
 // }
+#include <ZC/Tools/Math/ZC_Mat.h>
+#include <ZC/GUI/ZC_GUI_WinMutable.h>
+#include <ZC/GUI/ZC_GUI_Button.h>
+
+// ZC_uptr<ZC_GUI> pGUI;   //  must be in ZC_SWindowHolder
+struct ZC_W
+{
+    ZC_uptr<ZC_GUI_Window> pWin;
+    ZC_uptr<ZC_GUI_Button> pBtn1;
+    ZC_uptr<ZC_GUI_Button> pBtn2;
+    ZC_uptr<ZC_GUI_Button> pBtn3;
+    ZC_uptr<ZC_GUI_Button> pBtn4;
+    ZC_W() = default;
+    ZC_W(float indentX, float indexntY)
+    {
+        pWin = new ZC_GUI_WinMutable(ZC_WOIData{.width = 200, .height = 200, .indentX = indentX, .indentY = indexntY, .indentFlags = ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel},
+            ZC_UV{.bl{0,0}, .tr{1,1}}, ZC_GUI_WF__NeedDraw);
+
+        pBtn1 = new ZC_GUI_Button(30, 30);
+        pBtn2 = new ZC_GUI_Button(30, 30);
+        pWin->AddRow({.indent_x = 10, .indent_y = 0, .distance_x = 30, .height = 20});
+        pWin->VAddObj(pBtn1.Get());
+        pWin->VAddObj(pBtn2.Get());
+
+        pBtn3 = new ZC_GUI_Button(10, 20);
+        pBtn4 = new ZC_GUI_Button(20, 200);
+        pWin->AddRow({.indent_x = 5, .indent_y = 100, .distance_x = 10, .height = 0});
+        pWin->VAddObj(pBtn3.Get());
+        pWin->VAddObj(pBtn4.Get());
+    }    
+};
 
 int ZC_main()
 {
-
     using namespace ZC_SWindow;
     ZC_SWindow::MakeWindow(
         ZC_Window_Multisampling_4 | 
@@ -52,10 +83,9 @@ int ZC_main()
     ZC_SWindow::SetFPS(0);
     ZC_SWindow::NeedDrawFPS(true);
 
-    {
-        ZCR_ShaderKeeper sm;
-        auto p = ZC_ShaderManager::GetPipeLine(ZCR_SV_colorFigure, ZCR_STC_None, ZCR_STE_None, ZCR_SG_None, ZCR_SF_color);
-    }
+    // ZC_GUI::Init();
+
+    ZCR_ShaderLoader::LoadAllShaders();
 
     // ZC_ShaderPrograms::CompilationTest(
     //     "/home/dmitry/projects/ZCreator/build/assets/ZC/shaders/GUI/gui.vs",
@@ -69,12 +99,30 @@ int ZC_main()
     ZCR_Scene scene;
     
 
+
+    ZC_W win1 = ZC_W(10, 10);
+    ZC_W win2 = ZC_W(50, 50);
+    ZC_W win3 = ZC_W(100, 100);
+
+    win2.pWin->SetFocuseDepth();
+    win2.pWin->isDrawing = true;
+
+    win3.pWin->SetFocuseDepth();
+    win3.pWin->isDrawing = true;
+    
+    win1.pWin->SetFocuseDepth();
+    win1.pWin->isDrawing = true;
+
+    
+
     ZC_SWindow::RuntMainCycle();
     
     return 0;
 }
 
 
+        // #include <ZC/Tools/Time/ZC_Clock.h>
+        // #include <iostream>
         // ZC_Clock cl;
         // size_t count = 1000000;
 
