@@ -45,6 +45,7 @@
 #include <ZC/Tools/Math/ZC_Mat.h>
 #include <ZC/GUI/ZC_GUI_WinMutable.h>
 #include <ZC/GUI/ZC_GUI_Button.h>
+#include <ZC/Events/ZC_Events.h>
 
 // ZC_uptr<ZC_GUI> pGUI;   //  must be in ZC_SWindowHolder
 struct ZC_W
@@ -58,21 +59,37 @@ struct ZC_W
     ZC_W(float indentX, float indexntY)
     {
         pWin = new ZC_GUI_WinMutable(ZC_WOIData{.width = 200, .height = 200, .indentX = indentX, .indentY = indexntY, .indentFlags = ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel},
-            ZC_UV{.bl{0,0}, .tr{1,1}}, ZC_GUI_WF__NeedDraw);
+            ZC_UV{.bl{0,0}, .tr{1,1}},
+             ZC_GUI_WF__Movable
+            );
 
         pBtn1 = new ZC_GUI_Button(30, 30);
         pBtn2 = new ZC_GUI_Button(30, 30);
         pWin->AddRow({.indent_x = 10, .indent_y = 0, .distance_x = 30, .height = 20});
-        pWin->VAddObj(pBtn1.Get());
-        pWin->VAddObj(pBtn2.Get());
+        pWin->AddObj(pBtn1.Get());
+        pWin->AddObj(pBtn2.Get());
 
         pBtn3 = new ZC_GUI_Button(10, 20);
         pBtn4 = new ZC_GUI_Button(20, 200);
         pWin->AddRow({.indent_x = 5, .indent_y = 100, .distance_x = 10, .height = 0});
-        pWin->VAddObj(pBtn3.Get());
-        pWin->VAddObj(pBtn4.Get());
+        pWin->AddObj(pBtn3.Get());
+        pWin->AddObj(pBtn4.Get());
     }    
 };
+
+ZC_W* win1;
+ZC_W* win2;
+ZC_W* win3;
+
+void Draw1(ZC_ButtonID,float) { win1->pWin->VSetDrawState_W(true); }
+void NoDraw1(ZC_ButtonID,float) { win1->pWin->VSetDrawState_W(false); }
+void Focuse1(ZC_ButtonID,float) { win1->pWin->MakeForcused(); }
+void Draw2(ZC_ButtonID,float) { win2->pWin->VSetDrawState_W(true); }
+void NoDraw2(ZC_ButtonID,float) { win2->pWin->VSetDrawState_W(false); }
+void Focuse2(ZC_ButtonID,float) { win2->pWin->MakeForcused(); }
+void Draw3(ZC_ButtonID,float) { win3->pWin->VSetDrawState_W(true); }
+void NoDraw3(ZC_ButtonID,float) { win3->pWin->VSetDrawState_W(false); }
+void Focuse3(ZC_ButtonID,float) { win3->pWin->MakeForcused(); }
 
 int ZC_main()
 {
@@ -97,26 +114,32 @@ int ZC_main()
     ZCR_LoadFonts();
     
     ZCR_Scene scene;
-    
 
 
-    ZC_W win1 = ZC_W(10, 10);
-    ZC_W win2 = ZC_W(50, 50);
-    ZC_W win3 = ZC_W(100, 100);
+    ZC_Events::ConnectButtonClick(ZC_ButtonID::K_Q, {}, Draw1);
+    ZC_Events::ConnectButtonClick(ZC_ButtonID::K_W, {}, NoDraw1);
+    ZC_Events::ConnectButtonClick(ZC_ButtonID::K_E, {}, Focuse1);
+    ZC_Events::ConnectButtonClick(ZC_ButtonID::K_A, {}, Draw2);
+    ZC_Events::ConnectButtonClick(ZC_ButtonID::K_S, {}, NoDraw2);
+    ZC_Events::ConnectButtonClick(ZC_ButtonID::K_D, {}, Focuse2);
+    ZC_Events::ConnectButtonClick(ZC_ButtonID::K_Z, {}, Draw3);
+    ZC_Events::ConnectButtonClick(ZC_ButtonID::K_X, {}, NoDraw3);
+    ZC_Events::ConnectButtonClick(ZC_ButtonID::K_C, {}, Focuse3);
 
-    win2.pWin->SetFocuseDepth();
-    win2.pWin->isDrawing = true;
+    win1 = new ZC_W(10, 10);
+    win2 = new ZC_W(50, 50);
+    win3 = new ZC_W(100, 100);
 
-    win3.pWin->SetFocuseDepth();
-    win3.pWin->isDrawing = true;
-    
-    win1.pWin->SetFocuseDepth();
-    win1.pWin->isDrawing = true;
+    // win2.pWin->VSetDrawState(true);
+    // win1.pWin->VSetDrawState(true);
+    // win3.pWin->VSetDrawState(true);
 
-    
 
     ZC_SWindow::RuntMainCycle();
     
+    delete win1;
+    delete win2;
+    delete win3;
     return 0;
 }
 
