@@ -44,10 +44,11 @@
 // }
 #include <ZC/Tools/Math/ZC_Mat.h>
 #include <ZC/GUI/ZC_GUI_WinMutable.h>
+#include <ZC/GUI/ZC_GUI_WinImmutable.h>
 #include <ZC/GUI/ZC_GUI_Button.h>
 #include <ZC/Events/ZC_Events.h>
 
-// ZC_uptr<ZC_GUI> pGUI;   //  must be in ZC_SWindowHolder
+
 struct ZC_W
 {
     ZC_uptr<ZC_GUI_Window> pWin;
@@ -56,30 +57,38 @@ struct ZC_W
     ZC_uptr<ZC_GUI_Button> pBtn3;
     ZC_uptr<ZC_GUI_Button> pBtn4;
     ZC_W() = default;
-    ZC_W(float indentX, float indexntY)
+    ZC_W(float indentX, float indexntY, int indentFlags, int guiFLags)
     {
-        pWin = new ZC_GUI_WinMutable(ZC_WOIData{.width = 200, .height = 200, .indentX = indentX, .indentY = indexntY, .indentFlags = ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel},
-            ZC_UV{.bl{0,0}, .tr{1,1}},
-             ZC_GUI_WF__Movable
+        // const float tex_size = 512.f,
+        //     icon_size = 128.f,
+        //     step = icon_size / tex_size;
+        // float bl_u = step * 0.f;
+        // float bl_v = step * 3.f;
+        // float tr_u = step * 1.f;
+        // float tr_v = step * 4.f;
+        pWin = new ZC_GUI_WinImmutable(ZC_WOIData{.width = 200, .height = 200, .indentX = indentX, .indentY = indexntY, .indentFlags = indentFlags},
+            // ZC_UV{.bl{0,0}, .tr{1,1}}, guiFLags
+             guiFLags
             );
 
         pBtn1 = new ZC_GUI_Button(30, 30);
         pBtn2 = new ZC_GUI_Button(30, 30);
-        pWin->AddRow({.indent_x = 10, .indent_y = 0, .distance_x = 30, .height = 20});
-        pWin->AddObj(pBtn1.Get());
-        pWin->AddObj(pBtn2.Get());
+        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
+        pWin->VAddObj_Obj(pBtn1.Get());
+        pWin->VAddObj_Obj(pBtn2.Get());
 
         pBtn3 = new ZC_GUI_Button(10, 20);
         pBtn4 = new ZC_GUI_Button(20, 200);
-        pWin->AddRow({.indent_x = 5, .indent_y = 100, .distance_x = 10, .height = 0});
-        pWin->AddObj(pBtn3.Get());
-        pWin->AddObj(pBtn4.Get());
+        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(5, ZC_GUI_RowParams::Indent_X::Left, 100, 10)));
+        pWin->VAddObj_Obj(pBtn3.Get());
+        pWin->VAddObj_Obj(pBtn4.Get());
     }    
 };
 
 ZC_W* win1;
 ZC_W* win2;
 ZC_W* win3;
+ZC_W* win4;
 
 void Draw1(ZC_ButtonID,float) { win1->pWin->VSetDrawState_W(true); }
 void NoDraw1(ZC_ButtonID,float) { win1->pWin->VSetDrawState_W(false); }
@@ -90,9 +99,60 @@ void Focuse2(ZC_ButtonID,float) { win2->pWin->MakeForcused(); }
 void Draw3(ZC_ButtonID,float) { win3->pWin->VSetDrawState_W(true); }
 void NoDraw3(ZC_ButtonID,float) { win3->pWin->VSetDrawState_W(false); }
 void Focuse3(ZC_ButtonID,float) { win3->pWin->MakeForcused(); }
+#include <ZC/GUI/ZC_GUI_FontLoader.h>
 
+wchar_t GetUnicode(unsigned char ch, ZC_ButtonID butID)
+{
+    if (ch < 128) return ch;   //  return ch is english ascii
+        //  here must be if for keyboard, now next is russian. Letters have repeats in uchar (uchar Ё = c = 129), ё (uchar ё = Б = 145),
+        //  and we don't know unicode thancs SDL... so use stupid tactic with ZC_ButtonID
+    if (ch == 129 && butID == ZC_ButtonID::K_GRAVE) return 0x401;    //  Ё (unicode 0x401)
+    else if (ch == 145 && butID == ZC_ButtonID::K_GRAVE) return 0x451;    //  ё (unicode 0x451)
+    else if (ch >= 128 && ch <= 143) return (wchar_t)ch + 960;  //  first range: 1088 - 128 = 960 -> 1088(0x440 unicode start), 128(uchar ascii start)
+    else if (ch >= 144 && ch <= 191) return (wchar_t)ch + 896;  //  second range: 1040 - 144 = 896 -> 1040(0x410 unicode start), 144(uchar ascii start)
+
+    assert(false);  //  can't find charracter
+    return ch;
+}
+
+#include <iostream>
 int ZC_main()
 {
+    
+    ZC_GUI_Font font = ZC_GUI_FontLoader::LoadFont(ZC_GUI_FontLoader::FontName::Arial, 18, ZC_GUI_FE_Symbols | ZC_GUI_FE_English | ZC_GUI_FE_Russian);
+//     auto vec = font.FillWStrData(L"uД", 0);
+//     int length = vec.size() / font.GetHeight();   //  18 is height
+//     for (size_t i = 0; i < vec.size(); i++)
+//     {
+//         if (i > 0 && i % length == 0) std::cout<<std::endl;
+//         vec[i] == 0 ? std::cout<<' ' : std::cout<<vec[i];
+//     }
+// std::cout<<std::endl;
+// //     auto ch = font.FindCharacter(L'H');
+// //     for (size_t i = 0; i < ch->data.size(); i++)
+// //     {
+// //         if (i > 0 && i % ch->width == 0)
+// //             std::cout<<std::endl;
+// //         ch->data[i] == 0 ? std::cout<<' ' : std::cout<<ch->data[i];
+// //     }
+// // std::cout<<std::endl;
+//     auto ch = font.FindCharacter(L'u');
+//     for (size_t i = 0; i < ch->data.size(); i++)
+//     {
+//         if (i > 0 && i % ch->width == 0)
+//             std::cout<<std::endl;
+//         ch->data[i] == 0 ? std::cout<<' ' : std::cout<<ch->data[i];
+//     }
+// std::cout<<std::endl;
+//     ch = font.FindCharacter(L'Д');
+//     for (size_t i = 0; i < ch->data.size(); i++)
+//     {
+//         if (i > 0 && i % ch->width == 0)
+//             std::cout<<std::endl;
+//         ch->data[i] == 0 ? std::cout<<' ' : std::cout<<ch->data[i];
+//     }
+// std::cout<<std::endl;
+
     using namespace ZC_SWindow;
     ZC_SWindow::MakeWindow(
         ZC_Window_Multisampling_4 | 
@@ -126,9 +186,14 @@ int ZC_main()
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_X, {}, NoDraw3);
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_C, {}, Focuse3);
 
-    win1 = new ZC_W(10, 10);
-    win2 = new ZC_W(50, 50);
-    win3 = new ZC_W(100, 100);
+// ZC_GUI_WF__Stacionar
+// ZC_GUI_WF__NeedDraw
+// ZC_GUI_WF__NoBackground
+// ZC_GUI_WF__Movable
+    // win1 = new ZC_W(10, 10, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel,       ZC_GUI_WF__Stacionar | ZC_GUI_WF__NeedDraw | ZC_GUI_WF__NoBackground | ZC_GUI_WF__Movable);
+    win2 = new ZC_W(50, 50, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel,      ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable);
+    // win3 = new ZC_W(100, 100, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Bottom_Pixel, ZC_GUI_WF__Stacionar);
+    win4 = new ZC_W(100, 100, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel,  ZC_GUI_WF__NeedDraw);
 
     // win2.pWin->VSetDrawState(true);
     // win1.pWin->VSetDrawState(true);
@@ -140,6 +205,7 @@ int ZC_main()
     delete win1;
     delete win2;
     delete win3;
+    delete win4;
     return 0;
 }
 
