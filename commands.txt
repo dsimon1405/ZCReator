@@ -4,7 +4,7 @@ cd /home/dmitry/projects/ZCreator/ZeroCore && git add . && git commit -m "" && g
 
 -> ZCReator
 cd /home/dmitry/projects/ZCreator && git add . && git commit -m "" && cd /home/dmitry/projects/ZCreator/build
-cd /home/dmitry/projects/ZCreator && git add . && git commit -m "" && git push origin main && cd /home/dmitry/projects/ZCreator/build
+cd /home/dmitry/projects/ZCreator && git add . && git commit -m "added gui mouse button"" && git push origin main && cd /home/dmitry/projects/ZCreator/build
 
 
 VAO -> https://hero.handmade.network/forums/code-discussion/t/8814-opengl__is_vao_creation_expensive

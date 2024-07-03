@@ -45,17 +45,18 @@
 #include <ZC/Tools/Math/ZC_Mat.h>
 #include <ZC/GUI/ZC_GUI_WinMutable.h>
 #include <ZC/GUI/ZC_GUI_WinImmutable.h>
-#include <ZC/GUI/ZC_GUI_Button.h>
+#include <ZC/GUI/ZC_GUI_ButtonMouse.h>
 #include <ZC/Events/ZC_Events.h>
-
+#include <ZC/GUI/ZC_GUI_Text.h>
 
 struct ZC_W
 {
     ZC_uptr<ZC_GUI_Window> pWin;
-    ZC_uptr<ZC_GUI_Button> pBtn1;
-    ZC_uptr<ZC_GUI_Button> pBtn2;
-    ZC_uptr<ZC_GUI_Button> pBtn3;
-    ZC_uptr<ZC_GUI_Button> pBtn4;
+    ZC_uptr<ZC_GUI_ButtonMouse> pBtn1;
+    ZC_uptr<ZC_GUI_ButtonMouse> pBtn2;
+    ZC_uptr<ZC_GUI_ButtonMouse> pBtn3;
+    ZC_uptr<ZC_GUI_ButtonMouse> pBtn4;
+    ZC_uptr<ZC_GUI_Text> pText1;
     ZC_W() = default;
     ZC_W(float indentX, float indexntY, int indentFlags, int guiFLags)
     {
@@ -67,21 +68,22 @@ struct ZC_W
         // float tr_u = step * 1.f;
         // float tr_v = step * 4.f;
         pWin = new ZC_GUI_WinImmutable(ZC_WOIData{.width = 200, .height = 200, .indentX = indentX, .indentY = indexntY, .indentFlags = indentFlags},
-            // ZC_UV{.bl{0,0}, .tr{1,1}}, guiFLags
              guiFLags
             );
 
-        pBtn1 = new ZC_GUI_Button(30, 30);
-        pBtn2 = new ZC_GUI_Button(30, 30);
+        pBtn1 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_BM__Scroll);
+        pBtn2 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_BM__CursorMoveOnButtonLeftPress);
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
         pWin->VAddObj_Obj(pBtn1.Get());
         pWin->VAddObj_Obj(pBtn2.Get());
 
-        pBtn3 = new ZC_GUI_Button(10, 20);
-        pBtn4 = new ZC_GUI_Button(20, 200);
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(5, ZC_GUI_RowParams::Indent_X::Left, 100, 10)));
+        pBtn3 = new ZC_GUI_ButtonMouse(10, 20, ZC_GUI_BM__DoubleCLick);
+        pBtn4 = new ZC_GUI_ButtonMouse(20, 20, 0);
+        pText1 = new ZC_GUI_Text(L"Dimka Молодчинка");
+        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(5, ZC_GUI_RowParams::Indent_X::Left, 10, 10)));
         pWin->VAddObj_Obj(pBtn3.Get());
         pWin->VAddObj_Obj(pBtn4.Get());
+        pWin->VAddObj_Obj(pText1.Get());
     }    
 };
 
@@ -103,7 +105,7 @@ void Focuse3(ZC_ButtonID,float) { win3->pWin->MakeForcused(); }
 
 wchar_t GetUnicode(unsigned char ch, ZC_ButtonID butID)
 {
-    if (ch < 128) return ch;   //  return ch is english ascii
+    if (ch < 128) return ch;   //  return ch, is english ascii
         //  here must be if for keyboard, now next is russian. Letters have repeats in uchar (uchar Ё = c = 129), ё (uchar ё = Б = 145),
         //  and we don't know unicode thancs SDL... so use stupid tactic with ZC_ButtonID
     if (ch == 129 && butID == ZC_ButtonID::K_GRAVE) return 0x401;    //  Ё (unicode 0x401)
@@ -114,45 +116,25 @@ wchar_t GetUnicode(unsigned char ch, ZC_ButtonID butID)
     assert(false);  //  can't find charracter
     return ch;
 }
+ZC_Clock cl;
+void Click(ZC_ButtonID, float)
+{
+    static int count = 0;
+    if (count == 0)
+    {
+        cl.Start();
+        ++count;
+    }
+    else
+    {
+        count = 0;
+        std::cout<<cl.Time<ZC_Nanoseconds>()<<std::endl;
+    }
+}
 
 #include <iostream>
 int ZC_main()
 {
-    
-    ZC_GUI_Font font = ZC_GUI_FontLoader::LoadFont(ZC_GUI_FontLoader::FontName::Arial, 18, ZC_GUI_FE_Symbols | ZC_GUI_FE_English | ZC_GUI_FE_Russian);
-//     auto vec = font.FillWStrData(L"uД", 0);
-//     int length = vec.size() / font.GetHeight();   //  18 is height
-//     for (size_t i = 0; i < vec.size(); i++)
-//     {
-//         if (i > 0 && i % length == 0) std::cout<<std::endl;
-//         vec[i] == 0 ? std::cout<<' ' : std::cout<<vec[i];
-//     }
-// std::cout<<std::endl;
-// //     auto ch = font.FindCharacter(L'H');
-// //     for (size_t i = 0; i < ch->data.size(); i++)
-// //     {
-// //         if (i > 0 && i % ch->width == 0)
-// //             std::cout<<std::endl;
-// //         ch->data[i] == 0 ? std::cout<<' ' : std::cout<<ch->data[i];
-// //     }
-// // std::cout<<std::endl;
-//     auto ch = font.FindCharacter(L'u');
-//     for (size_t i = 0; i < ch->data.size(); i++)
-//     {
-//         if (i > 0 && i % ch->width == 0)
-//             std::cout<<std::endl;
-//         ch->data[i] == 0 ? std::cout<<' ' : std::cout<<ch->data[i];
-//     }
-// std::cout<<std::endl;
-//     ch = font.FindCharacter(L'Д');
-//     for (size_t i = 0; i < ch->data.size(); i++)
-//     {
-//         if (i > 0 && i % ch->width == 0)
-//             std::cout<<std::endl;
-//         ch->data[i] == 0 ? std::cout<<' ' : std::cout<<ch->data[i];
-//     }
-// std::cout<<std::endl;
-
     using namespace ZC_SWindow;
     ZC_SWindow::MakeWindow(
         ZC_Window_Multisampling_4 | 
@@ -175,6 +157,7 @@ int ZC_main()
     
     ZCR_Scene scene;
 
+    ZC_Events::ConnectButtonClick(ZC_ButtonID::M_LEFT, Click, {});
 
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_Q, {}, Draw1);
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_W, {}, NoDraw1);
@@ -190,14 +173,10 @@ int ZC_main()
 // ZC_GUI_WF__NeedDraw
 // ZC_GUI_WF__NoBackground
 // ZC_GUI_WF__Movable
-    // win1 = new ZC_W(10, 10, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel,       ZC_GUI_WF__Stacionar | ZC_GUI_WF__NeedDraw | ZC_GUI_WF__NoBackground | ZC_GUI_WF__Movable);
+    win1 = new ZC_W(10, 10, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel,       ZC_GUI_WF__Stacionar | ZC_GUI_WF__NeedDraw | ZC_GUI_WF__NoBackground | ZC_GUI_WF__Movable);
     win2 = new ZC_W(50, 50, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel,      ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable);
-    // win3 = new ZC_W(100, 100, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Bottom_Pixel, ZC_GUI_WF__Stacionar);
+    win3 = new ZC_W(100, 100, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Bottom_Pixel, ZC_GUI_WF__Stacionar);
     win4 = new ZC_W(100, 100, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel,  ZC_GUI_WF__NeedDraw);
-
-    // win2.pWin->VSetDrawState(true);
-    // win1.pWin->VSetDrawState(true);
-    // win3.pWin->VSetDrawState(true);
 
 
     ZC_SWindow::RuntMainCycle();
