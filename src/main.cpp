@@ -71,14 +71,14 @@ struct ZC_W
              guiFLags
             );
 
-        pBtn1 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_BM__Scroll);
-        pBtn2 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_BM__CursorMoveOnButtonLeftPress);
+        pBtn1 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_MB__Scroll);
+        pBtn2 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_MB__CursorMoveOnMBLPress);
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
         pWin->VAddObj_Obj(pBtn1.Get());
         pWin->VAddObj_Obj(pBtn2.Get());
 
-        pBtn3 = new ZC_GUI_ButtonMouse(10, 20, ZC_GUI_BM__DoubleCLick);
-        pBtn4 = new ZC_GUI_ButtonMouse(20, 20, 0);
+        pBtn3 = new ZC_GUI_ButtonMouse(10, 20, ZC_GUI_MB__DoubleCLick);
+        pBtn4 = new ZC_GUI_ButtonMouse(20, 20, ZC_GUI_MB__MBLPress);
         pText1 = new ZC_GUI_Text(L"Dimka Молодчинка");
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(5, ZC_GUI_RowParams::Indent_X::Left, 10, 10)));
         pWin->VAddObj_Obj(pBtn3.Get());
@@ -94,13 +94,13 @@ ZC_W* win4;
 
 void Draw1(ZC_ButtonID,float) { win1->pWin->VSetDrawState_W(true); }
 void NoDraw1(ZC_ButtonID,float) { win1->pWin->VSetDrawState_W(false); }
-void Focuse1(ZC_ButtonID,float) { win1->pWin->MakeForcused(); }
+void Focuse1(ZC_ButtonID,float) { win1->pWin->MakeWindowFocused(); }
 void Draw2(ZC_ButtonID,float) { win2->pWin->VSetDrawState_W(true); }
 void NoDraw2(ZC_ButtonID,float) { win2->pWin->VSetDrawState_W(false); }
-void Focuse2(ZC_ButtonID,float) { win2->pWin->MakeForcused(); }
+void Focuse2(ZC_ButtonID,float) { win2->pWin->MakeWindowFocused(); }
 void Draw3(ZC_ButtonID,float) { win3->pWin->VSetDrawState_W(true); }
 void NoDraw3(ZC_ButtonID,float) { win3->pWin->VSetDrawState_W(false); }
-void Focuse3(ZC_ButtonID,float) { win3->pWin->MakeForcused(); }
+void Focuse3(ZC_ButtonID,float) { win3->pWin->MakeWindowFocused(); }
 #include <ZC/GUI/ZC_GUI_FontLoader.h>
 
 wchar_t GetUnicode(unsigned char ch, ZC_ButtonID butID)
@@ -137,8 +137,8 @@ int ZC_main()
 {
     using namespace ZC_SWindow;
     ZC_SWindow::MakeWindow(
-        ZC_Window_Multisampling_4 | 
-        ZC_Window_Border, 800, 600, "ZeroCreator");
+        ZC_SW__Multisampling_4 | 
+        ZC_SW__Border | ZC_SW__GUI, 800, 600, "ZeroCreator");
     ZC_SWindow::SetFPS(0);
     ZC_SWindow::NeedDrawFPS(true);
 
