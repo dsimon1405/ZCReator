@@ -46,58 +46,76 @@
 #include <ZC/GUI/ZC_GUI_WinMutable.h>
 #include <ZC/GUI/ZC_GUI_WinImmutable.h>
 #include <ZC/GUI/ZC_GUI_ButtonMouse.h>
+#include <ZC/GUI/ZC_GUI_ButtonKeyboard.h>
+#include <ZC/GUI/ZC_GUI_ButtonMouseAndKeyboard.h>
 #include <ZC/Events/ZC_Events.h>
 #include <ZC/GUI/ZC_GUI_Text.h>
 
+template<typename TWin>
 struct ZC_W
 {
-    ZC_uptr<ZC_GUI_Window> pWin;
+    ZC_uptr<TWin> pWin;
     ZC_uptr<ZC_GUI_ButtonMouse> pBtn1;
     ZC_uptr<ZC_GUI_ButtonMouse> pBtn2;
     ZC_uptr<ZC_GUI_ButtonMouse> pBtn3;
     ZC_uptr<ZC_GUI_ButtonMouse> pBtn4;
-    ZC_uptr<ZC_GUI_Text> pText1;
+    
+    ZC_uptr<ZC_GUI_ButtonKeyboard> pBK1;
+    ZC_uptr<ZC_GUI_ButtonKeyboard> pBK2;
+    
+    ZC_uptr<ZC_GUI_ButtonMouseAndKeyboard> pBMK1;
+    ZC_uptr<ZC_GUI_ButtonMouseAndKeyboard> pBMK2;
+    
+    ZC_uptr<ZC_GUI_TextImmutable> pText1;
     ZC_W() = default;
     ZC_W(float indentX, float indexntY, int indentFlags, int guiFLags)
     {
-        // const float tex_size = 512.f,
-        //     icon_size = 128.f,
-        //     step = icon_size / tex_size;
-        // float bl_u = step * 0.f;
-        // float bl_v = step * 3.f;
-        // float tr_u = step * 1.f;
-        // float tr_v = step * 4.f;
-        pWin = new ZC_GUI_WinImmutable(ZC_WOIData{.width = 200, .height = 200, .indentX = indentX, .indentY = indexntY, .indentFlags = indentFlags},
+        pWin = new TWin(ZC_WOIData{.width = 200, .height = 200, .indentX = indentX, .indentY = indexntY, .indentFlags = indentFlags},
              guiFLags
             );
 
         pBtn1 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_MB__Scroll);
         pBtn2 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_MB__CursorMoveOnMBLPress);
+
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
         pWin->VAddObj_Obj(pBtn1.Get());
         pWin->VAddObj_Obj(pBtn2.Get());
 
         pBtn3 = new ZC_GUI_ButtonMouse(10, 20, ZC_GUI_MB__DoubleCLick);
         pBtn4 = new ZC_GUI_ButtonMouse(20, 20, ZC_GUI_MB__MBLPress);
-        pText1 = new ZC_GUI_Text(L"Dimka Молодчинка");
+        pText1 = new ZC_GUI_TextImmutable(L"Dimka Молодчинка");
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(5, ZC_GUI_RowParams::Indent_X::Left, 10, 10)));
         pWin->VAddObj_Obj(pBtn3.Get());
         pWin->VAddObj_Obj(pBtn4.Get());
         pWin->VAddObj_Obj(pText1.Get());
-    }    
+
+        pBK1 = new ZC_GUI_ButtonKeyboard(ZC_ButtonID::K_N, 30, 30, false);
+        pBK2 = new ZC_GUI_ButtonKeyboard(ZC_ButtonID::K_M, 30, 30, true);
+        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 10, 10)));
+        pWin->VAddObj_Obj(pBK1.Get());
+        pWin->VAddObj_Obj(pBK2.Get());
+
+        pBMK1 = new ZC_GUI_ButtonMouseAndKeyboard(30, 30, ZC_GUI_MB__MBLPress, ZC_ButtonID::K_R, true);
+        pBMK2 = new ZC_GUI_ButtonMouseAndKeyboard(30, 30, ZC_GUI_MB__Scroll, ZC_ButtonID::K_F, false);
+        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 10, 10)));
+        pWin->VAddObj_Obj(pBMK1.Get());
+        pWin->VAddObj_Obj(pBMK2.Get());
+    }
 };
 
-ZC_W* win1;
-ZC_W* win2;
-ZC_W* win3;
-ZC_W* win4;
+ZC_W<ZC_GUI_WinImmutable>* win1;
+ZC_W<ZC_GUI_WinImmutable>* win2;
+ZC_W<ZC_GUI_WinMutable>* win3;
+ZC_W<ZC_GUI_WinMutable>* win4;
 
 void Draw1(ZC_ButtonID,float) { win1->pWin->VSetDrawState_W(true); }
 void NoDraw1(ZC_ButtonID,float) { win1->pWin->VSetDrawState_W(false); }
 void Focuse1(ZC_ButtonID,float) { win1->pWin->MakeWindowFocused(); }
+
 void Draw2(ZC_ButtonID,float) { win2->pWin->VSetDrawState_W(true); }
 void NoDraw2(ZC_ButtonID,float) { win2->pWin->VSetDrawState_W(false); }
 void Focuse2(ZC_ButtonID,float) { win2->pWin->MakeWindowFocused(); }
+
 void Draw3(ZC_ButtonID,float) { win3->pWin->VSetDrawState_W(true); }
 void NoDraw3(ZC_ButtonID,float) { win3->pWin->VSetDrawState_W(false); }
 void Focuse3(ZC_ButtonID,float) { win3->pWin->MakeWindowFocused(); }
@@ -116,20 +134,15 @@ wchar_t GetUnicode(unsigned char ch, ZC_ButtonID butID)
     assert(false);  //  can't find charracter
     return ch;
 }
-ZC_Clock cl;
+
 void Click(ZC_ButtonID, float)
 {
-    static int count = 0;
-    if (count == 0)
-    {
-        cl.Start();
-        ++count;
-    }
-    else
-    {
-        count = 0;
-        std::cout<<cl.Time<ZC_Nanoseconds>()<<std::endl;
-    }
+    std::cout<<"CLICK CLICK"<<std::endl;
+}
+
+void Boom(ZC_ButtonID, float)
+{
+    std::cout<<"BOOM"<<std::endl;
 }
 
 #include <iostream>
@@ -157,14 +170,18 @@ int ZC_main()
     
     ZCR_Scene scene;
 
-    ZC_Events::ConnectButtonClick(ZC_ButtonID::M_LEFT, Click, {});
+
+
+    ZC_Events::ConnectButtonClick(ZC_ButtonID::K_M, Click, Boom);
 
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_Q, {}, Draw1);
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_W, {}, NoDraw1);
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_E, {}, Focuse1);
+
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_A, {}, Draw2);
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_S, {}, NoDraw2);
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_D, {}, Focuse2);
+
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_Z, {}, Draw3);
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_X, {}, NoDraw3);
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_C, {}, Focuse3);
@@ -173,10 +190,10 @@ int ZC_main()
 // ZC_GUI_WF__NeedDraw
 // ZC_GUI_WF__NoBackground
 // ZC_GUI_WF__Movable
-    win1 = new ZC_W(10, 10, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel,       ZC_GUI_WF__Stacionar | ZC_GUI_WF__NeedDraw | ZC_GUI_WF__NoBackground | ZC_GUI_WF__Movable);
-    win2 = new ZC_W(50, 50, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel,      ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable);
-    win3 = new ZC_W(100, 100, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Bottom_Pixel, ZC_GUI_WF__Stacionar);
-    win4 = new ZC_W(100, 100, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel,  ZC_GUI_WF__NeedDraw);
+    win1 = new ZC_W<ZC_GUI_WinImmutable>(10, 10, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel,     ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable);
+    win2 = new ZC_W<ZC_GUI_WinImmutable>(50, 50, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel,    ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable);
+    // win3 = new ZC_W<ZC_GUI_WinMutable>(10, 10, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Bottom_Pixel,  ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable);
+    // win4 = new ZC_W<ZC_GUI_WinMutable>(100, 100, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel,  ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable);
 
 
     ZC_SWindow::RuntMainCycle();
