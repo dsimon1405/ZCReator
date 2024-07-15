@@ -49,7 +49,7 @@
 #include <ZC/GUI/ZC_GUI_ButtonKeyboard.h>
 #include <ZC/GUI/ZC_GUI_ButtonMouseAndKeyboard.h>
 #include <ZC/Events/ZC_Events.h>
-#include <ZC/GUI/ZC_GUI_Text.h>
+#include <ZC/GUI/Text/ZC_GUI_TextMutable.h>
 
 template<typename TWin>
 struct ZC_W
@@ -66,11 +66,11 @@ struct ZC_W
     ZC_uptr<ZC_GUI_ButtonMouseAndKeyboard> pBMK1;
     ZC_uptr<ZC_GUI_ButtonMouseAndKeyboard> pBMK2;
     
-    ZC_uptr<ZC_GUI_TextImmutable> pText1;
+    ZC_uptr<ZC_GUI_TextMutable> pText1;
     ZC_W() = default;
-    ZC_W(float indentX, float indexntY, int indentFlags, int guiFLags)
+    ZC_W(float indentX, float indexntY, int indentFlags, int guiFLags, const std::wstring& text)
     {
-        pWin = new TWin(ZC_WOIData{.width = 200, .height = 200, .indentX = indentX, .indentY = indexntY, .indentFlags = indentFlags},
+        pWin = new TWin(ZC_WOIData{.width = 250, .height = 200, .indentX = indentX, .indentY = indexntY, .indentFlags = indentFlags},
              guiFLags
             );
 
@@ -83,8 +83,8 @@ struct ZC_W
 
         pBtn3 = new ZC_GUI_ButtonMouse(10, 20, ZC_GUI_MB__DoubleCLick);
         pBtn4 = new ZC_GUI_ButtonMouse(20, 20, ZC_GUI_MB__MBLPress);
-        pText1 = new ZC_GUI_TextImmutable(L"Dimka Молодчинка");
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(5, ZC_GUI_RowParams::Indent_X::Left, 10, 10)));
+        pText1 = new ZC_GUI_TextMutable(text, ZC_GUI_TextManager::CalculateWstrWidth(L"Нет, я первый!"));
+        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 15, 10)));
         pWin->VAddObj_Obj(pBtn3.Get());
         pWin->VAddObj_Obj(pBtn4.Get());
         pWin->VAddObj_Obj(pText1.Get());
@@ -119,30 +119,46 @@ void Focuse2(ZC_ButtonID,float) { win2->pWin->MakeWindowFocused(); }
 void Draw3(ZC_ButtonID,float) { win3->pWin->VSetDrawState_W(true); }
 void NoDraw3(ZC_ButtonID,float) { win3->pWin->VSetDrawState_W(false); }
 void Focuse3(ZC_ButtonID,float) { win3->pWin->MakeWindowFocused(); }
-#include <ZC/GUI/ZC_GUI_FontLoader.h>
+#include <ZC/GUI/Text/ZC_GUI_TextInputWindow.h>
 
-wchar_t GetUnicode(unsigned char ch, ZC_ButtonID butID)
-{
-    if (ch < 128) return ch;   //  return ch, is english ascii
-        //  here must be if for keyboard, now next is russian. Letters have repeats in uchar (uchar Ё = c = 129), ё (uchar ё = Б = 145),
-        //  and we don't know unicode thancs SDL... so use stupid tactic with ZC_ButtonID
-    if (ch == 129 && butID == ZC_ButtonID::K_GRAVE) return 0x401;    //  Ё (unicode 0x401)
-    else if (ch == 145 && butID == ZC_ButtonID::K_GRAVE) return 0x451;    //  ё (unicode 0x451)
-    else if (ch >= 128 && ch <= 143) return (wchar_t)ch + 960;  //  first range: 1088 - 128 = 960 -> 1088(0x440 unicode start), 128(uchar ascii start)
-    else if (ch >= 144 && ch <= 191) return (wchar_t)ch + 896;  //  second range: 1040 - 144 = 896 -> 1040(0x410 unicode start), 144(uchar ascii start)
-
-    assert(false);  //  can't find charracter
-    return ch;
-}
-
+// ZC_GUI_TextMutable* pText1;
+// ZC_GUI_TextMutable* pText2;
+int counter = 0;
 void Click(ZC_ButtonID, float)
 {
-    std::cout<<"CLICK CLICK"<<std::endl;
+    // counter % 2 == 0 ? win1->pWin->ChangeObjsDrawState(false, win1->pBtn4.Get(), win1->pBMK1.Get()) : win1->pWin->ChangeObjsDrawState(true, win1->pBtn4.Get(), win1->pBMK1.Get());
+    // ++counter;
+    
+    
+    ZC_GUI_TextInputWindow::StartInputWindow(100, 100, 200, L"Abora Кодабора!", nullptr);
+
+    
+    // if (counter % 2 == 0)
+    // {
+    //     win1->pText1->UpdateText(L"Нет, я первый!");
+    //     win2->pText1->UpdateText(L"Я первый");
+    // }
+    // else
+    // {
+    //     win1->pText1->UpdateText(L"Я первый");
+    //     win2->pText1->UpdateText(L"Нет, я первый!");
+    // }
+    // ++counter;
+
+
+    // switch (counter++)
+    // {
+    // case 0: pText1 = new ZC_GUI_TextMutable(L"Long night!", 0); break;
+    // case 1: pText2 = new ZC_GUI_TextMutable(L"Очень длиннаЯ", 0); break;
+    // case 2: delete pText1; break;
+    // case 3: delete pText2; break;
+    // }
+    // std::cout<<"CLICK CLICK"<<std::endl;
 }
 
 void Boom(ZC_ButtonID, float)
 {
-    std::cout<<"BOOM"<<std::endl;
+    // std::cout<<"BOOM"<<std::endl;
 }
 
 #include <iostream>
@@ -172,7 +188,7 @@ int ZC_main()
 
 
 
-    ZC_Events::ConnectButtonClick(ZC_ButtonID::K_M, Click, Boom);
+    ZC_Events::ConnectButtonClick(ZC_ButtonID::K_L, Click, Boom);
 
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_Q, {}, Draw1);
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_W, {}, NoDraw1);
@@ -190,8 +206,8 @@ int ZC_main()
 // ZC_GUI_WF__NeedDraw
 // ZC_GUI_WF__NoBackground
 // ZC_GUI_WF__Movable
-    win1 = new ZC_W<ZC_GUI_WinImmutable>(10, 10, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel,     ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable);
-    win2 = new ZC_W<ZC_GUI_WinImmutable>(50, 50, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel,    ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable);
+    win1 = new ZC_W<ZC_GUI_WinImmutable>(10, 10, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel,     ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable, L"Я первый");
+    win2 = new ZC_W<ZC_GUI_WinImmutable>(50, 50, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel,    ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable, L"Нет, я первый!");
     // win3 = new ZC_W<ZC_GUI_WinMutable>(10, 10, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Bottom_Pixel,  ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable);
     // win4 = new ZC_W<ZC_GUI_WinMutable>(100, 100, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel,  ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable);
 

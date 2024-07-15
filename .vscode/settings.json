@@ -90,5 +90,6 @@
         "zcr_igwfigures.h": "c",
         "zcr_igw_figure": "cpp",
         "*.h copy": "c"
-    }
+    },
+    "C_Cpp.errorSquiggles": "disabled"
 }
