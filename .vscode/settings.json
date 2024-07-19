@@ -89,7 +89,8 @@
         "xutility": "cpp",
         "zcr_igwfigures.h": "c",
         "zcr_igw_figure": "cpp",
-        "*.h copy": "c"
+        "*.h copy": "c",
+        "zc_gui_": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
