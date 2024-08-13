@@ -16,7 +16,7 @@ void ZCR_IGWBM_Interface::VCallButtonDownBM(ZC_ButtonID buttonId, float time)
 {
     switch (buttonId)
     {
-    case K_O: orientatin3D.IsActive() ? orientatin3D.Deactivate() : orientatin3D.Activate(); break;
+    // case K_O: orientatin3D.IsActive() ? orientatin3D.Deactivate() : orientatin3D.Activate(); break;
     case K_G: ZC_IGWindow::NeedImGuiDraw(!ZC_IGWindow::IsImGuiDrawing()); break;
     case K_1: ZCR_Scene::GetScene()->SetMeshSpecificCoordSystem(ZCR_Mesh::CS_Auto); break;
     case K_2: ZCR_Scene::GetScene()->SetMeshSpecificCoordSystem(ZCR_Mesh::CS_XY); break;
@@ -38,8 +38,8 @@ void ZCR_IGWBM_Interface::VDrawWindowIGW()
 void ZCR_IGWBM_Interface::DrawInterface(bool isActiveBM)
 {
     ImGui::SeparatorText("Interface");
-    bool isActiveO3d = orientatin3D.IsActive();
-    if (ImGui::Checkbox(isActiveBM ? " Orientation3D(O)" : " Orientation3D", &isActiveO3d)) isActiveO3d ? orientatin3D.Activate() : orientatin3D.Deactivate();
+    // bool isActiveO3d = orientatin3D.IsActive();
+    // if (ImGui::Checkbox(isActiveBM ? " Orientation3D(O)" : " Orientation3D", &isActiveO3d)) isActiveO3d ? orientatin3D.Activate() : orientatin3D.Deactivate();
     bool isDrawingIG = ZC_IGWindow::IsImGuiDrawing();
     if (ImGui::Checkbox(isActiveBM ? " ImGui(G)" : " ImGui", &isDrawingIG)) ZC_IGWindow::NeedImGuiDraw(isDrawingIG);
 }

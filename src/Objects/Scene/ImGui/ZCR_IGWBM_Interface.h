@@ -9,7 +9,7 @@ public:
     ZCR_IGWBM_Interface();
 
 private:
-    ZCR_Orientation3D orientatin3D;
+    // ZCR_Orientation3D orientatin3D;
     bool showInterface = true;
 
     void VCallButtonDownBM(ZC_ButtonID buttonId, float time) override;

@@ -111,7 +111,8 @@ struct ZC_W
     ZC_W() = default;
     ZC_W(float indentX, float indexntY, int indentFlags, int guiFLags, const std::wstring& text)
     {
-        pWin = new TWin(ZC_WOIData(250, 200, indentX, indexntY, indentFlags),
+        pWin = new TWin(ZC_WOIData(400, 400, indentX, indexntY, indentFlags), 
+        // pWin = new TWin(ZC_WOIData(250, 200, indentX, indexntY, indentFlags),
              guiFLags
             );
 
@@ -179,17 +180,17 @@ struct ZC_W
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
         pWin->VAddObj_Obj(pBtn2.Get());
 
-        pBMT1 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::checkBox);
+        pBMT1 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrowDown);
         pBMK2 = new ZC_GUI_ButtonMouseAndKeyboard(30, 30, ZC_GUI_BF_M__Scroll, ZC_ButtonID::K_F);
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
         pWin->VAddObj_Obj(pBMT1.Get());
         pWin->VAddObj_Obj(pBMK2.Get());
 
-        pBMT2 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::checkBox);
+        pBMT2 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrowDown);
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
         pWin->VAddObj_Obj(pBMT2.Get());
 
-        pBMT3 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::checkBox);
+        pBMT3 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrowDown);
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
         pWin->VAddObj_Obj(pBMT3.Get());
 
@@ -290,6 +291,13 @@ float Round(float number, int n)
     return long(number * pow(10., n)) / pow(10., n);
 }
 
+struct Q
+{
+    int q;
+
+    Q(int _q) : q(_q){}
+};
+
 int ZC_main()
 {
     using namespace ZC_SWindow;
@@ -313,6 +321,8 @@ int ZC_main()
     ZCR_LoadFonts();
     
     ZCR_Scene scene;
+
+    ZCR_GUI_Orientation3D or3d;
 
     // auto scrl = [](float x, float y, float time)
     // {
@@ -338,7 +348,7 @@ int ZC_main()
 // ZC_GUI_WF__NeedDraw
 // ZC_GUI_WF__NoBackground
 // ZC_GUI_WF__Movable
-    win1 = new ZC_W<ZC_GUI_WinMutable>(10, 10, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel, ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Frame | ZC_GUI_WF__Scrollable , L"Я chekBox");
+    // win1 = new ZC_W<ZC_GUI_WinMutable>(10, 10, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Top_Pixel, ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Frame | ZC_GUI_WF__Scrollable , L"Я chekBox");
     win2 = new ZC_W<ZC_GUI_WinMutable>(50, 50, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Top_Pixel,    ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable | ZC_GUI_WF__Frame | ZC_GUI_WF__Scrollable, L"Нет, я первый!");
     // win3 = new ZC_W<ZC_GUI_WinMutable>(10, 10, ZC_WOIF__X_Right_Pixel | ZC_WOIF__Y_Bottom_Pixel,  ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable);
     // win4 = new ZC_W<ZC_GUI_WinMutable>(100, 100, ZC_WOIF__X_Left_Pixel | ZC_WOIF__Y_Bottom_Pixel,  ZC_GUI_WF__NeedDraw | ZC_GUI_WF__Movable);
