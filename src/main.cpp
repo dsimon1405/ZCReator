@@ -49,7 +49,6 @@
 #include <ZC/GUI/ZC_GUI_ButtonKeyboard.h>
 #include <ZC/GUI/ZC_GUI_ButtonMouseAndKeyboard.h>
 #include <ZC/Events/ZC_Events.h>
-#include <ZC/GUI/Text/ZC_GUI_TextMutable.h>
 #include <ZC/GUI/ZC_GUI_ButtonMouseText.h>
 #include <ZC/GUI/ZC_GUI_DropDown.h>
 #include <ZC/GUI/ZC_GUI_CheckBox.h>
@@ -106,7 +105,7 @@ struct ZC_W
     
     ZC_uptr<ZC_GUI_Text> pText1;
 
-    ZC_uptr<ZC_GUI_ButtonNumber<int>> upBNumb;
+    ZC_uptr<ZC_GUI_ButtonNumber<float>> upBNumb;
 
     ZC_W() = default;
     ZC_W(float indentX, float indexntY, int indentFlags, int guiFLags, const std::wstring& text)
@@ -171,7 +170,7 @@ struct ZC_W
         pBtn1 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_BF_M__Scroll);
         pDD = new ZC_GUI_DropDown(std::vector<std::wstring>{L"первы", L"Вторы", L"Third", L"Four"}, 0);
         pBtn2 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_BF_M__CursorMoveOnMBLPress);
-        upBNumb = new ZC_GUI_ButtonNumber<int>(40.f, 14, ZC_INT_MAX, ZC_INT_MIN, 1, 2, 0, ZC_GUI_TextAlignment::Center);
+        upBNumb = new ZC_GUI_ButtonNumber<float>(40, 30, 14.2f, 14.2f, 15.f, 0.1f, 0.2f, 2, ZC_GUI_TextAlignment::Center);
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
         pWin->VAddObj_Obj(pBtn1.Get());
         pWin->VAddObj_Obj(upBNumb.Get());
@@ -235,10 +234,18 @@ void Focuse3(ZC_ButtonID,float) { win3->pWin->MakeWindowFocused(); }
 
 // ZC_GUI_TextMutable* pText1;
 // ZC_GUI_TextMutable* pText2;
+
+void Foo(float i)
+{
+    std::wcout<<i<<std::endl;
+}
+
 int counter = 0;
 void Click(ZC_ButtonID, float)
 {
-    counter++ % 2 == 0 ? ZC_SWindow::LimitCursor() : ZC_SWindow::UnlimitCursor();
+    ZC_GUI_TextInputWindow::StartInputWindow(200, 200, 50, ZC_GUI_TextInputWindow::NumberInput<float>(34, { &Foo }, 0), false);
+
+    // counter++ % 2 == 0 ? ZC_SWindow::LimitCursor() : ZC_SWindow::UnlimitCursor();
 
     // counter++ % 2 == 0 ? win1->upTree->AddBranch(win1->upBr12.Get(), win1->upBrOp1.Get()) : win1->upTree->EraseBranch(win1->upBr12.Get(), true);
 
@@ -285,7 +292,6 @@ void Boom(ZC_ButtonID, float)
     // std::cout<<"BOOM"<<std::endl;
 }
 #include <iostream>
-
 float Round(float number, int n)
 {
     return long(number * pow(10., n)) / pow(10., n);
@@ -300,6 +306,9 @@ struct Q
 
 int ZC_main()
 {
+    // std::wstring sch_min = L"177";
+    // int q = sch_min.compare(L"0");
+
     using namespace ZC_SWindow;
     ZC_SWindow::MakeWindow(
         ZC_SW__Multisampling_4 | 
@@ -330,7 +339,7 @@ int ZC_main()
     // };
     // ZC_Events::ConnectMouseScroll({ scrl });
 
-    ZC_Events::ConnectButtonClick(ZC_ButtonID::M_X1, Click, Boom);
+    ZC_Events::ConnectButtonClick(ZC_ButtonID::K_L, Click, Boom);
 
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_Q, {}, Draw1);
     ZC_Events::ConnectButtonClick(ZC_ButtonID::K_W, {}, NoDraw1);
