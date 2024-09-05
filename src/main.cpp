@@ -55,6 +55,7 @@
 #include <ZC/GUI/ZC_GUI_Tree.h>
 #include <ZC/GUI/Text/ZC_GUI_TextInputWindow.h>
 #include <ZC/GUI/ZC_GUI_ButtonNumber.h>
+#include <ZC/GUI/ZC_GUI_ColorManipulator.h>
 
 #include <Objects/Scene/Orientation3/ZCR_GUI_Orientation3D.h>
 
@@ -104,8 +105,12 @@ struct ZC_W
     ZC_uptr<ZC_GUI_ButtonMouseAndKeyboard> pBMK2;
     
     ZC_uptr<ZC_GUI_Text> pText1;
+    ZC_uptr<ZC_GUI_Text> pText2;
+    ZC_uptr<ZC_GUI_Text> pText3;
 
-    ZC_uptr<ZC_GUI_ButtonNumber<float>> upBNumb;
+    ZC_uptr<ZC_GUI_ButtonNumberText<float>> upBNumb;
+
+    ZC_uptr<ZC_GUI_ColorManipulator> upColorManipulator;
 
     ZC_W() = default;
     ZC_W(float indentX, float indexntY, int indentFlags, int guiFLags, const std::wstring& text)
@@ -115,103 +120,117 @@ struct ZC_W
              guiFLags
             );
 
-        upTree = new ZC_GUI_Tree(220, 190);
-        upBr0 = new ZC_GUI_Branch(L"Branch_0");
-        upBrOp1 = new ZC_GUI_BranchOpenable(L"Openable_1", true);
-        upBr11 = new ZC_GUI_Branch(L"Branch_11");
-        upBr12 = new ZC_GUI_Branch(L"Branch_12");
-        upBr13 = new ZC_GUI_Branch(L"Branch_13");
-        upBr14 = new ZC_GUI_Branch(L"Branch_14");
-        upBr15 = new ZC_GUI_Branch(L"Branch_15");
-        upBr16 = new ZC_GUI_Branch(L"Branch_16");
-        upBr17 = new ZC_GUI_Branch(L"Branch_17");
-        upBrOp2 = new ZC_GUI_BranchOpenable(L"Openable_2", true);
-        upBr21 = new ZC_GUI_Branch(L"Branch_21");
-        upBr22 = new ZC_GUI_Branch(L"Branch_22");
-        upBrOp3 = new ZC_GUI_BranchOpenable(L"Openable_3", false);
-        upBr31 = new ZC_GUI_Branch(L"Branch_31");
-        upBr32 = new ZC_GUI_Branch(L"Branch_32");
-        upBr33 = new ZC_GUI_Branch(L"Branch_33");
-        upBr34 = new ZC_GUI_Branch(L"Branch_34");
-        upBr35 = new ZC_GUI_Branch(L"Branch_35");
-        upBr36 = new ZC_GUI_Branch(L"Branch_36");
-        upBr37 = new ZC_GUI_Branch(L"Branch_37");
-        upTree->AddBranches({ upBr0.Get(), upBrOp1.Get(), upBrOp2.Get() }, nullptr);
-        upTree->AddBranches(
-            {
-                upBr11.Get(),
-                upBr12.Get(),
-                upBr13.Get(),
-                upBr14.Get(),
-                upBrOp3.Get(),
-                upBr15.Get(),
-                upBr16.Get(),
-                upBr17.Get(),
-            }, upBrOp1.Get());
-        upTree->AddBranches(
-            {
-                upBr21.Get(),
-                upBr22.Get(),
-            }, upBrOp2.Get());
-        upTree->AddBranches(
-            {
-                upBr31.Get(),
-                upBr32.Get(),
-                upBr33.Get(),
-                upBr34.Get(),
-                upBr35.Get(),
-                upBr36.Get(),
-                upBr37.Get(),
-            }, upBrOp3.Get());
+        upColorManipulator = new ZC_GUI_ColorManipulator(true);
+        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(0, ZC_GUI_RowParams::Indent_X::Left, 0, 0)));
+        pWin->VAddObj_Obj(upColorManipulator.Get());
 
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(0, ZC_GUI_RowParams::Indent_X::Center, 5, 0)));
-        pWin->VAddObj_Obj(upTree.Get());
-
-        pBtn1 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_BF_M__Scroll);
-        pDD = new ZC_GUI_DropDown(std::vector<std::wstring>{L"первы", L"Вторы", L"Third", L"Four"}, 0);
-        pBtn2 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_BF_M__CursorMoveOnMBLPress);
-        upBNumb = new ZC_GUI_ButtonNumber<float>(40, 30, 14.2f, 14.2f, 15.f, 0.1f, 0.2f, 2, ZC_GUI_TextAlignment::Center);
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
-        pWin->VAddObj_Obj(pBtn1.Get());
-        pWin->VAddObj_Obj(upBNumb.Get());
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
-        pWin->VAddObj_Obj(pDD.Get());
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
-        pWin->VAddObj_Obj(pBtn2.Get());
-
-        pBMT1 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrowDown);
-        pBMK2 = new ZC_GUI_ButtonMouseAndKeyboard(30, 30, ZC_GUI_BF_M__Scroll, ZC_ButtonID::K_F);
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
-        pWin->VAddObj_Obj(pBMT1.Get());
-        pWin->VAddObj_Obj(pBMK2.Get());
-
-        pBMT2 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrowDown);
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
-        pWin->VAddObj_Obj(pBMT2.Get());
-
-        pBMT3 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrowDown);
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
-        pWin->VAddObj_Obj(pBMT3.Get());
-
-        pBtn3 = new ZC_GUI_ButtonMouse(10, 20, ZC_GUI_BF_M__DoubleCLick);
-        pBtn4 = new ZC_GUI_ButtonMouse(20, 20, ZC_GUI_BF__MBLPress);
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(47, ZC_GUI_RowParams::Indent_X::Left, 15, 10)));
-        pWin->VAddObj_Obj(pBtn3.Get());
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(47, ZC_GUI_RowParams::Indent_X::Left, 15, 10)));
-        pWin->VAddObj_Obj(pBtn4.Get());
-
-        pBK1 = new ZC_GUI_ButtonKeyboard(ZC_ButtonID::K_N, 30, 30, false);
-        pChB = new ZC_GUI_CheckBox(L"Я chekBox", true);
-        pBK2 = new ZC_GUI_ButtonKeyboard(ZC_ButtonID::K_M, 30, 30, true);
-        pText1 = new ZC_GUI_Text(text, false, ZC_GUI_TextManager::CalculateWstrWidth(L"Нет, я первый!"), ZC_GUI_TextAlignment::Right);
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
-        pWin->VAddObj_Obj(pBK1.Get());
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
-        pWin->VAddObj_Obj(pChB.Get());
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
-        pWin->VAddObj_Obj(pBK2.Get());
-        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
+        pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(0, ZC_GUI_RowParams::Indent_X::Left, 0, 0)));
+        pText1 = new ZC_GUI_Text(L"Text Some", true, 0, ZC_GUI_TextAlignment::Left);
         pWin->VAddObj_Obj(pText1.Get());
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(0, ZC_GUI_RowParams::Indent_X::Left, 0, 0)));
+        // pText2 = new ZC_GUI_Text(L"G", true, 0, ZC_GUI_TextAlignment::Left);
+        // pWin->VAddObj_Obj(pText2.Get());
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(0, ZC_GUI_RowParams::Indent_X::Left, 0, 0)));
+        // pText3 = new ZC_GUI_Text(L"B", true, 0, ZC_GUI_TextAlignment::Left);
+        // pWin->VAddObj_Obj(pText3.Get());
+
+
+        // upTree = new ZC_GUI_Tree(220, 190);
+        // upBr0 = new ZC_GUI_Branch(L"Branch_0");
+        // upBrOp1 = new ZC_GUI_BranchOpenable(L"Openable_1", true);
+        // upBr11 = new ZC_GUI_Branch(L"Branch_11");
+        // upBr12 = new ZC_GUI_Branch(L"Branch_12");
+        // upBr13 = new ZC_GUI_Branch(L"Branch_13");
+        // upBr14 = new ZC_GUI_Branch(L"Branch_14");
+        // upBr15 = new ZC_GUI_Branch(L"Branch_15");
+        // upBr16 = new ZC_GUI_Branch(L"Branch_16");
+        // upBr17 = new ZC_GUI_Branch(L"Branch_17");
+        // upBrOp2 = new ZC_GUI_BranchOpenable(L"Openable_2", true);
+        // upBr21 = new ZC_GUI_Branch(L"Branch_21");
+        // upBr22 = new ZC_GUI_Branch(L"Branch_22");
+        // upBrOp3 = new ZC_GUI_BranchOpenable(L"Openable_3", false);
+        // upBr31 = new ZC_GUI_Branch(L"Branch_31");
+        // upBr32 = new ZC_GUI_Branch(L"Branch_32");
+        // upBr33 = new ZC_GUI_Branch(L"Branch_33");
+        // upBr34 = new ZC_GUI_Branch(L"Branch_34");
+        // upBr35 = new ZC_GUI_Branch(L"Branch_35");
+        // upBr36 = new ZC_GUI_Branch(L"Branch_36");
+        // upBr37 = new ZC_GUI_Branch(L"Branch_37");
+        // upTree->AddBranches({ upBr0.Get(), upBrOp1.Get(), upBrOp2.Get() }, nullptr);
+        // upTree->AddBranches(
+        //     {
+        //         upBr11.Get(),
+        //         upBr12.Get(),
+        //         upBr13.Get(),
+        //         upBr14.Get(),
+        //         upBrOp3.Get(),
+        //         upBr15.Get(),
+        //         upBr16.Get(),
+        //         upBr17.Get(),
+        //     }, upBrOp1.Get());
+        // upTree->AddBranches(
+        //     {
+        //         upBr21.Get(),
+        //         upBr22.Get(),
+        //     }, upBrOp2.Get());
+        // upTree->AddBranches(
+        //     {
+        //         upBr31.Get(),
+        //         upBr32.Get(),
+        //         upBr33.Get(),
+        //         upBr34.Get(),
+        //         upBr35.Get(),
+        //         upBr36.Get(),
+        //         upBr37.Get(),
+        //     }, upBrOp3.Get());
+
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(0, ZC_GUI_RowParams::Indent_X::Center, 5, 0)));
+        // pWin->VAddObj_Obj(upTree.Get());
+
+        // pBtn1 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_BF_M__Scroll);
+        // pDD = new ZC_GUI_DropDown(std::vector<std::wstring>{L"первы", L"Вторы", L"Third", L"Four"}, 0);
+        // pBtn2 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_BF_M__CursorMoveOnMBLPress);
+        // upBNumb = new ZC_GUI_ButtonNumberText<float>(ZC_GUI_ButtonNumber<float>(40, 30, 14.2f, 14.2f, 15.f, 0.1f, 0.2f, 2, ZC_GUI_TextAlignment::Center),
+        //     ZC_GUI_Text(L"Red", true, 0, ZC_GUI_TextAlignment::Left), 5);
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
+        // pWin->VAddObj_Obj(pBtn1.Get());
+        // pWin->VAddObj_Obj(upBNumb.Get());
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
+        // pWin->VAddObj_Obj(pDD.Get());
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
+        // pWin->VAddObj_Obj(pBtn2.Get());
+
+        // pBMT1 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrow_down);
+        // pBMK2 = new ZC_GUI_ButtonMouseAndKeyboard(30, 30, ZC_GUI_BF_M__Scroll, ZC_ButtonID::K_F);
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
+        // pWin->VAddObj_Obj(pBMT1.Get());
+        // pWin->VAddObj_Obj(pBMK2.Get());
+
+        // pBMT2 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrow_down);
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
+        // pWin->VAddObj_Obj(pBMT2.Get());
+
+        // pBMT3 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrow_down);
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
+        // pWin->VAddObj_Obj(pBMT3.Get());
+
+        // pBtn3 = new ZC_GUI_ButtonMouse(10, 20, ZC_GUI_BF_M__DoubleCLick);
+        // pBtn4 = new ZC_GUI_ButtonMouse(20, 20, ZC_GUI_BF__MBLPress);
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(47, ZC_GUI_RowParams::Indent_X::Left, 15, 10)));
+        // pWin->VAddObj_Obj(pBtn3.Get());
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(47, ZC_GUI_RowParams::Indent_X::Left, 15, 10)));
+        // pWin->VAddObj_Obj(pBtn4.Get());
+
+        // pBK1 = new ZC_GUI_ButtonKeyboard(ZC_ButtonID::K_N, 30, 30, false);
+        // pChB = new ZC_GUI_CheckBox(L"Я chekBox", true);
+        // pBK2 = new ZC_GUI_ButtonKeyboard(ZC_ButtonID::K_M, 30, 30, true);
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
+        // pWin->VAddObj_Obj(pBK1.Get());
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
+        // pWin->VAddObj_Obj(pChB.Get());
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
+        // pWin->VAddObj_Obj(pBK2.Get());
+        // pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
     }
 };
 
@@ -240,10 +259,16 @@ void Foo(float i)
     std::wcout<<i<<std::endl;
 }
 
+void Foo1(const std::wstring& str)
+{
+    std::wcout<<str<<std::endl;
+}
+
 int counter = 0;
 void Click(ZC_ButtonID, float)
 {
-    ZC_GUI_TextInputWindow::StartInputWindow(200, 200, 50, ZC_GUI_TextInputWindow::NumberInput<float>(34, { &Foo }, 0), false);
+    ZC_GUI_TextInputWindow::StartInputWindow(200, 200, 50, 40, L"lonv", {Foo1}, false);
+    // ZC_GUI_TextInputWindow::StartInputNumberWindow(200, 200, 50, ZC_GUI_TextInputWindow::NumberInput<float>(34, { &Foo }, 0), false, 5);
 
     // counter++ % 2 == 0 ? ZC_SWindow::LimitCursor() : ZC_SWindow::UnlimitCursor();
 
@@ -297,18 +322,8 @@ float Round(float number, int n)
     return long(number * pow(10., n)) / pow(10., n);
 }
 
-struct Q
-{
-    int q;
-
-    Q(int _q) : q(_q){}
-};
-
 int ZC_main()
 {
-    // std::wstring sch_min = L"177";
-    // int q = sch_min.compare(L"0");
-
     using namespace ZC_SWindow;
     ZC_SWindow::MakeWindow(
         ZC_SW__Multisampling_4 | 

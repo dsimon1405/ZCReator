@@ -18,7 +18,7 @@ struct ZCR_GUI_Orientation3D : public ZC_GUI_WinImmutable
         float temp_depth = 0.f;
 
         AxisButton(const std::wstring& wstr_axis, ZCR_Axis _axis, const ZC_Vec3<float>& _start_pos, uint _color_default, uint color_under_cursor)
-            : ZC_GUI_ButtonBase(ZC_GUI_ObjData(0.f, 0.f, 0, ZC_GUI_IconUV::arrowRight, ZC_GUI_Bindings::bind_tex_Icons), ZC_GUI_BF__None, {_color_default, color_under_cursor, ZC_PackColorUCharToUInt(255, 255, 255) }),
+            : ZC_GUI_ButtonBase(ZC_GUI_ObjData(0.f, 0.f, 0, ZC_GUI_IconUV::arrow_right, ZC_GUI_Bindings::bind_tex_Icons), ZC_GUI_BF__None, {_color_default, color_under_cursor, ZC_PackColorUCharToUInt_RGB(255, 255, 255) }),
             // : ZC_GUI_ButtonBase(ZC_GUI_ObjData(0.f, 0.f, _color_default, ZC_GUI_IconUV::button, ZC_GUI_Bindings::bind_tex_Icons), ZC_GUI_BF__None, color_under_cursor, ZC_PackColorUCharToUInt(255, 255, 255)),
             ZC_GUI_ButtonMouseText(0.f, 0.f, ZC_GUI_BF__None,                                                                                           //  color black
                 ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(0.f, ZC_GUI_TextForButton::Indent::Center), wstr_axis, true, 0, ZC_GUI_TextAlignment::Left, 0)),
@@ -76,12 +76,12 @@ struct ZCR_GUI_Orientation3D : public ZC_GUI_WinImmutable
         ecCamChangePos(ZC_Events::ConnectActiveCameraChangePosition({ &ZCR_GUI_Orientation3D::CameraChangePosition, this })),
         axisButtons
             {
-                AxisButton(L"+X", ZCR_Axis::ZCR_A_PositiveX, { 1.f, 0.f, 0.f }, ZC_PackColorUCharToUInt(255, 0, 0), ZC_PackColorUCharToUInt(255, 60, 60)),
-                AxisButton(L"-X", ZCR_Axis::ZCR_A_NegativeX, { -1.f, 0.f, 0.f }, ZC_PackColorUCharToUInt(255, 0, 0), ZC_PackColorUCharToUInt(255, 60, 60)),
-                AxisButton(L"+Y", ZCR_Axis::ZCR_A_PositiveY, { 0.f, 1.f, 0.f }, ZC_PackColorUCharToUInt(0, 255, 0), ZC_PackColorUCharToUInt(60, 255, 60)),
-                AxisButton(L"-Y", ZCR_Axis::ZCR_A_NegativeY, { 0.f, -1.f, 0.f }, ZC_PackColorUCharToUInt(0, 255, 0), ZC_PackColorUCharToUInt(60, 255, 60)),
-                AxisButton(L"+Z", ZCR_Axis::ZCR_A_PositiveZ, { 0.f, 0.f, 1.f }, ZC_PackColorUCharToUInt(0, 0, 255), ZC_PackColorUCharToUInt(60, 60, 255)),
-                AxisButton(L"-Z", ZCR_Axis::ZCR_A_NegativeZ, { 0.f, 0.f, -1.f }, ZC_PackColorUCharToUInt(0, 0, 255), ZC_PackColorUCharToUInt(60, 60, 255)),
+                AxisButton(L"+X", ZCR_Axis::ZCR_A_PositiveX, { 1.f, 0.f, 0.f }, ZC_PackColorUCharToUInt_RGB(255, 0, 0), ZC_PackColorUCharToUInt_RGB(255, 60, 60)),
+                AxisButton(L"-X", ZCR_Axis::ZCR_A_NegativeX, { -1.f, 0.f, 0.f }, ZC_PackColorUCharToUInt_RGB(255, 0, 0), ZC_PackColorUCharToUInt_RGB(255, 60, 60)),
+                AxisButton(L"+Y", ZCR_Axis::ZCR_A_PositiveY, { 0.f, 1.f, 0.f }, ZC_PackColorUCharToUInt_RGB(0, 255, 0), ZC_PackColorUCharToUInt_RGB(60, 255, 60)),
+                AxisButton(L"-Y", ZCR_Axis::ZCR_A_NegativeY, { 0.f, -1.f, 0.f }, ZC_PackColorUCharToUInt_RGB(0, 255, 0), ZC_PackColorUCharToUInt_RGB(60, 255, 60)),
+                AxisButton(L"+Z", ZCR_Axis::ZCR_A_PositiveZ, { 0.f, 0.f, 1.f }, ZC_PackColorUCharToUInt_RGB(0, 0, 255), ZC_PackColorUCharToUInt_RGB(60, 60, 255)),
+                AxisButton(L"-Z", ZCR_Axis::ZCR_A_NegativeZ, { 0.f, 0.f, -1.f }, ZC_PackColorUCharToUInt_RGB(0, 0, 255), ZC_PackColorUCharToUInt_RGB(60, 60, 255)),
             }
     {
         AxisButton::win_max_depth = (this->pObjData->depth - (depth_step_obj * 9.f));     //  window have 9 steps of depth

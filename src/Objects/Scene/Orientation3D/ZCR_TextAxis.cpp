@@ -49,8 +49,8 @@ void ZCR_TextAxis::SetState(State newState)
 {
     if (state == newState) return;
 
-    static const uint colorActiveAxis = ZC_PackColorUCharToUInt(255, 255, 255);   //  white color
-    static const uint colorPressedAxis = ZC_PackColorUCharToUInt(127, 127, 127);   //  grey color
+    static const uint colorActiveAxis = ZC_PackColorUCharToUInt_RGB(255, 255, 255);   //  white color
+    static const uint colorPressedAxis = ZC_PackColorUCharToUInt_RGB(127, 127, 127);   //  grey color
 
     //  in current state need change only drawer level if current state is don't uses depth test
     if (state == S_Pressed || (state == S_UnderCursor && newState != S_Pressed))

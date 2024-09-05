@@ -120,7 +120,7 @@ ZC_DSController ZCR_Surface::MakeSurfaceRSController()
     // ZC_RSPDStencilBorder::Make({ 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) });
 
     std::forward_list<ZC_uptr<ZC_RSPersonalData>> persDatas;
-    persDatas.emplace_front(ZC_RSPDStencilBorder::Make({ 1.05f, 1.05f, 1.05f, ZC_PackColorUCharToUInt(255, 90, 0) }));    //  stencil border color {r = 255, g = 90, b = 0}
+    persDatas.emplace_front(ZC_RSPDStencilBorder::Make({ 1.05f, 1.05f, 1.05f, ZC_PackColorUCharToUInt_RGB(255, 90, 0) }));    //  stencil border color {r = 255, g = 90, b = 0}
     return dsSurface.MakeZC_DSController(-1, std::move(persDatas));
 }
 
