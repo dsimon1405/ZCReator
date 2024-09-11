@@ -90,7 +90,9 @@
         "zcr_igwfigures.h": "c",
         "zcr_igw_figure": "cpp",
         "*.h copy": "c",
-        "zc_gui_": "c"
+        "zc_gui_": "c",
+        "zc_gui_ddvariantcpp": "c",
+        "zc_gui_iconuv.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

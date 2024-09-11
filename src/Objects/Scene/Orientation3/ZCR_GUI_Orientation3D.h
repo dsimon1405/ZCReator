@@ -1,9 +1,9 @@
 #pragma once
 
-#include <ZC/GUI/ZC_GUI_WinImmutable.h>
+#include <ZC/GUI/Backend/Window/ZC_GUI_WinImmutable.h>
 #include <ZC/Events/ZC_Events.h>
 #include <ZC/Tools/Math/ZC_Mat.h>
-#include <ZC/GUI/ZC_GUI_ButtonMouseText.h>
+#include <ZC/GUI/Backend/Button/ZC_GUI_ButtonMouseText.h>
 #include <Objects/Scene/ZCR_Axis.h>
 
 struct ZCR_GUI_Orientation3D : public ZC_GUI_WinImmutable
