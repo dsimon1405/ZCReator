@@ -56,6 +56,7 @@
 #include <ZC/GUI/Backend/Window/ZC_GUI_TextInputWindow.h>
 #include <ZC/GUI/Backend/Button/ZC_GUI_ButtonNumber.h>
 #include <ZC/GUI/Backend/ZC_GUI_ColorManipulator.h>
+#include <ZC/GUI/Backend/ZC_GUI_DropDown.h>
 
 #include <Objects/Scene/Orientation3/ZCR_GUI_Orientation3D.h>
 
@@ -70,7 +71,7 @@
 #include <ZC/GUI/ZC_GUI__CheckBox.h>
 #include <ZC/GUI/ZC_GUI__ColorManipulator.h>
 #include <ZC/GUI/ZC_GUI__Switch.h>
-
+#include <ZC/GUI/ZC_GUI__DropDown.h>
 
 template<typename TWin>
 struct ZC_W
@@ -104,7 +105,7 @@ struct ZC_W
     ZC_uptr<ZC_GUI_ButtonMouse> pBtn3;
     ZC_uptr<ZC_GUI_ButtonMouse> pBtn4;
     
-    ZC_uptr<ZC_GUI__SwitchDropDown> pDD;
+    ZC_uptr<ZC_GUI__SwitchDropDown> upSDD;
     
     ZC_uptr<ZC_GUI__ButtonKeyboard> pBK1;
     ZC_uptr<ZC_GUI_ButtonKeyboard> pBK2;
@@ -129,6 +130,8 @@ struct ZC_W
     ZC_uptr<ZC_GUI__SwitchKeyboardUV> upSwitchUV2;
     ZC_uptr<ZC_GUI__SwitchText> upSwitchUV3;
 
+    ZC_uptr<ZC_GUI__DropDown> upDD;
+
     ZC_W() = default;
     ZC_W(float indentX, float indexntY, int indentFlags, int guiFLags, const std::wstring& text)
     {
@@ -136,6 +139,10 @@ struct ZC_W
         // pWin = new TWin(ZC_WOIData(250, 200, indentX, indexntY, indentFlags),
              guiFLags
             );
+
+        upDD = new ZC_GUI__DropDown(L"Редактировать", { L"Open", L"Create", L"", L"Exit" }, 60.f, 25.f, ZC_GUI_DDF__UnderCursor | ZC_GUI_DDF__DropIcon);
+        pWin->AddObj(upDD.Get()->GetObj());
+
 
         upColorManipulator = new ZC_GUI__ColorManipulator(true);
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(0, ZC_GUI_RowParams::Indent_X::Left, 0, 0)));
@@ -215,7 +222,7 @@ struct ZC_W
         pWin->AddObj(upTree.Get()->GetObj());
 
         pBtn1 = new ZC_GUI__ButtonMouse(30, 30, ZC_GUI_BF_M__Scroll);
-        pDD = new ZC_GUI__SwitchDropDown(std::vector<std::wstring>{L"первы", L"Вторы", L"Third", L"Four"}, 1, 100.f, 25.f);
+        upSDD = new ZC_GUI__SwitchDropDown(std::vector<std::wstring>{L"первы", L"Вторы", L"Third", L"Four"}, 1, 100.f, 25.f);
         pBtn2 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_BF_M__CursorMoveOnMBLPress);
         upBNumb = new ZC_GUI__ButtonNumberText<float>(ZC_GUI_ButtonNumber<float>(40, 30, 14.2f, 14.2f, 15.f, 0.1f, 0.2f, 2, ZC_GUI_TextAlignment::Center),
             ZC_GUI_Text(L"Red", true, 0, ZC_GUI_TextAlignment::Left), 5);
@@ -223,7 +230,7 @@ struct ZC_W
         pWin->AddObj(pBtn1.Get()->GetObj());
         pWin->AddObj(upBNumb.Get()->GetObj());
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
-        pWin->AddObj(pDD.Get()->GetObj());
+        pWin->AddObj(upSDD.Get()->GetObj());
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
         pWin->AddObj(pBtn2.Get());
 
