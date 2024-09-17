@@ -21,7 +21,7 @@ struct ZCR_GUI_Orientation3D : public ZC_GUI_WinImmutable
             : ZC_GUI_ButtonBase(ZC_GUI_ObjData(0.f, 0.f, 0, ZC_GUI_IconUV::arrow_right, ZC_GUI_Bindings::bind_tex_Icons), ZC_GUI_BF__None, {_color_default, color_under_cursor, ZC_PackColorUCharToUInt_RGB(255, 255, 255) }),
             // : ZC_GUI_ButtonBase(ZC_GUI_ObjData(0.f, 0.f, _color_default, ZC_GUI_IconUV::button, ZC_GUI_Bindings::bind_tex_Icons), ZC_GUI_BF__None, color_under_cursor, ZC_PackColorUCharToUInt(255, 255, 255)),
             ZC_GUI_ButtonMouseText(0.f, 0.f, ZC_GUI_BF__None,                                                                                           //  color black
-                ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(0.f, ZC_GUI_TextForButton::Indent::Center), wstr_axis, true, 0, ZC_GUI_TextAlignment::Left, 0)),
+                ZC_GUI_TextForButton(ZC_GUI_TFB_Indent(0.f, ZC_GUI_TFB_Indent::Center), wstr_axis, true, 0, ZC_GUI_TextAlignment::Left, 0)),
             axis(_axis),
             start_pos(_start_pos)
         {}

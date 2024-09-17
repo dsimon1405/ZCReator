@@ -1,7 +1,8 @@
 #include "ZCR_Figures.h"
 
 #include <ZC/Tools/Container/ZC_ContFunc.h>
-#include <Objects/Scene/ImGui/ZCR_IGWBM_Mode.h>
+// #include <Objects/Scene/ImGui/ZCR_IGWBM_Mode.h>
+#include <Objects/Scene/GUI/Mode/ZCR_GUI_SceneMode.h>
 #include "ZCR_ActiveFigures.h"
 
 ZCR_Figures::ZCR_Figures()
@@ -16,11 +17,16 @@ ZCR_Figures::~ZCR_Figures()
 
 void ZCR_Figures::CreateFigure(ZCR_FigureName figureName)
 {
-    if (ZCR_IGWBM_Mode::GetActiveSceneMode() != ZCR_SM_Model)
+    if (ZCR_GUI_SceneMode::GetActiveSceneMode() != ZCR_SM_Model)
     {
-        ZCR_IGWBM_Mode::SetActiveSceneMode(ZCR_SM_Model, false);
+        ZCR_GUI_SceneMode::SetActiveSceneMode(ZCR_SM_Model, false);
         for (auto& figure : pFigures->figures) figure->ChangeSceneModeAndActivity(ZCR_SM_Model, false);
     }
+    // if (ZCR_IGWBM_Mode::GetActiveSceneMode() != ZCR_SM_Model)
+    // {
+    //     ZCR_IGWBM_Mode::SetActiveSceneMode(ZCR_SM_Model, false);
+    //     for (auto& figure : pFigures->figures) figure->ChangeSceneModeAndActivity(ZCR_SM_Model, false);
+    // }
     
     MakeFigureActive((pFigures->figures.emplace_back(ZCR_FigureCreator::CreateFigure(figureName))).Get());
 }

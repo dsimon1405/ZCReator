@@ -66,6 +66,9 @@ set(ZCR_SRC_FILES ${ZCR_SRC_FILES}
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWBM_M_Edit.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWBM_M_Model.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/ImGui/ZCR_IGWBM_M_Sculpting.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/GUI/ZCR_GUI_W_Scene.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/GUI/ZCR_GUI_W_SceneOptions.cpp
+    ${PROJECT_SOURCE_DIR}/src/Objects/Scene/GUI/Mode/ZCR_GUI_SceneMode.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/Orientation3D/ZCR_Orientation3D.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/Orientation3D/ZCR_TextAxis.cpp
     ${PROJECT_SOURCE_DIR}/src/Objects/Scene/Orientation3D/ZCR_TextAxises.cpp

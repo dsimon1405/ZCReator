@@ -72,6 +72,15 @@
 #include <ZC/GUI/ZC_GUI__ColorManipulator.h>
 #include <ZC/GUI/ZC_GUI__Switch.h>
 #include <ZC/GUI/ZC_GUI__DropDown.h>
+#include <ZC/GUI/Button/ZC_GUI__Click.h>
+#include <ZC/GUI/ZC__GUI.h>
+
+#include <iostream>
+template <typename... T>
+void CBVarinat(T... index)
+{
+    ((std::cout<<index<<"    "),...)<<std::endl;
+}
 
 template<typename TWin>
 struct ZC_W
@@ -132,6 +141,11 @@ struct ZC_W
 
     ZC_uptr<ZC_GUI__DropDown> upDD;
 
+    ZC_uptr<ZC_GUI__ClickMouseText> upCMT;
+    ZC_uptr<ZC_GUI__ClickMouse> upCM;
+    ZC_uptr<ZC_GUI__ClickKeyboard> upCK;
+    ZC_uptr<ZC_GUI__ClickMouseAndKeyboard> upCBK;
+
     ZC_W() = default;
     ZC_W(float indentX, float indexntY, int indentFlags, int guiFLags, const std::wstring& text)
     {
@@ -140,18 +154,26 @@ struct ZC_W
              guiFLags
             );
 
-        upDD = new ZC_GUI__DropDown(L"Редактировать", { L"Open", L"Create", L"", L"Exit" }, 60.f, 25.f, ZC_GUI_DDF__UnderCursor | ZC_GUI_DDF__DropIcon);
+        upDD = new ZC_GUI__DropDown(L"Редактировать", { L"Open", L"Create", L"", L"Exit" }, 60.f, 25.f, ZC_GUI_DDF__UnderCursor | ZC_GUI_DDF__DropIcon, { &CBVarinat });
         pWin->AddObj(upDD.Get()->GetObj());
 
+        upCMT = new ZC_GUI__ClickMouseText(40, 40, ZC_GUI_TextForButton(ZC_GUI_TFB_Indent(15, ZC_GUI_TFB_Indent::Location::OutOfButton), L"Buba", true, 0, ZC_GUI_TextAlignment::Left), { &CBVarinat }, { &CBVarinat });
+        pWin->AddObj(upCMT.Get()->GetObj());
+        upCM = new ZC_GUI__ClickMouse(30, 30, { &CBVarinat }, nullptr);
+        pWin->AddObj(upCM.Get()->GetObj());
+        upCK = new ZC_GUI__ClickKeyboard(ZC_ButtonID::K_R, 20, 40, nullptr, { &CBVarinat });
+        pWin->AddObj(upCK.Get()->GetObj());
+        upCBK = new ZC_GUI__ClickMouseAndKeyboard(20, 40, ZC_ButtonID::K_R, nullptr, { &CBVarinat });
+        pWin->AddObj(upCBK.Get()->GetObj());
 
-        upColorManipulator = new ZC_GUI__ColorManipulator(true);
+        upColorManipulator = new ZC_GUI__ColorManipulator({ &CBVarinat }, true);
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(0, ZC_GUI_RowParams::Indent_X::Left, 0, 0)));
         pWin->AddObj(upColorManipulator.Get()->GetObj());
 
-        upSwitchUV1 = new ZC_GUI__SwitchUV({ ZC_GUI_IconUV::quad, ZC_GUI_IconUV::quad_colored, ZC_GUI_IconUV::arrow_down }, 30, 50, false, 10);
+        upSwitchUV1 = new ZC_GUI__SwitchUV({ ZC_GUI_IconUV::quad, ZC_GUI_IconUV::quad_colored, ZC_GUI_IconUV::arrow_down }, 30, 50, false, 10, { &CBVarinat });
         upSwitchUV2 = new ZC_GUI__SwitchKeyboardUV({ { ZC_GUI_IconUV::quad, ZC_ButtonID::K_A }, { ZC_GUI_IconUV::quad_colored, ZC_ButtonID::K_S },
-            { ZC_GUI_IconUV::arrow_down, ZC_ButtonID::K_D } }, 40, 40, true, 5);
-        upSwitchUV3 = new ZC_GUI__SwitchText({ L"Эники", L"Baniky", L"Ели", L"Vareniky" }, 30, 0, false, 2);
+            { ZC_GUI_IconUV::arrow_down, ZC_ButtonID::K_D } }, 40, 40, true, 5, { &CBVarinat });
+        upSwitchUV3 = new ZC_GUI__SwitchText({ L"Эники", L"Baniky", L"Ели", L"Vareniky" }, 30, 0, false, 2, { &CBVarinat });
 
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(0, ZC_GUI_RowParams::Indent_X::Left, 0, 0)));
         pText1 = new ZC_GUI__Text(L"Text Some", true, 0, ZC_GUI_TextAlignment::Left);
@@ -222,10 +244,9 @@ struct ZC_W
         pWin->AddObj(upTree.Get()->GetObj());
 
         pBtn1 = new ZC_GUI__ButtonMouse(30, 30, ZC_GUI_BF_M__Scroll);
-        upSDD = new ZC_GUI__SwitchDropDown(std::vector<std::wstring>{L"первы", L"Вторы", L"Third", L"Four"}, 1, 100.f, 25.f);
+        upSDD = new ZC_GUI__SwitchDropDown(std::vector<std::wstring>{L"первы", L"Вторы", L"Third", L"Four"}, 1, 100.f, 25.f, { &CBVarinat });
         pBtn2 = new ZC_GUI_ButtonMouse(30, 30, ZC_GUI_BF_M__CursorMoveOnMBLPress);
-        upBNumb = new ZC_GUI__ButtonNumberText<float>(ZC_GUI_ButtonNumber<float>(40, 30, 14.2f, 14.2f, 15.f, 0.1f, 0.2f, 2, ZC_GUI_TextAlignment::Center),
-            ZC_GUI_Text(L"Red", true, 0, ZC_GUI_TextAlignment::Left), 5);
+        upBNumb = new ZC_GUI__ButtonNumberText<float>(ZC_GUI_ButtonNumber<float>(40, 30, 14.2f, 14.2f, 15.f, 0.1f, 0.2f, 2, ZC_GUI_TextAlignment::Center, { &CBVarinat }), L"Red", 5);
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
         pWin->AddObj(pBtn1.Get()->GetObj());
         pWin->AddObj(upBNumb.Get()->GetObj());
@@ -234,17 +255,17 @@ struct ZC_W
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(10, ZC_GUI_RowParams::Indent_X::Left, 0, 30)));
         pWin->AddObj(pBtn2.Get());
 
-        pBMT1 = new ZC_GUI__ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrow_down);
+        pBMT1 = new ZC_GUI__ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TFB_Indent(7.f, ZC_GUI_TFB_Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrow_down);
         pBMK2 = new ZC_GUI__ButtonMouseAndKeyboard(30, 30, ZC_GUI_BF_M__Scroll, ZC_ButtonID::K_F);
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
         pWin->AddObj(pBMT1.Get()->GetObj());
         pWin->AddObj(pBMK2.Get()->GetObj());
 
-        pBMT2 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrow_down);
+        pBMT2 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TFB_Indent(7.f, ZC_GUI_TFB_Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrow_down);
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
         pWin->AddObj(pBMT2.Get());
 
-        pBMT3 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TextForButton::Indent(7.f, ZC_GUI_TextForButton::Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrow_down);
+        pBMT3 = new ZC_GUI_ButtonMouseText(20, 10, ZC_GUI_BF__MBLPress | ZC_GUI_BF_M__DoubleCLick, ZC_GUI_TextForButton(ZC_GUI_TFB_Indent(7.f, ZC_GUI_TFB_Indent::OutOfButton), L"Я chekBox", true, 0, ZC_GUI_TextAlignment::Left), ZC_GUI_IconUV::arrow_down);
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
         pWin->AddObj(pBMT3.Get());
 
@@ -256,7 +277,7 @@ struct ZC_W
         pWin->AddObj(pBtn4.Get());
 
         pBK1 = new ZC_GUI__ButtonKeyboard(ZC_ButtonID::K_N, 30, 30, false);
-        pChB = new ZC_GUI__CheckBox(L"Я chekBox", true);
+        pChB = new ZC_GUI__CheckBox(L"Я chekBox", true, { &CBVarinat });
         pBK2 = new ZC_GUI_ButtonKeyboard(ZC_ButtonID::K_M, 30, 30, true);
         pWin->AddRow(ZC_GUI_Row(ZC_GUI_RowParams(20, ZC_GUI_RowParams::Indent_X::Left, 0, 10)));
         pWin->AddObj(pBK1.Get()->GetObj());
@@ -301,7 +322,14 @@ void Foo1(const std::wstring& str)
 int counter = 0;
 void Click(ZC_ButtonID, float)
 {
-    win2->upSwitchUV3->MakeVariantActive(counter % 2 == 0 ? 1 : 3);
+    ZC__GUI::SetState(counter % 2 == 0);
+    // uchar r = 120;
+    // uchar g = 176;
+    // float r1 = 0.2;
+    // float b = 0.8;
+    // counter % 2 == 0 ? win2->upColorManipulator->SetColor<uchar>(&r, &g, nullptr, false) : win2->upColorManipulator->SetColor<float>(&r1, nullptr, &b, true);
+    // counter % 2 == 0 ? win2->upColorManipulator->SetAlpha(r1, 0) : win2->upColorManipulator->SetAlpha(b, 1);
+    // win2->upSwitchUV3->MakeVariantActive(counter % 2 == 0 ? 1 : 3, true);
     ++counter;
     // win2->pWin->SetDrawState(!(win2->pWin->IsDrawing()));
     // ZC_GUI_TextInputWindow::StartInputWindow(200, 200, 50, 40, L"lonv", {Foo1}, false);
@@ -353,11 +381,12 @@ void Boom(ZC_ButtonID, float)
 {
     // std::cout<<"BOOM"<<std::endl;
 }
-#include <iostream>
 float Round(float number, int n)
 {
     return long(number * pow(10., n)) / pow(10., n);
 }
+
+#include <assimp/vector3.h>
 
 int ZC_main()
 {

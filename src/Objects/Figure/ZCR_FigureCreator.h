@@ -5,7 +5,7 @@
 
 enum ZCR_FigureName
 {
-    ZCR_FN_Cube,
+    ZCR_FN_Cube = 0,
 };
 
 struct ZCR_FigureCreator
